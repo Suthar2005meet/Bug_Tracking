@@ -19,6 +19,8 @@ app.use('/bug',bugRoute)
 const UserRoute = require('./src/Routes/UserRouter')
 app.use('/user',UserRoute)
 
+const ProjectRoute = require('./src/Routes/ProjectRoute')
+app.use('/project',ProjectRoute)
 
 const PORT = process.env.PORT
 app.listen(PORT,()=>{
