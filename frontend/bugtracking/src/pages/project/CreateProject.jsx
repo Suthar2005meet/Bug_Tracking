@@ -1,5 +1,4 @@
 import axios from 'axios';
-import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -44,7 +43,7 @@ export const CreateProject = () => {
                 type="text"
                 placeholder="Enter project name"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
-                {...register("ProjectName", { required: "Project name is required" })}
+                {...register("projectName", { required: "Project name is required" })}
               />
               {errors.ProjectName && (
                 <p className="mt-1 text-sm text-red-600">{errors.ProjectName.message}</p>
@@ -60,7 +59,7 @@ export const CreateProject = () => {
                 type="text"
                 placeholder="Brief description of the project"
                 className="w-full px-4 py-2 border border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
-                {...register("ProjectDec")}
+                {...register("description")}
               />
             </div>
 
@@ -72,7 +71,7 @@ export const CreateProject = () => {
                 </label>
                 <select
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white outline-none transition"
-                  {...register("ProjectPriority", { required: "Please select priority" })}
+                  {...register("priority", { required: "Please select priority" })}
                 >
                   <option value="">-- Select Priority --</option>
                   <option value="Low">Low</option>
@@ -91,10 +90,10 @@ export const CreateProject = () => {
                 </label>
                 <select
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white outline-none transition"
-                  {...register("ProjectStatus")}
+                  {...register("status")}
                 >
                   <option value="">-- Select Status --</option>
-                  <option value="Working">Working</option>
+                  <option value="Working">In Progress</option>
                   <option value="Pending">Pending</option>
                   <option value="Completed">Completed</option>
                 </select>
@@ -110,7 +109,7 @@ export const CreateProject = () => {
                 <input
                   type="date"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
-                  {...register("StartDate", { required: "Start date is required" })}
+                  {...register("startDate", { required: "Start date is required" })}
                 />
                 {errors.StartDate && (
                   <p className="mt-1 text-sm text-red-600">{errors.StartDate.message}</p>
@@ -124,7 +123,7 @@ export const CreateProject = () => {
                 <input
                   type="date"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
-                  {...register("DueDate")}
+                  {...register("eueDate")}
                 />
               </div>
             </div>

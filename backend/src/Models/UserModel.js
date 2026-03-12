@@ -19,6 +19,11 @@
             type: String,
             required: true,
         },
+        
+        mobileno : {
+            type : Number,
+            required : true
+        },
 
         role: {
             type: String,

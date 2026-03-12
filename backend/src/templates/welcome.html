@@ -3,10 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Welcome to Our App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: #deeee9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+        }
+
+        .welcome-card {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .welcome-card img {
+            width: 100px;
+            height: auto;
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+
+        .welcome-card h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: #2d3436;
+        }
+
+        .welcome-card p {
+            color: #636e72;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: #00b894;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #00a082;
+            transform: translateY(-2px);
+        }
+    </style>
 </head>
 <body>
-    <img src="https://static.thenounproject.com/png/3381594-200.png" alt="">
-    <h1>Welcome to our app</h1>
+
+    <div class="welcome-card">
+        <img src="https://static.thenounproject.com/png/3381594-200.png" alt="App Icon">
+        <h1>Welcome to our app</h1>
+        <p>We're glad you're here. Discover a new way to manage your tasks and boost your productivity effortlessly.</p>
+        <a href="#" class="btn">Get Started</a>
+    </div>
+
 </body>
 </html>

@@ -24,7 +24,7 @@ export const CreateBug = () => {
           </div>
           <div>
             <label className='block text-gray-600 font-bold'>Project Name :</label>
-            <input className='border-1 border-gray-400 w-full px-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400' type="text"  {...register('projectName')}/>
+            <input className='border-1 border-gray-400 w-full px-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400' type="text"  {...register('project')}/>
           </div>
           <div>
             <label className='block text-gray-600 font-bold'>Select the component : </label>
@@ -54,17 +54,13 @@ export const CreateBug = () => {
             <input className='border-1 border-gray-400 w-full px-2 rounded-lg focus:outline-none focus:ring-2 focus:rimg-blue-400' type="text" {...register('expectedResult')} placeholder='Expected results'/>
           </div>
           <div>
-            <label className='block text-gray-600 font-bold'>Actual Result</label>
-            <input className='border-1 border-gray-400 w-full px-2 rounded-lg focus:outline-none focus:ring-2 focus:rimg-blue-400' type="text" {...register('actualResult')} placeholder='Expected results'/>
-          </div>
-          <div>
             <label className='block text-gray-600 font-bold'>Due Date</label>
             <input className='border-1 border-gray-400 w-full px-2 rounded-lg focus:outline-none focus:ring-2 focus:rimg-blue-400' type='date'  {...register('dueDate')} placeholder='Enter the date'/>
           </div>
-          <div>
+          {/* <div>
             <label className='block text-gray-600 font-bold'>Upload File/Image : </label>
             <input className='border-1 border-gray-400 w-full px-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400' {...register('uploadedDoc')} type='file' />
-          </div><br />
+          </div><br /> */}
           <div>
             <button onClick={handleSubmit} className='border-1 w-full px-2 rounded-lg bg-green-400 font-bold'>Submit</button>
           </div>

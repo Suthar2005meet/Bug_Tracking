@@ -12,6 +12,12 @@
             type: String,
         },
 
+        priority : {
+            type : String,
+            required : true,
+            enum : ["Low","Medium","High"]
+        },
+
         startDate: Date,
         endDate: Date,
 
@@ -21,18 +27,18 @@
             default: "Pending",
         },
 
-        createdBy: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-            required: true,
-        },
+        // createdBy: {
+        //     type: mongoose.Schema.Types.ObjectId,
+        //     ref: "User",
+        //     required: true,
+        // },
 
-        assignedMembers: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "User",
-            },
-        ],
+        // assignedMembers: [
+        //     {
+        //         type: mongoose.Schema.Types.ObjectId,
+        //         ref: "User",
+        //     },
+        // ],
     },
     { timestamps: true }
     );

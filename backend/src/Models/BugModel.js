@@ -2,7 +2,7 @@
 
     const BugSchema = new mongoose.Schema(
     {
-        bugTitle: {
+        title: {
             type: String,
             required: true,
         },
@@ -15,28 +15,46 @@
             default: "Medium",
         },
 
+        type : {
+            type : String,
+            enum : ["UI Based","Frontend","Backend","API"]
+        },
+
         status: {
             type: String,
             enum: ["Open", "In Progress", "Resolved", "Closed"],
             default: "Open",
         },
 
-        project: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Project",
-            required: true,
+        reproduce : {
+            type : String,
+            required : true
         },
 
-        reportedBy: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-            required: true,
+        expectedResult : {
+            type : String,
+            required : true
         },
 
-        assignedTo: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-        },
+        duedate : {
+            type : String
+        }
+        // project: {
+        //     type: mongoose.Schema.Types.ObjectId,
+        //     ref: "Project",
+        //     required: true,
+        // },
+
+        // reportedBy: {
+        //     type: mongoose.Schema.Types.ObjectId,
+        //     ref: "User",
+        //     required: true,
+        // },
+
+        // assignedTo: {
+        //     type: mongoose.Schema.Types.ObjectId,
+        //     ref: "User",
+        // },
     },
     { timestamps: true }
     );

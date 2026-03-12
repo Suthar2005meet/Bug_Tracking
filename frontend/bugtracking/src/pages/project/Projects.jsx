@@ -10,7 +10,7 @@ export const Projects = () => {
     const res = await axios.get('/project/all')
     console.log(res)
     console.log(res.data);
-    setproject(res.data)
+    setproject(res.data.data)
   }
 
   useEffect(()=>{
@@ -29,7 +29,16 @@ export const Projects = () => {
         </div>
       </div>
       <div>
-        
+        {
+          projects.map((project)=> {
+            return <div key={project._id}>
+                <div className='border-1 m-5'>
+                <h2>Project Name : {project.projectName}</h2>
+                <p>Project Description : {project.description}</p>
+              </div>
+            </div>
+          })
+        }
       </div>
     </div>
 
