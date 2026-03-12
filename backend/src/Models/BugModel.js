@@ -1,40 +1,45 @@
-const mongoose = require('mongoose')
-const Schema = mongoose.Schema
+    const mongoose = require("mongoose");
 
-const CreateBugschema = new Schema ({
-    title : {
-        type : String
-    },
-    Description : {
-        type : String
-    },
-    projectName : {
-        type : String
-    },
-    type : {
-        type : String
-    },
-    priority : {
-        type : String
-    },
-    developer : {
-        type : String
-    },
-    reproduce : {
-        type : String
-    },
-    expectedResult : {
-        type : String
-    },
-    ActualResult : {
-        type : String
-    },
-    dueDate : {
-        type : String
-    },
-    uploadedDoc : {
-        type : Object
-    }
-},{timestamps : true})
+    const BugSchema = new mongoose.Schema(
+    {
+        bugTitle: {
+            type: String,
+            required: true,
+        },
 
-module.exports = mongoose.model('bugs',CreateBugschema)
+        description: String,
+
+        priority: {
+            type: String,
+            enum: ["Low", "Medium", "High"],
+            default: "Medium",
+        },
+
+        status: {
+            type: String,
+            enum: ["Open", "In Progress", "Resolved", "Closed"],
+            default: "Open",
+        },
+
+        project: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Project",
+            required: true,
+        },
+
+        reportedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+        },
+
+        assignedTo: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+        },
+    },
+    { timestamps: true }
+    );
+
+    const BugModel = mongoose.model("Bug", BugSchema);
+    module.exports = BugModel;

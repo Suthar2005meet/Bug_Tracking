@@ -11,6 +11,7 @@ export const AddUser = () => {
     const submitHandle = async (data) => {
         try{
             const res = await axios.post("/user/create",data)
+            console.log(data);
             console.log(res);
             if(res.status = 201 ){
                 navigate("/admin/user")
@@ -19,7 +20,7 @@ export const AddUser = () => {
 
             }
         }catch(err){
-            err.err
+            console.log(err);
         }
     }
   return (
@@ -33,7 +34,7 @@ export const AddUser = () => {
                 </div>
                 <div>
                     <label className='block text-gray-600 font-bold'>Email</label>
-                    <input type="text" className='border-1 w-full border-gray-400 px-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400' placeholder='Enter User EmailID' {...register('Email')} />
+                    <input type="email" className='border-1 w-full border-gray-400 px-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400' placeholder='Enter User EmailID' {...register('email')} />
                 </div>
                 <div>
                     <label className='block text-gray-600 font-bold'>Password</label>
@@ -45,13 +46,13 @@ export const AddUser = () => {
                 </div>
                 <div>
                     <label className='block text-gray-600 font-bold'>Mobile Number</label>
-                    <input type="text" className='border-1 w-full border-gray-400 px-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400' placeholder='Enter Upper Password' {...register('MobileNo')} />
+                    <input type="text" className='border-1 w-full border-gray-400 px-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400' placeholder='Enter Upper Password' {...register('mobileNo')} />
                 </div>
                 <div>
                     <label className='block text-gray-600 font-bold'>Role</label>
                     <select className='border-1 w-full border-gray-400 px-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400' {...register('role')}>
                         <option value="">--Select Role--</option>
-                        <option value="Project Manager">Project Manager</option>
+                        <option value="ProjectManager">Project Manager</option>
                         <option value="Developer">Developer</option>
                         <option value="Tester">Tester</option>
                     </select>
