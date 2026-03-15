@@ -18,21 +18,21 @@ const AddUser = async (req,resp) => {
             return resp.status(400).json({
                 message: "Email already registered"
             })
-        }
+        }else{
 
-        const hashedPassword = await bcrypt.hash(req.body.password,10)
-        const savedUser = await UserSchema.create({...req.body,password:hashedPassword})
-        await mailSend(savedUser.email,"wellcome to our app","welcome.html")
-        resp.status(201).json({
-        message : 'User Data Saved',
-        data : savedUser
-        })
+            const hashedPassword = await bcrypt.hash(req.body.password,10)
+            const savedUser = await UserSchema.create({...req.body,password:hashedPassword})
+            await mailSend(savedUser.email,"wellcome to our app","welcome.html")
+            resp.status(201).json({
+            message : 'User Data Saved',
+            data : savedUser
+            })
+        }
     }catch(err){
         console.log(err)
         resp.status(500).json({
             message : "User Data not Saved",
             err:err
-
         })
     }
 }

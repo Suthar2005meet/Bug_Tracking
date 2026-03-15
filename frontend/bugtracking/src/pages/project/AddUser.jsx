@@ -19,8 +19,11 @@ export const AddUser = () => {
         const { confirmpassword, ...backendData } = data;
 
         try {
-            const res = await axios.post("/user/create", backendData);
-            if (res.status === 201) {
+            console.log(backendData)
+            const res = await axios.post("/user/create", backendData)
+            console.log(res.data)
+            console.log(res.data.data)
+            if (res.status == 201) {
                 toast.success("User Created Successfully!");
                 navigate("/admin/user");
             }

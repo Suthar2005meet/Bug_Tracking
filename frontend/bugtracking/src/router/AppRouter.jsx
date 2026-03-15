@@ -30,7 +30,7 @@ const router = createBrowserRouter([
             {path:'bug',element:<Bugs/>},
             {path:'bug/createbug',element:<CreateBug/>},
             {path:'bug/editbug',element:<Editbug/>},
-            {path:'bug/bugdetail',element:<BugDetails/>},
+            {path:'bug/bugdetail/:id',element:<BugDetails/>},
             {path:'project',element:<Projects/>},
             {path:'project/assignproject',element:<AssignProject/>},
             {path:'project/createproject',element:<CreateProject/>},
