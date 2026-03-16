@@ -29,7 +29,7 @@ const router = createBrowserRouter([
             {path:'',element:<AdDash/>},
             {path:'bug',element:<Bugs/>},
             {path:'bug/createbug',element:<CreateBug/>},
-            {path:'bug/editbug',element:<Editbug/>},
+            {path:'bug/editbug/:id',element:<Editbug/>},
             {path:'bug/bugdetail/:id',element:<BugDetails/>},
             {path:'project',element:<Projects/>},
             {path:'project/assignproject',element:<AssignProject/>},

@@ -2,19 +2,6 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
-/* ── Add to tailwind.config.js → theme.extend ──────────────────
-   animation: {
-     'fade-up':    'fadeUp 0.6s ease forwards',
-     'slide-in':   'slideIn 0.5s ease forwards',
-     'pop-in':     'popIn 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards',
-     'pulse-dot':  'pulse 2s cubic-bezier(0.4,0,0.6,1) infinite',
-   },
-   keyframes: {
-     fadeUp:  { '0%': { opacity:'0', transform:'translateY(24px)' }, '100%': { opacity:'1', transform:'translateY(0)' } },
-     slideIn: { '0%': { opacity:'0', transform:'translateX(-20px)' }, '100%': { opacity:'1', transform:'translateX(0)' } },
-     popIn:   { '0%': { opacity:'0', transform:'scale(0.85)' }, '100%': { opacity:'1', transform:'scale(1)' } },
-   },
-──────────────────────────────────────────────────────────────── */
 
 export const BugDetails = () => {
   const [bug, setBug]         = useState(null);

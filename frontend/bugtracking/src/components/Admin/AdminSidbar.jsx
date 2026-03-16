@@ -9,7 +9,7 @@ export const AdminSidebar = () => {
   const menuItems = [
     { name: "Dashboard", path: "/admin",         icon: <FaTachometerAlt />, badge: null },
     { name: "Users",     path: "/admin/user",     icon: <FaUsers />,         badge: null },
-    { name: "Bugs",      path: "/admin/Bug",      icon: <FaBug />,           badge: "12" },
+    { name: "Bugs",      path: "/admin/Bug",      icon: <FaBug />,           badge: null },
     { name: "Projects",  path: "/admin/project",  icon: <FaBox />,           badge: null },
     { name: "Settings",  path: "/admin/settings", icon: <FaCog />,           badge: null },
   ];
