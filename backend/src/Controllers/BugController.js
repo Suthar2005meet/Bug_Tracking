@@ -19,7 +19,7 @@
     const addBug = async (req, resp) => {
     try {
             console.log("BODY:", req.body);
-        console.log("FILE:", req.file);
+            console.log("FILE:", req.file);
 
         if (!req.file) {
         return resp.status(400).json({

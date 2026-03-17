@@ -10,22 +10,58 @@ export const CreateBug = () => {
   const navigate = useNavigate();
 
   const { register, handleSubmit, formState: { errors } } = useForm()
-  const submitHandle = async (data) =>{
-    try {
-      console.log(data);
-      const res = await axios.post("/bug/create", data);
-      console.log(res);
-      if (res.status == 201) {
-        toast.success("Bug Created Successfully!");
-        navigate("/admin/bug"); // Uncomment if you have navigation
-      }
-    }
-    catch(err){
-      console.log(err);
-      toast.error(err.response?.data?.message || "Failed to create bug");
-    }
-  }
+  // const submitHandle = async (data) =>{
+  //   try {
+  //     const formData = new FormData();
+  //     formData.append("image", data.image[0]);
 
+  //     console.log(data);
+  //     const res = await axios.post("/bug/create", data);
+  //     console.log(res);
+  //     if (res.status == 201) {
+  //       toast.success("Bug Created Successfully!");
+  //       navigate("/admin/bug"); // Uncomment if you have navigation
+  //     }
+  //   }
+  //   catch(err){
+  //     console.log(err);
+  //     toast.error(err.response?.data?.message || "Failed to create bug");
+  //   }
+  // }
+
+
+  const submitHandle = async (data) => {
+  try {
+    const formData = new FormData();
+
+    formData.append("title", data.title);
+    formData.append("description", data.description);
+    formData.append("projectName", data.projectName);
+    formData.append("type", data.type);
+    formData.append("priority", data.priority);
+    formData.append("reproduce", data.reproduce);
+    formData.append("expectedResult", data.expectedResult);
+    formData.append("dueDate", data.dueDate);
+
+    // 🔥 IMPORTANT
+    formData.append("image", data.image[0]);
+
+    const res = await axios.post("/bug/create", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    if (res.status === 201) {
+      toast.success("Bug Created Successfully!");
+      navigate("/admin/bug");
+    }
+
+  } catch (err) {
+    console.log(err);
+    toast.error(err.response?.data?.message || "Failed to create bug");
+  }
+};
   const fetchAllProjects = async () => {
     try {
       const res = await axios.get("/project/all");
@@ -57,6 +93,11 @@ export const CreateBug = () => {
             <label className='block text-gray-600 font-bold'>Description : </label>
             <textarea className='border-1 border-gray-400 w-full px-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400' {...register('description', { required: 'Description is required' })}></textarea>
             {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
+          </div>
+          <div>
+            <label className='block text-gray-600 font-bold'>Image : </label>
+            <input type="file" accept="image/*" className='border-1 border-gray-400 w-full px-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400' {...register('image', { required: "Image is required" })} />
+            {errors.image && <p className="text-red-500 text-sm">{errors.image.message}</p>}
           </div>
           <div>
             <label className='block text-gray-600 font-bold'>Select the project : </label>

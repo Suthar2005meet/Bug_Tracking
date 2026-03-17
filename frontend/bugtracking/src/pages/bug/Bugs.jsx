@@ -180,7 +180,7 @@ const BugCard = ({ bug, index, visible }) => {
             {bug.project && (
               <span className="flex items-center gap-1">
                 <span>📁</span>
-                <span className="font-medium text-slate-600">{bug.project}</span>
+                <span className="font-medium text-slate-600">{bugs.projectName}</span>
               </span>
             )}
             {bug.duedate && (
