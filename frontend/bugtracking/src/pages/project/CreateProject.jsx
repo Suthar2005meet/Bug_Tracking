@@ -50,6 +50,21 @@ export const CreateProject = () => {
               )}
             </div>
 
+            {/* Project Document */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Project Document <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="file"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                {...register("document", { required: "Project Document is required" })}
+              />
+              {errors.document && (
+                <p className="mt-1 text-sm text-red-600">{errors.document.message}</p>
+              )}
+            </div>
+
             {/* Project Description */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">

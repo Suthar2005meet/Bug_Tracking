@@ -1,8 +1,9 @@
 const router = require('express').Router()
 
 const ProjectController = require('../Controllers/ProjectController')
+const upload = require('../middlewares/uploadMiddleware')
 router.get('/all',ProjectController.getAllProject)
-router.post('/create',ProjectController.createProject)
+router.post('/create',upload.single('document'),ProjectController.createProject)
 
 
 module.exports = router
