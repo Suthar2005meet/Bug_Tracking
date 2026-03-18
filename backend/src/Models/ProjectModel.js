@@ -28,7 +28,8 @@
         },
 
         document : {
-            type : String
+            type : String,
+            require : true
         }
         // createdBy: {
         //     type: mongoose.Schema.Types.ObjectId,

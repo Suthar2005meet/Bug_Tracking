@@ -7,22 +7,54 @@ export const CreateProject = () => {
   const navigate = useNavigate();
   const { register, handleSubmit, formState: { errors } } = useForm();
 
-  const onSubmit = async (data) => {
-    try {
-      const res = await axios.post("/project/create", data);
+  // const onSubmit = async (data) => {
+  //   const formData = new FormData();
+  //   formData.append("document", data.document[0]);
+  //   try {
+  //     const res = await axios.post("/project/create", data);
 
-      if (res.status === 201) {
-        toast.success("Project created successfully!");
-        navigate('/admin/project');
-      } else {
-        toast.warn("Something went wrong. Project not saved.");
+  //     if (res.status === 201) {
+  //       toast.success("Project created successfully!");
+  //       navigate('/admin/project');
+  //     } else {
+  //       toast.warn("Something went wrong. Project not saved.");
+  //     }
+  //   } catch (error) {
+  //     console.error(error);
+  //     toast.error("Failed to create project. Please try again.");
+  //   }
+  // };
+
+  const submitHandle = async (data) => {
+  try {
+    const formData = new FormData();
+
+    formData.append("projectName", data.projectName);
+    formData.append("description", data.description);
+    formData.append("priority", data.priority);
+    formData.append("status", data.status);
+    formData.append("startDate", data.startDate);
+    formData.append("dueDate", data.dueDate);
+
+    // Important for file
+    formData.append("document", data.document[2]);
+    console.log(data)
+    const res = await axios.post("/project/create", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data"
       }
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to create project. Please try again.");
-    }
-  };
+    });
 
+    if (res.status === 201) {
+      toast.success("Project created successfully!");
+      navigate('/admin/project');
+    }
+
+  } catch (error) {
+    console.error(error);
+    toast.error("Failed to create project.");
+  }
+};
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
@@ -33,7 +65,7 @@ export const CreateProject = () => {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit(onSubmit)} className="p-6 sm:p-8 space-y-6">
+          <form onSubmit={handleSubmit(submitHandle)} className="p-6 sm:p-8 space-y-6">
             {/* Project Name */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -138,7 +170,7 @@ export const CreateProject = () => {
                 <input
                   type="date"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
-                  {...register("eueDate")}
+                  {...register("dueDate")}
                 />
               </div>
             </div>

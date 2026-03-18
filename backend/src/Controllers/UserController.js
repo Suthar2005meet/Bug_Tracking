@@ -75,6 +75,24 @@ const loginUser = async(req,resp) => {
     }
 }
 
+const testerUser = async (req,resp) =>{
+    try{
+        const res = await UserSchema.find({role:"Tester"})
+        resp.json({
+            message : "Tester User detsils found",
+            data : res
+        })
+    }catch(err){
+        console.log(err);
+        resp.status(500).json({
+            message : "Details Not Fetched"
+        })
+    }
+}
+
 module.exports = {
-    getAllUser,AddUser,loginUser
+    getAllUser,
+    AddUser,
+    loginUser,
+    testerUser
 }

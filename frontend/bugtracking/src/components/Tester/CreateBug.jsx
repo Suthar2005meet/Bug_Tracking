@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 export const CreateBug = () => {
 
   const [projects, setProjects] = useState([]);
+  const [reported, setReported] = useState([])
   const navigate = useNavigate();
 
   const { register, handleSubmit, formState: { errors } } = useForm()
@@ -75,8 +76,20 @@ export const CreateBug = () => {
     }
   }
 
+  const fetchAllReported = async()  => {
+    try{
+      const report = await axios.get("/user/tester");
+      console.log(report.data);
+      console.log(report.data.data);
+      setReported(report.data.data)
+    }catch(err){
+      console.log(err);
+    }
+  }
+
   useEffect(() => {
     fetchAllProjects();
+    fetchAllReported()
   }, []);
 
   return (
@@ -105,6 +118,17 @@ export const CreateBug = () => {
               {
                 projects.map((project) => {
                   return <option key={project._id} value={project._id}>{project.projectName}</option>;
+                })
+              }
+            </select>
+            {errors.project && <p className="text-red-500 text-sm">{errors.project.message}</p>}
+          </div>
+          <div>
+            <label className='block text-gray-600 font-bold'>ReportedBy : </label>
+            <select className='border-1 border-gray-400 w-full px-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400' {...register('projectName', { required: 'Project selection is required' })}>
+              {
+                reported.map((report) => {
+                  return <option key={report._id} value={report._id}>{report.name}</option>;
                 })
               }
             </select>

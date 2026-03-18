@@ -1,5 +1,5 @@
 const ProjectSchema = require('../Models/ProjectModel')
-const uploadToCloudinary = require('../Utils/CloudinaryUtil')
+const uploadToCloudinary = require('../Utils/uploadToCloudinary')
 
 const getAllProject = async(req,resp) => {
     const allProject = await ProjectSchema.find()

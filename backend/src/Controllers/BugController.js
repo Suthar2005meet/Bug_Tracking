@@ -1,5 +1,5 @@
     const BugSchema = require('../Models/BugModel')
-    const uploadToCloudinary = require('../Utils/CloudinaryUtil')
+    const uploadToCloudinary = require('../Utils/uploadToCloudinary')
 
 
     const allbugs = async(req,resp) => {
@@ -27,7 +27,7 @@
         });
     }
         //console.log('Response.....', cloudinaryResponse)
-        const cloudinaryResponse = await uploadToCloudinary(req.file.path)
+        const cloudinaryResponse = await uploadToCloudinary(req.file.buffer)
         console.log(req.file.path);
         console.log('Response.....', cloudinaryResponse)
         const savedbug = await BugSchema.create({...req.body,image: cloudinaryResponse.secure_url})
