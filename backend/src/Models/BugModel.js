@@ -12,38 +12,38 @@ const BugSchema = new mongoose.Schema(
         default : "https://cdn-icons-png.flaticon.com/512/564/564619.png"
     },
 
-    // description: String,
+    description: String,
 
-    // priority: {
-    //     type: String,
-    //     enum: ["Low", "Medium", "High"],
-    //     default: "Medium",
-    // },
+    priority: {
+        type: String,
+        enum: ["Low", "Medium", "High"],
+        default: "Medium",
+    },
 
-    // type : {
-    //     type : String,
-    //     enum : ["UI Based","Frontend","Backend","API"]
-    // },
+    type : {
+        type : String,
+        enum : ["UI Based","Frontend","Backend","API"]
+    },
 
-    // status: {
-    //     type: String,
-    //     enum: ["Open", "In Progress", "Resolved", "Closed"],
-    //     default: "Open",
-    // },
+    status: {
+        type: String,
+        enum: ["Open", "In Progress", "Resolved", "Closed"],
+        default: "Open",
+    },
 
-    // reproduce : {
-    //     type : String,
-    //     required : true
-    // },
+    reproduce : {
+        type : String,
+        required : true
+    },
 
-    // expectedResult : {
-    //     type : String,
-    //     required : true
-    // },
+    expectedResult : {
+        type : String,
+        required : true
+    },
 
-    // duedate : {
-    //     type : String
-    // },
+    duedate : {
+        type : String
+    },
     projectName : {
         type: mongoose.Schema.Types.ObjectId,
         ref: "projects",

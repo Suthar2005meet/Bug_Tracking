@@ -38,6 +38,9 @@ export const Login = () => {
     setLoading(true)
     try {
       const res = await axios.post('/user/login', data)
+      console.log(res.data.token);
+      localStorage.setItem("token",res.data.token)
+      localStorage.setItem("role",res.data.role)
       if (res.status === 201) {
         toast.success('Login Successfully 🎉')
         switch (res.data.role) {

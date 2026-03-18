@@ -1,7 +1,8 @@
 const router = require('express').Router()
 
 const UserController = require('../Controllers/UserController')
-router.get('/all', UserController.getAllUser)
+const validateToken = require('../middlewares/authMiddleware')
+router.get('/all',validateToken,UserController.getAllUser)
 router.post('/create',UserController.AddUser)
 router.post('/login',UserController.loginUser)
 
