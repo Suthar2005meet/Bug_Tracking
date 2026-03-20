@@ -54,10 +54,24 @@ const getProjectById = async (req,resp) => {
     }
 }
 
-
+const updateById = async (req,resp)  => {
+    try{
+        const res = await ProjectSchema.findByIdAndUpdate(req.params.id, req.body, {new : true})
+        resp.json({
+            message : "Update Succesfully",
+            data : res
+        })
+    }catch(err){
+        resp.status(500).json({
+            message : "error while fetching the data",
+            err : err
+        })
+    }
+}
 
 module.exports = {
     getAllProject,
     createProject,
-    getProjectById
+    getProjectById,
+    updateById
 }

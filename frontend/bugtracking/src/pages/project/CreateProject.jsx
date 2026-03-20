@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -6,6 +7,21 @@ import { toast } from 'react-toastify';
 export const CreateProject = () => {
   const navigate = useNavigate();
   const { register, handleSubmit, formState: { errors } } = useForm();
+  const [developer, setdeveloper] = useState([])
+
+  const getDeveloper = async () => {
+    try{
+      const res = await axios.get('/user/developer')
+      console.log(res.data.data)
+      setdeveloper(res.data.data)
+    }catch(error){
+      console.log(error);
+    }
+  }
+
+  useEffect(()=>{
+    getDeveloper()
+  },[])
 
   const submitHandle = async (data) => {
   try {
@@ -17,6 +33,14 @@ export const CreateProject = () => {
     formData.append("status", data.status);
     formData.append("startDate", data.startDate);
     formData.append("dueDate", data.dueDate);
+    
+    if (data.assignedMembers) {
+      data.assignedMembers.forEach((member) => {
+        formData.append("assignedMembers", member);
+      });
+    }
+
+
 
     // Important for file
     formData.append("document", data.document[0]);
@@ -92,6 +116,26 @@ export const CreateProject = () => {
                 {...register("description")}
               />
             </div>
+
+              {/* assigned members */}
+              <div className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+            {developer.map((dev) => (
+              <label
+                key={dev._id}
+                className="flex items-center gap-2 mb-2 cursor-pointer"
+              >
+                <input
+                  type="checkbox"
+                  value={dev._id} // store ID in database
+                  {...register("assignedMembers", { required: true })}
+                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+
+                <span>{dev.name}</span>
+              </label>
+            ))}
+          </div>
+
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Priority */}

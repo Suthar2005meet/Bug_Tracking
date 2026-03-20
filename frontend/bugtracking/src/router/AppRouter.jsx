@@ -34,7 +34,7 @@ const router = createBrowserRouter([
             {path:'project',element:<Projects/>},
             {path:'project/assignproject',element:<AssignProject/>},
             {path:'project/createproject',element:<CreateProject/>},
-            {path:'project/editproject',element:<EditProject/>},
+            {path:'project/edit/:id',element:<EditProject/>},
             {path:'project/details/:id',element:<ProjectDetails/>},
             {path:'user',element:<ShowUser/>},
             {path:'user/userdetails',element:<UserDetail/>},

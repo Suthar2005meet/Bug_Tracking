@@ -45,7 +45,11 @@
     }
 
     const getBugById = async(req,resp) => {
-        const bugdetail = await BugSchema.findById(req.params.id).populate("projectName")
+        const bugdetail = await BugSchema.findById(req.params.id).populate([
+            {path : "projectName"},
+            {path : "assigned"},
+            {path : "reportedBy"}
+        ])
         try{
             resp.json({
             message : "bug Details Fetched",

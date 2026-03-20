@@ -7,7 +7,8 @@ import { toast } from 'react-toastify';
 export const CreateBug = () => {
 
   const [projects, setProjects] = useState([]);
-  const [reported, setReported] = useState([])
+  const [reported, setReported] = useState([]);
+  const [developer, setdeveloper] = useState([]);
   const navigate = useNavigate();
 
   const { register, handleSubmit, formState: { errors } } = useForm()
@@ -43,6 +44,13 @@ export const CreateBug = () => {
     formData.append("reproduce", data.reproduce);
     formData.append("expectedResult", data.expectedResult);
     formData.append("dueDate", data.dueDate);
+    formData.append("reportedBy", data.reportedBy);
+
+    if (data.assigned) {
+      data.assigned.forEach((member) => {
+        formData.append("assigned", member);
+      });
+    }
 
     // 🔥 IMPORTANT
     formData.append("image", data.image[0]);
@@ -52,6 +60,7 @@ export const CreateBug = () => {
         "Content-Type": "multipart/form-data",
       },
     });
+    console.log(res.data.data);
 
     if (res.status === 201) {
       toast.success("Bug Created Successfully!");
@@ -87,9 +96,20 @@ export const CreateBug = () => {
     }
   }
 
+  const fetchAllDeveloper = async() => {
+    try{
+      const res = await axios.get('/user/developer')
+      console.log(res.data.data)
+      setdeveloper(res.data.data)
+    }catch(err){
+      console.log(err);
+    }
+  }
+
   useEffect(() => {
     fetchAllProjects();
-    fetchAllReported()
+    fetchAllReported();
+    fetchAllDeveloper();
   }, []);
 
   return (
@@ -125,7 +145,7 @@ export const CreateBug = () => {
           </div>
           <div>
             <label className='block text-gray-600 font-bold'>ReportedBy : </label>
-            <select className='border-1 border-gray-400 w-full px-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400' {...register('projectName', { required: 'Project selection is required' })}>
+            <select className='border-1 border-gray-400 w-full px-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400' {...register('reportedBy', { required: 'Project selection is required' })}>
               {
                 reported.map((report) => {
                   return <option key={report._id} value={report._id}>{report.name}</option>;
@@ -133,6 +153,17 @@ export const CreateBug = () => {
               }
             </select>
             {errors.project && <p className="text-red-500 text-sm">{errors.project.message}</p>}
+          </div>
+          <label className='block text-gray-600 font-bold' >Select Developer : </label>
+          <div className='border-1 border-gray-400 w-full px-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400'>
+            {
+              developer.map((dev) =>
+                <label key={dev._id} >
+                  <input type="checkbox" value={dev._id} {...register('assigned')} className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
+                  <span>{dev.name}</span>
+                </label>
+              )
+            }
           </div>
           <div>
             <label className='block text-gray-600 font-bold'>Select the component : </label>
@@ -170,10 +201,6 @@ export const CreateBug = () => {
             <input className='border-1 border-gray-400 w-full px-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400' type='date'  {...register('dueDate', { required: 'Due date is required' })} placeholder='Enter the date'/>
             {errors.dueDate && <p className="text-red-500 text-sm">{errors.dueDate.message}</p>}
           </div>
-          {/* <div>
-            <label className='block text-gray-600 font-bold'>Upload File/Image : </label>
-            <input className='border-1 border-gray-400 w-full px-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400' {...register('uploadedDoc')} type='file' />
-          </div><br /> */}
           <div>
             <button type="submit" className='border-1 w-full px-2 rounded-lg bg-green-400 font-bold'>Submit</button>
           </div>

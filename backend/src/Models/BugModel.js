@@ -41,7 +41,7 @@ const BugSchema = new mongoose.Schema(
         required : true
     },
 
-    duedate : {
+    dueDate : {
         type : String
     },
     projectName : {
@@ -51,19 +51,19 @@ const BugSchema = new mongoose.Schema(
     },
 
 
-    // reportedBy: {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: "User",
-    //     required: true,
-    // },
-
-    assignedTo: {
+    reportedBy : {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: "users",
+        required: true,
     },
+
+    assigned : [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "users",
+    }]
 },
 { timestamps: true }
 );
 
-const BugModel = mongoose.model("bug", BugSchema);
+const BugModel = mongoose.model("bugs", BugSchema);
 module.exports = BugModel;

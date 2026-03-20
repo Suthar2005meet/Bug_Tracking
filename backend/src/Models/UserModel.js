@@ -31,15 +31,15 @@
             required: true,
         },
 
-        assignedProjects: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "Project",
-            },
-        ],
+        // assignedProjects: [
+        //     {
+        //         type: mongoose.Schema.Types.ObjectId,
+        //         ref: "Project",
+        //     },
+        // ],
     },
     { timestamps: true }
     );
 
-    const UserModel = mongoose.model("User", UserSchema);
+    const UserModel = mongoose.model("users", UserSchema);
     module.exports = UserModel;
