@@ -6,6 +6,7 @@ router.get('/all',validateToken,UserController.getAllUser)
 router.post('/create',UserController.AddUser)
 router.post('/login',UserController.loginUser)
 router.get('/tester',UserController.testerUser)
+router.get('/developer',UserController.developerUser)
 
 
 module.exports = router

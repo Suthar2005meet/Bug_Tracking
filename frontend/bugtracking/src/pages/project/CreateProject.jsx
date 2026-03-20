@@ -7,24 +7,6 @@ export const CreateProject = () => {
   const navigate = useNavigate();
   const { register, handleSubmit, formState: { errors } } = useForm();
 
-  // const onSubmit = async (data) => {
-  //   const formData = new FormData();
-  //   formData.append("document", data.document[0]);
-  //   try {
-  //     const res = await axios.post("/project/create", data);
-
-  //     if (res.status === 201) {
-  //       toast.success("Project created successfully!");
-  //       navigate('/admin/project');
-  //     } else {
-  //       toast.warn("Something went wrong. Project not saved.");
-  //     }
-  //   } catch (error) {
-  //     console.error(error);
-  //     toast.error("Failed to create project. Please try again.");
-  //   }
-  // };
-
   const submitHandle = async (data) => {
   try {
     const formData = new FormData();
@@ -37,21 +19,22 @@ export const CreateProject = () => {
     formData.append("dueDate", data.dueDate);
 
     // Important for file
-    formData.append("document", data.document[2]);
+    formData.append("document", data.document[0]);
     console.log(data)
     const res = await axios.post("/project/create", formData, {
       headers: {
         "Content-Type": "multipart/form-data"
       }
     });
-
+    console.log(formData);
+    
     if (res.status === 201) {
       toast.success("Project created successfully!");
       navigate('/admin/project');
     }
 
   } catch (error) {
-    console.error(error);
+    console.log(error);
     toast.error("Failed to create project.");
   }
 };

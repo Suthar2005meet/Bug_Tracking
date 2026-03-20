@@ -16,6 +16,8 @@ export const BugDetails = () => {
       setLoading(true);
       setError(null);
       const res = await axios.get(`/bug/bug/${id}`);
+      console.log(res.data.data);
+      
       setBug(res.data.data);
       setTimeout(() => setVisible(true), 60);
     } catch (err) {

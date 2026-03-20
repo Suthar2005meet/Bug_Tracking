@@ -26,7 +26,7 @@ const router = createBrowserRouter([
     {
         path:'/admin', element:<AdminSidebar/>,
         children: [
-            {path:'',element:<AdDash/>},
+            {path:'dash',element:<AdDash/>},
             {path:'bug',element:<Bugs/>},
             {path:'bug/createbug',element:<CreateBug/>},
             {path:'bug/editbug/:id',element:<Editbug/>},
@@ -35,7 +35,7 @@ const router = createBrowserRouter([
             {path:'project/assignproject',element:<AssignProject/>},
             {path:'project/createproject',element:<CreateProject/>},
             {path:'project/editproject',element:<EditProject/>},
-            {path:'project/projectdetails',element:<ProjectDetails/>},
+            {path:'project/details/:id',element:<ProjectDetails/>},
             {path:'user',element:<ShowUser/>},
             {path:'user/userdetails',element:<UserDetail/>},
             {path:'user/adduser',element:<AddUser/>},

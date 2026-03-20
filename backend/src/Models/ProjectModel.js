@@ -18,8 +18,12 @@
             enum : ["Low","Medium","High"]
         },
 
-        startDate: Date,
-        endDate: Date,
+        startDate: {
+            type : String,
+        },
+        dueDate: {
+            type : String
+        },
 
         status: {
             type: String,
@@ -30,19 +34,20 @@
         document : {
             type : String,
             require : true
-        }
+        },
+
         // createdBy: {
         //     type: mongoose.Schema.Types.ObjectId,
-        //     ref: "User",
+        //     ref: "user",
         //     required: true,
         // },
 
-        // assignedMembers: [
-        //     {
-        //         type: mongoose.Schema.Types.ObjectId,
-        //         ref: "User",
-        //     },
-        // ],
+        assignedMembers : [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "user",
+            },
+        ],
     },
     { timestamps: true }
     );

@@ -51,16 +51,16 @@ const BugSchema = new mongoose.Schema(
     },
 
 
-    reportedBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        required: true,
-    },
-
-    // assignedTo: {
+    // reportedBy: {
     //     type: mongoose.Schema.Types.ObjectId,
     //     ref: "User",
+    //     required: true,
     // },
+
+    assignedTo: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+    },
 },
 { timestamps: true }
 );

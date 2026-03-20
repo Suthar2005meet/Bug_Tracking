@@ -90,9 +90,24 @@ const testerUser = async (req,resp) =>{
     }
 }
 
+const developerUser = async(req,resp) => {
+    try{
+        const res = await UserSchema.find({role:"Developer"})
+        resp.json({
+            message : "Developer Details Fetched",
+            data : res
+        })
+    }catch(err){
+        resp.status(500).json({
+            message : "Developer Detail not been exixted"
+        })
+    }
+}
+
 module.exports = {
     getAllUser,
     AddUser,
     loginUser,
-    testerUser
+    testerUser,
+    developerUser
 }

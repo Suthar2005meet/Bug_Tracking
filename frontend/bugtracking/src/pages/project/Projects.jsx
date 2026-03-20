@@ -168,7 +168,7 @@ export const Projects = () => {
                   {/* Right Actions */}
                   <div className='px-6 md:px-8 py-4 md:py-8 flex md:flex-col gap-2 border-t md:border-t-0 md:border-l border-gray-200 group-hover:border-blue-200 bg-gradient-to-b md:bg-gradient-to-l from-gray-50 to-white transition-all'>
                     <Link
-                      to='projectdetails'
+                      to={`details/${project._id}`}
                       className='px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg font-semibold text-center text-sm transition-all active:scale-95 shadow-sm hover:shadow-md'
                     >
                       Details
