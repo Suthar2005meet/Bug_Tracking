@@ -174,12 +174,6 @@ export const Projects = () => {
                       Details
                     </Link>
                     <Link
-                      to='assignproject'
-                      className='px-3 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white rounded-lg font-semibold text-center text-sm transition-all active:scale-95 shadow-sm hover:shadow-md'
-                    >
-                      Assign
-                    </Link>
-                    <Link
                       to={`edit/${project._id}`}
                       className='px-3 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg font-semibold text-center text-sm transition-all active:scale-95 shadow-sm hover:shadow-md'
                     >
