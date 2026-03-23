@@ -37,9 +37,9 @@ const router = createBrowserRouter([
             {path:'project/edit/:id',element:<EditProject/>},
             {path:'project/details/:id',element:<ProjectDetails/>},
             {path:'user',element:<ShowUser/>},
-            {path:'user/userdetails',element:<UserDetail/>},
+            {path:'user/userdetail/:id',element:<UserDetail/>},
             {path:'user/adduser',element:<AddUser/>},
-            {path:'user/edituser',element:<EditUser/>},
+            {path:'user/edituser/:id',element:<EditUser/>},
             
         ]
     },

@@ -30,13 +30,6 @@
             enum: ["Admin", "ProjectManager", "Tester", "Developer"],
             required: true,
         },
-
-        // assignedProjects: [
-        //     {
-        //         type: mongoose.Schema.Types.ObjectId,
-        //         ref: "Project",
-        //     },
-        // ],
     },
     { timestamps: true }
     );

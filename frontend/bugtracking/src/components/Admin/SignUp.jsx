@@ -62,7 +62,7 @@ export const SignUp = () => {
     setTimeout(() => {
       alert("Account Created Successfully 🎉");
       setLoading(false);
-    }, 2000);
+    }, 1000);
   };
 
   return (

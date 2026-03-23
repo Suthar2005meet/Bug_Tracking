@@ -104,10 +104,42 @@ const developerUser = async(req,resp) => {
     }
 }
 
+const getUserById = async(req,resp) => {
+    try{
+        const res = await UserSchema.findById(req.params.id)
+        resp.json({
+            message : "User Details Found",
+            data : res
+        })
+    }catch(err){
+        resp.status(500).json({
+            message : "User Id Not Found",
+            err : err
+        })
+    }
+}
+
+const updateUser = async(req,resp) => {
+    try{
+        const res = await UserSchema.findByIdAndUpdate(req.params.id, req.body,{new : true})
+        resp.json({
+            message : "Update data Successfully",
+            data : res
+        })
+    }catch(err){
+        resp.status(500).json({
+            message : "User not update",
+            err : err
+        })
+    }
+}
+
 module.exports = {
     getAllUser,
     AddUser,
     loginUser,
     testerUser,
-    developerUser
+    developerUser,
+    getUserById,
+    updateUser
 }
