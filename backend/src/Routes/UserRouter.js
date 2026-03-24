@@ -9,6 +9,8 @@ router.get('/tester',UserController.testerUser)
 router.get('/developer',UserController.developerUser)
 router.get('/details/:id',UserController.getUserById)
 router.put('/update/:id',UserController.updateUser)
+router.post('/forgotpassword',UserController.forgotPassword)
+router.put('/resetpassword',UserController.resetPassword)
 
 
 module.exports = router

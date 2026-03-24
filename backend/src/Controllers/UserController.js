@@ -134,6 +134,48 @@ const updateUser = async(req,resp) => {
     }
 }
 
+const forgotPassword = async(req,resp) => {
+
+    const {email} = req.body
+    if(!email){
+        return resp.status(400).json({
+            message : "email is not provided"
+        })
+    }
+
+    const foundUserFromEmail = await UserSchema.findOne({email:email})
+    if(foundUserFromEmail){
+        const token = jwt.sign(foundUserFromEmail.toObject(),secret,{expiresIn:60*10})
+        await mailSend(foundUserFromEmail.email,"Reset Password Link","forgetPassword.html",token)
+        resp.status(201).json({
+            message : "Mail Send Successfull",
+            token : token
+        })
+    }else{
+        resp.status(404).json({
+            message : "User Not Found"
+        })
+    }
+}
+
+const resetPassword = async(req,resp) => {
+    const {newPassword, token} = req.body
+    try{
+        const decodedUser = jwt.verify(token,secret)
+        const hashedPassword = await bcrypt.hash(newPassword,10)
+        await UserSchema.findByIdAndUpdate(decodedUser._id,{password:hashedPassword})
+        resp.status(200).json({
+            message : "Password Reset Successfully"
+        })
+
+    }catch(err){
+        console.log(err)
+        resp.status(500).json({
+            message : "Password not sucessfully"
+        })
+    }
+}
+
 module.exports = {
     getAllUser,
     AddUser,
@@ -141,5 +183,7 @@ module.exports = {
     testerUser,
     developerUser,
     getUserById,
-    updateUser
+    updateUser,
+    forgotPassword,
+    resetPassword
 }

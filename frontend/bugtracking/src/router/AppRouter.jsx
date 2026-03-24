@@ -20,10 +20,14 @@ import { ProjectDetails } from "../pages/project/ProjectDetails";
 import { Projects } from "../pages/project/Projects";
 import { PmNavbar } from "../components/projetcmanager/PmNavbar";
 import { TestDashBoard } from "../components/Tester/TestDashBoard";
+import { ForgotPassword } from "../components/Admin/ForgotPassword";
+import { ResetPassword } from "../components/Admin/ResetPassword";
 
 const router = createBrowserRouter([
     {path:'/' , element:<Login/>},
     {path:'/signup', element:<SignUp/>},
+    {path:"/forgetpassword",element:<ForgotPassword/>},
+    {path:"/resetpassword/:token",element:<ResetPassword/>},
     {
         path:'/admin', element:<AdminSidebar/>,
         children: [

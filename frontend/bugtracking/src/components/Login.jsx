@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import bugimg from '../assets/bug.png'
+import { Link } from 'react-router-dom'
 
 /* ─── Floating particle component ─────────────────────────── */
 const Particle = ({ style }) => (
@@ -235,6 +236,11 @@ export const Login = () => {
                     {showPassword ? 'Hide' : 'Show'}
                   </button>
                 </div>
+              </div>
+
+              {/* forgetpassword */}
+              <div>
+                <Link to="/forgetpassword" >Forget Paassword</Link>
               </div>
 
               {/* Submit */}
