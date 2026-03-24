@@ -67,12 +67,12 @@ export const Bugs = () => {
               <span className="rounded-full bg-blue-100 px-3 py-1 font-mono text-xs font-bold text-blue-600">
                 {filteredBugs.length} found
               </span>
-              <Link
+              {/* <Link
                 to="createbug"
                 className="rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2.5 font-mono text-xs font-bold uppercase tracking-widest text-white shadow-lg shadow-blue-200 transition-all hover:scale-105 hover:shadow-xl hover:shadow-blue-300 active:scale-95"
               >
                 + Report Bug
-              </Link>
+              </Link> */}
             </div>
           </div>
         </div>

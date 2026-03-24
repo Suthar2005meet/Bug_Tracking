@@ -77,6 +77,16 @@
         }
     }
 
+    const getBugByStatus = async(req,resp) => {
+        try {
+            const statusData = await BugSchema.findOne
+        }catch(err){
+            resp.status(500).json({
+                message : "Data not found"
+            })
+        }
+    }
+
     module.exports = {
         addBug,
         allbugs,

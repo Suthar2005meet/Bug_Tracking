@@ -19,6 +19,7 @@ import { EditProject } from "../pages/project/EditProject";
 import { ProjectDetails } from "../pages/project/ProjectDetails";
 import { Projects } from "../pages/project/Projects";
 import { PmNavbar } from "../components/projetcmanager/PmNavbar";
+import { TestDashBoard } from "../components/Tester/TestDashBoard";
 
 const router = createBrowserRouter([
     {path:'/' , element:<Login/>},
@@ -53,9 +54,11 @@ const router = createBrowserRouter([
     {
         path:'/tester', element:<TesterNavbar/>,
         children:[
+            {path:'dashboard',element:<TestDashBoard/>},
             {path:'createbug',element:<CreateBug/>},
-            {path:'allbug',element:<Bugs/>},
-            {path:'bugdetail',element:<BugDetails/>}
+            {path:'bug',element:<Bugs/>},
+            {path:'bug/bugdetail/:id',element:<BugDetails/>},
+            {path:'profile/:id',element:<UserDetail/>}
         ]
     },
     {
