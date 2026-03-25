@@ -1,13 +1,13 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 export const BugDetails = () => {
   const [bug, setBug] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [developer, setdeveloper] = useState([]);
-  const [projecr, setproject] = useState([]);
+  const [project, setproject] = useState([]);
   const [tester, settester] = useState([]);
   const { id } = useParams();
   const navigate = useNavigate();
@@ -24,7 +24,7 @@ export const BugDetails = () => {
 
   const fetchAllProject = async () => {
     try {
-      const res = await axios.get("project/all");
+      const res = await axios.get("/project/all");
       console.log(res.data.data);
       setproject(res.data.data);
     } catch (err) {

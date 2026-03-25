@@ -42,6 +42,7 @@ export const Login = () => {
       console.log(res.data.token);
       localStorage.setItem("token",res.data.token)
       localStorage.setItem("role",res.data.role)
+      // localStorage.setItem("userId",res.data.userId)
       if (res.status === 201) {
         toast.success('Login Successfully 🎉')
         switch (res.data.role) {

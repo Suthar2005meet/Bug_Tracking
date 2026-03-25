@@ -1,5 +1,4 @@
 import axios from 'axios'
-import React from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
@@ -10,10 +9,15 @@ export const ForgotPassword = () => {
     const navigate = useNavigate()
 
     const submitHandle = async (data) => {
-        const res = await axios.post('/user/forgotpassword', data)
-        if (res.status == 201) {
-            navigate('/')
-            toast.success('Reset password link sent to your Email')
+        try {
+            const res = await axios.post('/user/forgotpassword', data)
+            if (res.status == 201) {
+                navigate('/')
+                toast.success('Reset password link sent to your Email')
+            }
+        } catch (err) {
+            console.log(err)
+            toast.error(err.response?.data?.message || 'Failed to send reset link')
         }
     }
 

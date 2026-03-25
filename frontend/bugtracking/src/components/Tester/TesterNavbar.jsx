@@ -1,11 +1,17 @@
 import React, { useState, useRef, useEffect } from "react";
-import { NavLink, Outlet, Link, useParams } from "react-router-dom";
+import { NavLink, Outlet, Link, useParams, useNavigate } from "react-router-dom";
 import { FaBug, FaUserCircle } from "react-icons/fa";
+import { jwtDecode } from "jwt-decode";
 
 export const TesterNavbar = () => {
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef(null);
-  const { id } = useParams();
+
+  const token = localStorage.getItem("token")
+  const decode = jwtDecode(token)
+  console.log(decode)
+  const id = decode._id
+  console.log(id)
 
   const navLinks = [
     { name: "Dashboard", path: "dashboard" },
@@ -89,8 +95,7 @@ export const TesterNavbar = () => {
 
                     {/* Menu Items */}
                     <div className="py-1">
-                      <Link
-                        to={`/tester/profile/${id}`}
+                      <Link to={`/tester/profile/${id}`}
                         onClick={() => setProfileOpen(false)}
                         className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-slate-600 hover:text-indigo-700 hover:bg-indigo-50 transition-all duration-150 group"
                       >

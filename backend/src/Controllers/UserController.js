@@ -121,7 +121,10 @@ const getUserById = async(req,resp) => {
 
 const updateUser = async(req,resp) => {
     try{
-        const res = await UserSchema.findByIdAndUpdate(req.params.id, req.body,{new : true})
+        const cloudinaryResponse = await uploadToCloudinary(req.file.buffer)
+        console.log(req.file.path);
+        console.log('Response.....', cloudinaryResponse)
+        const res = await UserSchema.findByIdAndUpdate({...req.body,image: cloudinaryResponse.secure_url})
         resp.json({
             message : "Update data Successfully",
             data : res

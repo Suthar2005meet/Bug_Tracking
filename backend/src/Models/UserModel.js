@@ -33,7 +33,7 @@
 
         image : {
             type : String,
-            default : " "
+            default : "https://icon-icons.com/icon/avatar-default-user/92824 "
         },
 
         bio : {

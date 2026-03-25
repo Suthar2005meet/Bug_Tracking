@@ -1,28 +1,30 @@
 import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
 import { AdDash } from "../components/Admin/AdDash";
-import { AddUser } from "../pages/project/AddUser";
 import { AdminSidebar } from "../components/Admin/AdminSidbar";
+import { ForgotPassword } from "../components/Admin/ForgotPassword";
 import { AssignProject } from "../components/Admin/project/AssignProject";
+import { ResetPassword } from "../components/Admin/ResetPassword";
 import { SignUp } from "../components/Admin/SignUp";
 import { EditUser } from "../components/Admin/users/EditUser";
 import { ShowUser } from "../components/Admin/users/ShowUser";
 import { UserDetail } from "../components/Admin/users/UserDetail";
 import { DevelopNavbar } from "../components/developer/DevelopNavbar";
 import { Login } from "../components/Login";
+import { PmDashboard } from "../components/projetcmanager/PmDashboard";
+import { PmNavbar } from "../components/projetcmanager/PmNavbar";
+import { ProtectedRoutes } from "../components/ProtectedRoutes";
 import { CreateBug } from "../components/Tester/CreateBug";
+import { TestDashBoard } from "../components/Tester/TestDashBoard";
 import { TesterNavbar } from "../components/Tester/TesterNavbar";
 import { BugDetails } from "../pages/bug/BugDetails";
 import { Bugs } from "../pages/bug/Bugs";
-import { CreateProject } from "../pages/project/CreateProject";
 import { Editbug } from "../pages/bug/Editbug";
+import { AddUser } from "../pages/project/AddUser";
+import { CreateProject } from "../pages/project/CreateProject";
 import { EditProject } from "../pages/project/EditProject";
 import { ProjectDetails } from "../pages/project/ProjectDetails";
 import { Projects } from "../pages/project/Projects";
-import { PmNavbar } from "../components/projetcmanager/PmNavbar";
-import { TestDashBoard } from "../components/Tester/TestDashBoard";
-import { ForgotPassword } from "../components/Admin/ForgotPassword";
-import { ResetPassword } from "../components/Admin/ResetPassword";
-import { PmDashboard } from "../components/projetcmanager/PmDashboard";
+import { ProfileUser } from "../components/Admin/users/ProfileUser";
 
 const router = createBrowserRouter([
     {path:'/' , element:<Login/>},
@@ -54,18 +56,21 @@ const router = createBrowserRouter([
         path:'/developer', element:<DevelopNavbar/>,
         children:[
             {path:'projects',element:<Projects/>},
-            {path:'bugs',element:<Bugs/>}
+            {path:'bugs',element:<Bugs/>},
+            {path:'profile/:id',element:<ProfileUser/>}
         ]
     },
     {
-        path:'/tester', element:<TesterNavbar/>,
+        path:'/tester', element:<ProtectedRoutes userRoles={["Tester"]}>
+            <TesterNavbar/>,
+        </ProtectedRoutes>,
         children:[
             {index: true,element:<Navigate to="dashboard" replace />},
             {path:'dashboard',element:<TestDashBoard/>},
             {path:'createbug',element:<CreateBug/>},
             {path:'bug',element:<Bugs/>},
             {path:'bug/bugdetail/:id',element:<BugDetails/>},
-            {path:'tester/profile/:id',element:<UserDetail/>},
+            {path:'profile/:id',element:<ProfileUser/>},
             {path:'bug/editbug/:id',element:<Editbug/>}
         ]
     },

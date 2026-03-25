@@ -1,11 +1,15 @@
-import React, { useState } from "react";
+import axios from "axios";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export const SignUp = () => {
 
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const password = watch("password");
 
@@ -55,14 +59,19 @@ export const SignUp = () => {
     }
   ];
 
-  const onSubmit = (data) => {
-    setLoading(true);
-    console.log(data);
-
-    setTimeout(() => {
-      alert("Account Created Successfully 🎉");
+  const onSubmit = async (data) => {
+    try {
+      setLoading(true);
+      const { confirmPassword, ...signupData } = data;
+      const res = await axios.post('/user/signup', signupData);
+      toast.success('Account Created Successfully 🎉');
+      navigate('/');
+    } catch (err) {
+      console.log(err);
+      toast.error(err.response?.data?.message || 'Failed to create account');
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   return (
