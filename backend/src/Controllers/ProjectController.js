@@ -69,9 +69,33 @@ const updateById = async (req,resp)  => {
     }
 }
 
+const getProjectByStatus = async(req,resp) => {
+    try{
+        const statusData = await ProjectSchema.aggregate([
+        {
+            $group : {
+                _id : "$status",
+                total : { $sum : 1}
+            }
+        }
+        ])
+        resp.status(200).json({
+            success : true,
+            data : statusData
+        })
+    }catch(err){
+        console.log(err)
+        resp.status(500).json({
+            message : "Data not Found",
+            data : err.message
+        })
+    }
+}
+
 module.exports = {
     getAllProject,
     createProject,
     getProjectById,
-    updateById
+    updateById,
+    getProjectByStatus
 }

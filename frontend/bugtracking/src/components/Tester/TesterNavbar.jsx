@@ -90,7 +90,7 @@ export const TesterNavbar = () => {
                     {/* Menu Items */}
                     <div className="py-1">
                       <Link
-                        to={`/profile/${id}`}
+                        to={`/tester/profile/${id}`}
                         onClick={() => setProfileOpen(false)}
                         className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-slate-600 hover:text-indigo-700 hover:bg-indigo-50 transition-all duration-150 group"
                       >

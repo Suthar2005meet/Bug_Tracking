@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { FaBars, FaBox, FaBug, FaChevronRight, FaCog, FaUsers } from "react-icons/fa";
+import { FaDatabase } from "react-icons/fa6";
 import { Link, NavLink, Outlet } from "react-router-dom";
 
 export const AdminSidebar = () => {
@@ -7,7 +8,7 @@ export const AdminSidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
 
   const menuItems = [
-    //{ name: "Dashboard", path: "/admin/dash",         icon: <FaTachometerAlt />, badge: null },
+    { name: "Dashboard", path: "/admin/dashboard",icon: <FaDatabase />,                badge: null },
     { name: "Users",     path: "/admin/user",     icon: <FaUsers />,         badge: null },
     { name: "Bugs",      path: "/admin/Bug",      icon: <FaBug />,           badge: null },
     { name: "Projects",  path: "/admin/project",  icon: <FaBox />,           badge: null },

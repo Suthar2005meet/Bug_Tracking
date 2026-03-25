@@ -77,19 +77,34 @@
         }
     }
 
-    const getBugByStatus = async(req,resp) => {
+    const getBugByStatus = async (req, res) => {
         try {
-            const statusData = await BugSchema.findOne
-        }catch(err){
-            resp.status(500).json({
-                message : "Data not found"
-            })
+            const statusData = await BugSchema.aggregate([
+            {
+                $group: {
+                _id: "$status",      // group by status field
+                total: { $sum: 1 }   // count documents
+                }
+            }
+            ]);
+
+            res.status(200).json({
+            success: true,
+            data: statusData
+            });
+
+        } catch (err) {
+            res.status(500).json({
+            message: "Data not found",
+            error: err.message
+            });
         }
-    }
+    };
 
     module.exports = {
         addBug,
         allbugs,
         getBugById,
-        uppdateBug
+        uppdateBug,
+        getBugByStatus,
     }

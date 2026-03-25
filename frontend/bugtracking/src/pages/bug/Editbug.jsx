@@ -28,9 +28,9 @@ export const Editbug = () => {
   const submitHandle = async (data) => {
     try {
       const res = await axios.put(`/bug/update/${id}`, data);
-      if (res.status === 200) {
+      if (res.status == 200) {
         toast.success("Bug Updated Successfully!");
-        navigate("/admin/bug");
+        navigate(-1);
       }
     } catch (error) {
       console.log(error);

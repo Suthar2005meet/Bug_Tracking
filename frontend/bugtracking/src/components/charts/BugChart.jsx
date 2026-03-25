@@ -1,14 +1,39 @@
+    import axios from "axios";
 import { ArcElement, Chart as ChartJS, Legend, Tooltip } from "chart.js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
+import { useEffect, useState } from "react";
 import { Doughnut } from "react-chartjs-2";
 
     ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels);
 
-    const UserChart = () => {
-    const dataValues = [10, 45, 25, 20];
+    const BugChart = () => {
+    const [labels, setLabels] = useState([]);
+    const [dataValues, setDataValues] = useState([]);
+
+    useEffect(() => {
+        getBugStatus();
+    }, []);
+
+    const getBugStatus = async () => {
+        try {
+        const res = await axios.get("/bug/status");
+
+        const apiData = res.data.data;
+
+        // Extract from your response format
+        const statusLabels = apiData.map(item => item._id);
+        const statusCounts = apiData.map(item => item.total);
+
+        setLabels(statusLabels);
+        setDataValues(statusCounts);
+
+        } catch (err) {
+        console.log(err);
+        }
+    };
 
     const data = {
-        labels: ["Admin", "Customer", "Guest", "Moderator"],
+        labels: labels,
         datasets: [
         {
             data: dataValues,
@@ -35,10 +60,10 @@ import { Doughnut } from "react-chartjs-2";
 
     return (
         <div style={{ width: "400px", margin: "50px auto" }}>
-        <h2>User Distribution</h2>
+        <h2>Bug Status Distribution</h2>
         <Doughnut data={data} options={options} />
         </div>
     );
     };
 
-    export default UserChart;
+    export default BugChart;

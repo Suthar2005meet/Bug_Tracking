@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
 import { AdDash } from "../components/Admin/AdDash";
 import { AddUser } from "../pages/project/AddUser";
 import { AdminSidebar } from "../components/Admin/AdminSidbar";
@@ -22,6 +22,7 @@ import { PmNavbar } from "../components/projetcmanager/PmNavbar";
 import { TestDashBoard } from "../components/Tester/TestDashBoard";
 import { ForgotPassword } from "../components/Admin/ForgotPassword";
 import { ResetPassword } from "../components/Admin/ResetPassword";
+import { PmDashboard } from "../components/projetcmanager/PmDashboard";
 
 const router = createBrowserRouter([
     {path:'/' , element:<Login/>},
@@ -31,7 +32,8 @@ const router = createBrowserRouter([
     {
         path:'/admin', element:<AdminSidebar/>,
         children: [
-            {path:'dash',element:<AdDash/>},
+            {index: true,element:<Navigate to="dashboard" replace />},
+            {path:'dashboard',element:<AdDash/>},
             {path:'bug',element:<Bugs/>},
             {path:'bug/createbug',element:<CreateBug/>},
             {path:'bug/editbug/:id',element:<Editbug/>},
@@ -58,18 +60,23 @@ const router = createBrowserRouter([
     {
         path:'/tester', element:<TesterNavbar/>,
         children:[
+            {index: true,element:<Navigate to="dashboard" replace />},
             {path:'dashboard',element:<TestDashBoard/>},
             {path:'createbug',element:<CreateBug/>},
             {path:'bug',element:<Bugs/>},
             {path:'bug/bugdetail/:id',element:<BugDetails/>},
-            {path:'profile/:id',element:<UserDetail/>}
+            {path:'tester/profile/:id',element:<UserDetail/>},
+            {path:'bug/editbug/:id',element:<Editbug/>}
         ]
     },
     {
         path:'/projectmanager', element:<PmNavbar/>,
         children:[
+            {index: true,element:<Navigate to="dashboard" replace />},
+            {path:'dashboard',element:<PmDashboard/>},
             {path:'bugs',element:<Bugs/>},
             {path:'projects',element:<Projects/>},
+            {path:'user',element:<ShowUser/>}
 
         ]
     }

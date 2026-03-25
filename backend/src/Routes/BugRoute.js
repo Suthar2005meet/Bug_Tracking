@@ -7,6 +7,7 @@ router.get('/all',BugController.allbugs)
 router.post('/create',upload.single("image"),BugController.addBug)
 router.get('/bug/:id',BugController.getBugById)
 router.put('/update/:id',BugController.uppdateBug)
+router.get('/status',BugController.getBugByStatus)
 
 
 module.exports = router

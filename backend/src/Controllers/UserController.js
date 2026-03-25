@@ -176,6 +176,29 @@ const resetPassword = async(req,resp) => {
     }
 }
 
+const getUserByRole = async(req,resp) => {
+    try{
+        const roleData = await UserSchema.aggregate([
+        {
+            $group : {
+                _id : "$role",
+                total : { $sum : 1}
+            }
+        }
+        ])
+        resp.status(200).json({
+            success : true,
+            data : roleData
+        })
+    }catch(err){
+        console.log(err)
+        resp.status(500).json({
+            message : "Data not Found",
+            data : err.message
+        })
+    }
+}
+
 module.exports = {
     getAllUser,
     AddUser,
@@ -185,5 +208,6 @@ module.exports = {
     getUserById,
     updateUser,
     forgotPassword,
-    resetPassword
+    resetPassword,
+    getUserByRole
 }
