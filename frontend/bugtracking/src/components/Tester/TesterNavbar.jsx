@@ -11,7 +11,6 @@ export const TesterNavbar = () => {
   const decode = jwtDecode(token)
   console.log(decode)
   const id = decode._id
-  console.log(id)
 
   const navLinks = [
     { name: "Dashboard", path: "dashboard" },
