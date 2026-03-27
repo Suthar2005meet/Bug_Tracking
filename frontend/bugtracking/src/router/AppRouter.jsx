@@ -2,10 +2,11 @@ import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom"
 import { AdDash } from "../components/Admin/AdDash";
 import { AdminSidebar } from "../components/Admin/AdminSidbar";
 import { ForgotPassword } from "../components/Admin/ForgotPassword";
-import { AssignProject } from "../components/Admin/project/AssignProject";
+import { AssignProject } from "../components/projetcmanager/AssignProject";
 import { ResetPassword } from "../components/Admin/ResetPassword";
 import { SignUp } from "../components/Admin/SignUp";
 import { EditUser } from "../components/Admin/users/EditUser";
+import { ProfileUser } from "../components/Admin/users/ProfileUser";
 import { ShowUser } from "../components/Admin/users/ShowUser";
 import { UserDetail } from "../components/Admin/users/UserDetail";
 import { DevelopNavbar } from "../components/developer/DevelopNavbar";
@@ -16,6 +17,7 @@ import { ProtectedRoutes } from "../components/ProtectedRoutes";
 import { CreateBug } from "../components/Tester/CreateBug";
 import { TestDashBoard } from "../components/Tester/TestDashBoard";
 import { TesterNavbar } from "../components/Tester/TesterNavbar";
+import { AddComment } from "../pages/bug/AddComment";
 import { BugDetails } from "../pages/bug/BugDetails";
 import { Bugs } from "../pages/bug/Bugs";
 import { Editbug } from "../pages/bug/Editbug";
@@ -24,7 +26,6 @@ import { CreateProject } from "../pages/project/CreateProject";
 import { EditProject } from "../pages/project/EditProject";
 import { ProjectDetails } from "../pages/project/ProjectDetails";
 import { Projects } from "../pages/project/Projects";
-import { ProfileUser } from "../components/Admin/users/ProfileUser";
 
 const router = createBrowserRouter([
     {path:'/' , element:<Login/>},
@@ -41,7 +42,7 @@ const router = createBrowserRouter([
             {path:'bug/editbug/:id',element:<Editbug/>},
             {path:'bug/bugdetail/:id',element:<BugDetails/>},
             {path:'project',element:<Projects/>},
-            {path:'project/assignproject',element:<AssignProject/>},
+            {path:'project/assign/:id',element:<AssignProject/>},
             {path:'project/createproject',element:<CreateProject/>},
             {path:'project/edit/:id',element:<EditProject/>},
             {path:'project/details/:id',element:<ProjectDetails/>},
@@ -53,7 +54,9 @@ const router = createBrowserRouter([
         ]
     },
     {
-        path:'/developer', element:<DevelopNavbar/>,
+        path:'/developer', element:<ProtectedRoutes userRoles={["Developer"]}>
+        <DevelopNavbar/>
+        </ProtectedRoutes>,
         children:[
             {path:'projects',element:<Projects/>},
             {path:'bugs',element:<Bugs/>},
@@ -70,17 +73,22 @@ const router = createBrowserRouter([
             {path:'createbug',element:<CreateBug/>},
             {path:'bug',element:<Bugs/>},
             {path:'bug/bugdetail/:id',element:<BugDetails/>},
-            {path:'profile/:id',element:<ProfileUser/>},
+            {path:'bug/comment/:id',element:<AddComment/>},
+            {path:'profile/:id',element:<EditUser/>},
             {path:'bug/editbug/:id',element:<Editbug/>}
         ]
     },
     {
-        path:'/projectmanager', element:<PmNavbar/>,
+        path:'/projectmanager', element:<ProtectedRoutes userRoles={['ProjectManager']}><PmNavbar/></ProtectedRoutes>,
         children:[
             {index: true,element:<Navigate to="dashboard" replace />},
             {path:'dashboard',element:<PmDashboard/>},
             {path:'bugs',element:<Bugs/>},
             {path:'projects',element:<Projects/>},
+            {path:'projects/details/:id',element:<ProjectDetails/>},
+            {path:'projects/createproject',element:<CreateProject/>},
+            {path:'projects/edit/:id',element:<EditProject/>},
+            {path:'projects/assign/:id',element:<AssignProject/>},
             {path:'user',element:<ShowUser/>}
 
         ]

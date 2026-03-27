@@ -45,9 +45,16 @@
         assignedMembers : [
             {
                 type: mongoose.Schema.Types.ObjectId,
-                ref: "user",
+                ref: "users",
             },
         ],
+
+        assignedTester : [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "users"
+            }
+        ]
     },
     { timestamps: true }
     );

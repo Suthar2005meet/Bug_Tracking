@@ -5,23 +5,8 @@ import { useParams } from "react-router-dom";
 export const ProjectDetails = () => {
   const [project, setProject] = useState(null);
   const [error, setError] = useState(null);
-  const [developer , setdeveloper] = useState(null);
   const { id } = useParams();
 
-  const getDeveloper = async() => {
-    try{
-      const res = await axios.get('/user/developer')
-      console.log(res.data.data);
-      setdeveloper(res.data.data)
-    }catch(err){
-      console.log(err);
-      
-    }
-  }
-
-  useEffect(()=>{
-    getDeveloper();
-  },[])
 
   useEffect(() => {
     const Details = async () => {
@@ -161,12 +146,26 @@ export const ProjectDetails = () => {
           </p>
           {project.assignedMembers && project.assignedMembers.length > 0 ? (
             <div className="flex flex-wrap gap-2">
-              {developer.map((member) => (
-                <span
-                  key={member._id}
-                  className="px-3 py-1 text-sm bg-indigo-50 text-indigo-700 rounded-full border border-indigo-200"
-                >
-                  {member.name}
+              {project.assignedMembers.map((member, index) => (
+                <span key={index} className="px-3 py-1 text-sm bg-indigo-50 text-indigo-700 rounded-full border border-indigo-200">
+                  {member.name || member}
+                </span>
+              ))}
+            </div>
+          ) : (
+            <span className="text-sm text-slate-400">No members assigned</span>
+          )}
+        </div>
+
+        <div className="bg-white border border-slate-200 shadow-sm px-6 py-5 border-l-4 border-l-red-400">
+          <p className="text-xs uppercase tracking-widest text-slate-400 mb-2">
+            Assigned Tester
+          </p>
+          {project.assignedTester && project.assignedTester.length > 0 ? (
+            <div className="flex flex-wrap gap-2">
+              {project.assignedTester.map((tester, index) => (
+                <span key={index} className="px-3 py-1 text-sm bg-indigo-50 text-indigo-700 rounded-full border border-indigo-200">
+                  {tester.name || tester}
                 </span>
               ))}
             </div>

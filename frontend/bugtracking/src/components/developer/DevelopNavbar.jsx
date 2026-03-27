@@ -7,11 +7,11 @@ export const DevelopNavbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef(null);
-
+  
   const navLinks = [
     { name: "Dashboard",  path: "/developer" },
-    { name: "Projects",   path: "projects" },
-    { name: "Manage Bug", path: "bugs" },
+    { name: "Projects",   path: "/projects" },
+    { name: "Manage Bug", path: "/bugs" },
     { name: "Reports",    path: "/reports" },
   ];
 

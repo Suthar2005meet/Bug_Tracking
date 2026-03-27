@@ -113,7 +113,7 @@ export const CreateProject = () => {
           </div>
 
           {/* Assigned Members */}
-          <div className="bg-rose-50 border border-rose-200 border-l-4 border-l-rose-500 p-5 hover:bg-rose-100 hover:border-l-rose-600">
+          {/* <div className="bg-rose-50 border border-rose-200 border-l-4 border-l-rose-500 p-5 hover:bg-rose-100 hover:border-l-rose-600">
             <label className="block text-xs font-mono text-rose-600 uppercase tracking-widest mb-3">
               Assign Members <span className="text-red-400">*</span>
             </label>
@@ -133,7 +133,7 @@ export const CreateProject = () => {
                 </label>
               ))}
             </div>
-          </div>
+          </div> */}
 
           {/* Priority & Status */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

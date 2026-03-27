@@ -2,19 +2,19 @@
 
     const CommentSchema = new mongoose.Schema(
     {
-        bug: {
+        bugId: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "Bug",
+            ref: "bugs",
             required: true,
         },
 
-        user: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-            required: true,
+        userId : {
+            type : mongoose.Schema.Types.ObjectId,
+            ref: "users",
+            required:true
         },
 
-        message: {
+        comment: {
             type: String,
             required: true,
         },
@@ -22,5 +22,5 @@
     { timestamps: true }
     );
 
-    const CommentModel = mongoose.model("Comment", CommentSchema);
+    const CommentModel = mongoose.model("comment", CommentSchema);
     module.exports = CommentModel;

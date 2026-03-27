@@ -41,7 +41,10 @@ const createProject = async(req,resp) => {
 }
 
 const getProjectById = async (req,resp) => {
-    const res = await ProjectSchema.findById(req.params.id)
+    const res = await ProjectSchema.findById(req.params.id).populate([
+        {path: "assignedMembers"},
+        {path: "assignedTester"}
+    ])
     try{
         resp.json({
             message : "Project Details Fetched",

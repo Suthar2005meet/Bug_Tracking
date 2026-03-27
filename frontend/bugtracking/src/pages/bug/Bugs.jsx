@@ -206,6 +206,12 @@ const BugCard = ({ bug, index, visible }) => {
           >
             Edit
           </Link>
+          <Link
+            to={`comment/${bug._id}`}
+            className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-center font-mono text-[11px] font-bold uppercase tracking-widest text-slate-500 transition-all hover:border-orange-300 hover:bg-orange-50 hover:text-orange-600"
+          >
+            Edit
+          </Link>
         </div>
 
       </div>

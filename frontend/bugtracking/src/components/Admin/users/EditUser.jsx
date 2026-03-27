@@ -14,45 +14,118 @@ import {
 } from 'react-icons/fi'
 import { useNavigate, useParams } from 'react-router-dom'
 
+// ── FIELD CONFIG ──────────────────────────────────────────────────────────────
+// Central registry of all form fields. Add / remove / reorder here.
+const FIELD_CONFIG = [
+  {
+    key: 'image',
+    type: 'image',
+    label: 'Profile Image',
+    icon: <FiImage />,
+    gradient: 'from-pink-500 to-rose-400',
+    shadow: 'shadow-pink-200',
+  },
+  {
+    key: 'name',
+    type: 'text',
+    label: 'Full Name',
+    placeholder: 'Enter full name',
+    icon: <FiUser />,
+    gradient: 'from-sky-400 to-cyan-400',
+    shadow: 'shadow-sky-200',
+    focusColor: 'focus:border-sky-400 focus:ring-sky-100',
+    rules: { required: 'Name is required' },
+  },
+  {
+    key: 'email',
+    type: 'email',
+    label: 'Email Address',
+    placeholder: 'Enter email address',
+    icon: <FiMail />,
+    gradient: 'from-violet-500 to-purple-400',
+    shadow: 'shadow-violet-200',
+    focusColor: 'focus:border-violet-400 focus:ring-violet-100',
+    rules: {
+      required: 'Email is required',
+      pattern: { value: /^\S+@\S+\.\S+$/, message: 'Invalid email format' },
+    },
+  },
+  {
+    key: 'mobileno',
+    type: 'tel',
+    label: 'Mobile Number',
+    placeholder: 'Enter mobile number',
+    icon: <FiPhone />,
+    gradient: 'from-emerald-500 to-teal-400',
+    shadow: 'shadow-emerald-200',
+    focusColor: 'focus:border-emerald-400 focus:ring-emerald-100',
+    rules: {
+      required: 'Mobile number is required',
+      pattern: { value: /^[0-9]{10}$/, message: 'Must be 10 digits' },
+    },
+  },
+  {
+    key: 'role',
+    type: 'select',
+    label: 'Role',
+    icon: <FiShield />,
+    gradient: 'from-amber-400 to-orange-400',
+    shadow: 'shadow-amber-200',
+    focusColor: 'focus:border-amber-400 focus:ring-amber-100',
+    rules: { required: 'Role is required' },
+    options: [
+      { value: '', label: 'Select a role' },
+      { value: 'admin', label: 'Admin' },
+      { value: 'ProjectManager', label: 'Project Manager' },
+      { value: 'Developer', label: 'Developer' },
+      { value: 'Tester', label: 'Tester' },
+    ],
+  },
+  {
+    key: 'isActive',
+    type: 'select',
+    label: 'Account Status',
+    icon: <FiCheckCircle />,
+    gradient: 'from-teal-400 to-green-400',
+    shadow: 'shadow-teal-200',
+    focusColor: 'focus:border-teal-400 focus:ring-teal-100',
+    options: [
+      { value: 'true', label: 'Active' },
+      { value: 'false', label: 'Inactive' },
+    ],
+  },
+]
+
+// ── MAIN COMPONENT ────────────────────────────────────────────────────────────
 export const EditUser = () => {
 
-  const [user, setUser]           = useState(null)
-  const [loading, setLoading]     = useState(true)
-  const [saving, setSaving]       = useState(false)
-  const [success, setSuccess]     = useState(false)
-  const [error, setError]         = useState(null)
-  const [imagePreview, setImagePreview] = useState(null)  // live preview URL
+  const [user, setUser]                 = useState(null)
+  const [loading, setLoading]           = useState(true)
+  const [saving, setSaving]             = useState(false)
+  const [success, setSuccess]           = useState(false)
+  const [error, setError]               = useState(null)
+  const [imagePreview, setImagePreview] = useState(null)
 
   const { register, handleSubmit, reset, watch, formState: { errors } } = useForm()
   const { id }   = useParams()
   const navigate = useNavigate()
 
-  // Watch the file input so we can show live preview
   const watchedImage = watch('image')
 
   useEffect(() => {
-    // Check if we have a valid file
     if (watchedImage && (watchedImage instanceof FileList) && watchedImage.length > 0) {
       const file = watchedImage[0]
-      // Additional check to ensure it's a valid file
       if (file instanceof File) {
         try {
           const url = URL.createObjectURL(file)
           setImagePreview(url)
-
-          // Cleanup function
-          return () => {
-            if (url && url.startsWith('blob:')) {
-              URL.revokeObjectURL(url)
-            }
-          }
-        } catch (error) {
-          console.error('Error creating object URL:', error)
+          return () => { if (url?.startsWith('blob:')) URL.revokeObjectURL(url) }
+        } catch (e) {
+          console.error('Error creating object URL:', e)
           setImagePreview(null)
         }
       }
     } else if (!watchedImage || watchedImage.length === 0) {
-      // Clear preview if no file selected
       setImagePreview(user?.image || null)
     }
   }, [watchedImage, user?.image])
@@ -61,21 +134,14 @@ export const EditUser = () => {
     try {
       setLoading(true)
       setError(null)
-      const res = await axios.get(`/user/details/${id}`)
+      const res  = await axios.get(`/user/details/${id}`)
       const data = res.data.data
-      console.log('Fetched user data:', data)
       setUser(data)
-      setImagePreview(data.image || null)   // seed preview with existing image
-
-      // reset must convert boolean isActive to string for <select>
-      // Don't include image in reset as it should be handled separately
+      setImagePreview(data.image || null)
       const { image, ...formData } = data
-      reset({
-        ...formData,
-        isActive: data.isActive ? 'true' : 'false',
-      })
+      reset({ ...formData, isActive: data.isActive ? 'true' : 'false' })
     } catch (err) {
-      setError("Failed to load user data.")
+      setError('Failed to load user data.')
       console.error('Error fetching user data:', err)
     } finally {
       setLoading(false)
@@ -88,34 +154,22 @@ export const EditUser = () => {
       setError(null)
       setSuccess(false)
 
-      // Create FormData for file upload
       const formData = new FormData()
-
-      // Convert isActive string back to boolean
       formData.append('isActive', data.isActive === 'true')
-
-      // Add other fields
       Object.keys(data).forEach(key => {
-        if (key !== 'image' && key !== 'isActive') {
-          formData.append(key, data[key])
-        }
+        if (key !== 'image' && key !== 'isActive') formData.append(key, data[key])
       })
-
-      // Add image file if exists
-      if (data.image && data.image[0]) {
-        formData.append('image', data.image[0])
-      }
+      if (data.image?.[0]) formData.append('image', data.image[0])
 
       const res = await axios.put(`/user/update/${id}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+        headers: { 'Content-Type': 'multipart/form-data' },
       })
       console.log('Update response:', res.data)
+      navigate(-1)
       setSuccess(true)
       setTimeout(() => setSuccess(false), 3000)
     } catch (err) {
-      setError("Failed to update user. Please try again.")
+      setError('Failed to update user. Please try again.')
       console.error('Error updating user:', err)
     } finally {
       setSaving(false)
@@ -187,109 +241,26 @@ export const EditUser = () => {
 
           <form onSubmit={handleSubmit(submitHandle)} className="space-y-4">
 
-            {/* ── IMAGE FIRST — preview + upload ── */}
-            <FormField icon={<FiImage />} label="Profile Image" gradient="from-pink-500 to-rose-400" shadow="shadow-pink-200">
-              <div className="flex items-center gap-5">
-
-                {/* Avatar preview */}
-                <div className="relative shrink-0">
-                  <div className="h-20 w-20 rounded-2xl overflow-hidden border-2 border-slate-200 shadow-md bg-slate-100">
-                    {imagePreview ? (
-                      <img
-                        src={imagePreview}
-                        alt="Preview"
-                        className="h-full w-full object-cover"
-                        onError={() => setImagePreview(null)}
-                      />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-sky-400 to-blue-500 text-white text-2xl font-black">
-                        {user?.name?.charAt(0)?.toUpperCase() ?? 'U'}
-                      </div>
-                    )}
-                  </div>
-                  {/* Camera badge */}
-                  <div className="absolute -bottom-1.5 -right-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-pink-500 to-rose-400 text-white text-xs shadow-md">
-                    <FiCamera />
-                  </div>
-                </div>
-
-                {/* File input */}
-                <div className="flex-1">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    {...register('image')}
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-500 font-medium outline-none cursor-pointer
-                      file:mr-3 file:rounded-lg file:border-0 file:bg-pink-50 file:px-3 file:py-1 file:text-xs file:font-bold file:text-pink-600
-                      hover:file:bg-pink-100 focus:border-pink-400 focus:ring-2 focus:ring-pink-100 transition-all duration-150"
-                  />
-                  <p className="mt-1.5 text-[10px] text-slate-400 font-medium pl-1">
-                    JPG, PNG or WEBP · Max 2MB · Changes preview instantly
-                  </p>
-                </div>
-              </div>
-            </FormField>
-
-            {/* ── NAME ── */}
-            <FormField icon={<FiUser />} label="Full Name" gradient="from-sky-400 to-cyan-400" shadow="shadow-sky-200" error={errors.name}>
-              <input
-                type="text"
-                placeholder="Enter full name"
-                {...register('name', { required: "Name is required" })}
-                className={inputClass(errors.name, "focus:border-sky-400 focus:ring-sky-100")}
-              />
-            </FormField>
-
-            {/* ── EMAIL ── */}
-            <FormField icon={<FiMail />} label="Email Address" gradient="from-violet-500 to-purple-400" shadow="shadow-violet-200" error={errors.email}>
-              <input
-                type="email"
-                placeholder="Enter email address"
-                {...register('email', {
-                  required: "Email is required",
-                  pattern: { value: /^\S+@\S+\.\S+$/, message: "Invalid email format" }
-                })}
-                className={inputClass(errors.email, "focus:border-violet-400 focus:ring-violet-100")}
-              />
-            </FormField>
-
-            {/* ── MOBILE ── */}
-            <FormField icon={<FiPhone />} label="Mobile Number" gradient="from-emerald-500 to-teal-400" shadow="shadow-emerald-200" error={errors.mobileno}>
-              <input
-                type="tel"
-                placeholder="Enter mobile number"
-                {...register('mobileno', {
-                  required: "Mobile number is required",
-                  pattern: { value: /^[0-9]{10}$/, message: "Must be 10 digits" }
-                })}
-                className={inputClass(errors.mobileno, "focus:border-emerald-400 focus:ring-emerald-100")}
-              />
-            </FormField>
-
-            {/* ── ROLE ── */}
-            <FormField icon={<FiShield />} label="Role" gradient="from-amber-400 to-orange-400" shadow="shadow-amber-200" error={errors.role}>
-              <select
-                {...register('role', { required: "Role is required" })}
-                className={selectClass(errors.role, "focus:border-amber-400 focus:ring-amber-100")}
+            {/* ── DYNAMIC FIELDS ── */}
+            {FIELD_CONFIG.map((field) => (
+              <FormField
+                key={field.key}
+                icon={field.icon}
+                label={field.label}
+                gradient={field.gradient}
+                shadow={field.shadow}
+                error={errors[field.key]}
               >
-                <option value="">Select a role</option>
-                <option value="admin">Admin</option>
-                <option value="ProjectManager">Project Manager</option>
-                <option value="Developer">Developer</option>
-                <option value="Tester">Tester</option>
-              </select>
-            </FormField>
-
-            {/* ── IS ACTIVE ── */}
-            <FormField icon={<FiCheckCircle />} label="Account Status" gradient="from-teal-400 to-green-400" shadow="shadow-teal-200" error={errors.isActive}>
-              <select
-                {...register('isActive')}
-                className={selectClass(null, "focus:border-teal-400 focus:ring-teal-100")}
-              >
-                <option value="true">Active</option>
-                <option value="false">Inactive</option>
-              </select>
-            </FormField>
+                <FieldRenderer
+                  field={field}
+                  register={register}
+                  errors={errors}
+                  user={user}
+                  imagePreview={imagePreview}
+                  setImagePreview={setImagePreview}
+                />
+              </FormField>
+            ))}
 
             {/* ── SUBMIT ── */}
             <div className="pt-2">
@@ -319,22 +290,94 @@ export const EditUser = () => {
   )
 }
 
-// ── HELPERS ──
+// ── FIELD RENDERER ────────────────────────────────────────────────────────────
+// Decides which input element to render based on field.type
+const FieldRenderer = ({ field, register, errors, user, imagePreview, setImagePreview }) => {
+
+  if (field.type === 'image') {
+    return (
+      <div className="flex items-center gap-6">
+
+        {/* Avatar preview — made bigger */}
+        <div className="relative shrink-0">
+          <div className="h-28 w-28 rounded-2xl overflow-hidden border-2 border-slate-200 shadow-md bg-slate-100">
+            {imagePreview ? (
+              <img
+                src={imagePreview}
+                alt="Preview"
+                className="h-full w-full object-cover"
+                onError={() => setImagePreview(null)}
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-sky-400 to-blue-500 text-white text-4xl font-black">
+                {user?.name?.charAt(0)?.toUpperCase() ?? 'U'}
+              </div>
+            )}
+          </div>
+          {/* Camera badge */}
+          <div className="absolute -bottom-1.5 -right-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-pink-500 to-rose-400 text-white text-sm shadow-md">
+            <FiCamera />
+          </div>
+        </div>
+
+        {/* File input */}
+        <div className="flex-1">
+          <input
+            type="file"
+            accept="image/*"
+            {...register('image')}
+            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-500 font-medium outline-none cursor-pointer
+              file:mr-3 file:rounded-lg file:border-0 file:bg-pink-50 file:px-3 file:py-1 file:text-xs file:font-bold file:text-pink-600
+              hover:file:bg-pink-100 focus:border-pink-400 focus:ring-2 focus:ring-pink-100 transition-all duration-150"
+          />
+          <p className="mt-1.5 text-[10px] text-slate-400 font-medium pl-1">
+            JPG, PNG or WEBP · Max 2MB · Changes preview instantly
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  if (field.type === 'select') {
+    return (
+      <select
+        {...register(field.key, field.rules)}
+        className={selectClass(errors[field.key], field.focusColor)}
+      >
+        {field.options.map(opt => (
+          <option key={opt.value} value={opt.value}>{opt.label}</option>
+        ))}
+      </select>
+    )
+  }
+
+  // Default: text / email / tel
+  return (
+    <input
+      type={field.type}
+      placeholder={field.placeholder}
+      {...register(field.key, field.rules)}
+      className={inputClass(errors[field.key], field.focusColor)}
+    />
+  )
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
 const inputClass = (error, focusClass) =>
   `w-full rounded-xl border px-4 py-2.5 text-sm text-slate-700 font-medium outline-none transition-all duration-150 placeholder:text-slate-300
   ${error
-    ? "border-red-300 bg-red-50 focus:border-red-400 focus:ring-2 focus:ring-red-100"
+    ? 'border-red-300 bg-red-50 focus:border-red-400 focus:ring-2 focus:ring-red-100'
     : `border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 ${focusClass}`
   }`
 
 const selectClass = (error, focusClass) =>
   `w-full rounded-xl border px-4 py-2.5 text-sm text-slate-700 font-medium outline-none transition-all duration-150 bg-slate-50 cursor-pointer
   ${error
-    ? "border-red-300 focus:border-red-400 focus:ring-2 focus:ring-red-100"
+    ? 'border-red-300 focus:border-red-400 focus:ring-2 focus:ring-red-100'
     : `border-slate-200 focus:bg-white focus:ring-2 ${focusClass}`
   }`
 
-// ── REUSABLE FORM FIELD ──
+// ── REUSABLE FORM FIELD ───────────────────────────────────────────────────────
 const FormField = ({ icon, label, gradient, shadow, error, children }) => (
   <div className="space-y-1.5">
     <div className="flex items-center gap-2">

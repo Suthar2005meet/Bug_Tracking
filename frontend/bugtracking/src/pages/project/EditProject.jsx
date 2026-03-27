@@ -147,7 +147,7 @@ export const EditProject = () => {
           </div>
 
           {/* Assign Developers */}
-          <div className="bg-rose-50 border border-rose-200 border-l-4 border-l-rose-500 p-5 hover:bg-rose-100 hover:border-l-rose-600">
+          {/* <div className="bg-rose-50 border border-rose-200 border-l-4 border-l-rose-500 p-5 hover:bg-rose-100 hover:border-l-rose-600">
             <label className="block text-xs font-mono text-rose-600 uppercase tracking-widest mb-3">
               Assign Developers
             </label>
@@ -167,7 +167,7 @@ export const EditProject = () => {
                 </label>
               ))}
             </div>
-          </div>
+          </div> */}
 
           {/* Document Upload */}
           <div className="bg-slate-50 border border-slate-200 border-l-4 border-l-slate-400 p-5 hover:bg-slate-100 hover:border-l-slate-500">
