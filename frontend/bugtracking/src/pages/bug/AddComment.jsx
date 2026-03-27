@@ -46,7 +46,11 @@ export const AddComment = () => {
                     <input type="text" {...register("bugId")} />
                 </div>
                 <div>
-                    {/* <label>Developer Name : {bug?.}</label> */}
+                    {/* <label>UserName : {bug?.} </label> */}
+                </div>
+                <div>
+                    <label>Comment : </label>
+                    <input type="textarea" />
                 </div>
             </form>
         </div>

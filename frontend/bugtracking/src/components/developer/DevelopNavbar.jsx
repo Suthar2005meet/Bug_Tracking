@@ -1,18 +1,24 @@
-import React, { useState, useRef, useEffect } from "react";
-import { NavLink, Outlet } from "react-router-dom";
-import { FaBars, FaTimes, FaCode } from "react-icons/fa";
-import { FiChevronDown, FiUser, FiSettings, FiLogOut, FiBell } from "react-icons/fi";
+import { useContext, useEffect, useRef, useState } from "react";
+import { FaBars, FaCode, FaTimes } from "react-icons/fa";
+import { FiBell, FiChevronDown, FiLogOut, FiSettings } from "react-icons/fi";
+import { Link, NavLink, Outlet } from "react-router-dom";
+import { AuthContext } from "../../AuthProvider";
 
 export const DevelopNavbar = () => {
+  const { userId } = useContext(AuthContext)
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef(null);
   
+  // const token = localStorage.getItem("token")
+  //   const decode = jwtDecode(token)
+  //   const userId = decode.userId
+
   const navLinks = [
-    { name: "Dashboard",  path: "/developer" },
-    { name: "Projects",   path: "/projects" },
-    { name: "Manage Bug", path: "/bugs" },
-    { name: "Reports",    path: "/reports" },
+    { name: "Dashboard",  path: "dashboard" },
+    { name: "Project",   path: `project/${userId}` },
+    { name: "Manage Bug", path: "bugs" },
+    { name: "Reports",    path: "reports" },
   ];
 
   useEffect(() => {
@@ -97,9 +103,7 @@ export const DevelopNavbar = () => {
                       <p className="text-xs font-semibold text-slate-700">Dev User</p>
                       <p className="text-[10px] text-slate-400">Developer</p>
                     </div>
-                    <button className="flex w-full items-center gap-2.5 px-3 py-2 text-xs text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors">
-                      <FiUser className="text-slate-400" /> Profile
-                    </button>
+                    <Link to={`/developer/profile/${userId}`}>Profile</Link>
                     <button className="flex w-full items-center gap-2.5 px-3 py-2 text-xs text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors">
                       <FiSettings className="text-slate-400" /> Settings
                     </button>

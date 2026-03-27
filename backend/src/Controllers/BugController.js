@@ -46,9 +46,10 @@
 
     const getBugById = async(req,resp) => {
         const bugdetail = await BugSchema.findById(req.params.id).populate([
-            {path : "projectName"},
-            {path : "assigned"},
-            {path : "reportedBy"}
+            {path : "projectName",populate : [
+                {path : "assignedMembers"},
+                {path : "assignedTester"}
+            ]}
         ])
         try{
             resp.json({
@@ -100,6 +101,34 @@
             });
         }
     };
+
+    const getBugByUser = async(req,resp) => {
+        try{
+            const { id } = req.params;
+            
+            if(!id){
+                return resp.status(400).json({
+                    success : false,
+                    message : "userId is required"
+                })
+            },
+
+            const bug = BugSchema.find({assignedTester: id})
+            .populate("assignedMembers","name email")
+            .populate("assignedTester" , "name email")
+
+            resp.status(200).json({
+                success : true,
+                totalBugs : bug.length,
+                data
+            })
+        }catch(err){
+            resp.status(500).json({
+                message : "Error while fetching the Bug",
+                err : err
+            })
+        }
+    }
 
     module.exports = {
         addBug,

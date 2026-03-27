@@ -1,7 +1,7 @@
-import React, { useState, useRef, useEffect } from "react";
-import { NavLink, Outlet, Link, useParams, useNavigate } from "react-router-dom";
-import { FaBug, FaUserCircle } from "react-icons/fa";
 import { jwtDecode } from "jwt-decode";
+import { useEffect, useRef, useState } from "react";
+import { FaBug, FaUserCircle } from "react-icons/fa";
+import { Link, NavLink, Outlet } from "react-router-dom";
 
 export const TesterNavbar = () => {
   const [profileOpen, setProfileOpen] = useState(false);
@@ -9,7 +9,6 @@ export const TesterNavbar = () => {
 
   const token = localStorage.getItem("token")
   const decode = jwtDecode(token)
-  console.log(decode)
   const id = decode._id
 
   const navLinks = [

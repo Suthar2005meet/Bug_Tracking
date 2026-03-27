@@ -7,5 +7,6 @@ router.post('/create',upload.single('document'),ProjectController.createProject)
 router.get('/details/:id',ProjectController.getProjectById)
 router.put('/update/:id',ProjectController.updateById)
 router.get('/status',ProjectController.getProjectByStatus)
+router.get("/user/:id", ProjectController.getProjectsByUser);
 
 module.exports = router

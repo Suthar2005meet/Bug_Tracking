@@ -202,6 +202,8 @@ const getUserByRole = async(req,resp) => {
     }
 }
 
+
+
 module.exports = {
     getAllUser,
     AddUser,

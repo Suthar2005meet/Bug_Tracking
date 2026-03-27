@@ -6,7 +6,6 @@ import { AssignProject } from "../components/projetcmanager/AssignProject";
 import { ResetPassword } from "../components/Admin/ResetPassword";
 import { SignUp } from "../components/Admin/SignUp";
 import { EditUser } from "../components/Admin/users/EditUser";
-import { ProfileUser } from "../components/Admin/users/ProfileUser";
 import { ShowUser } from "../components/Admin/users/ShowUser";
 import { UserDetail } from "../components/Admin/users/UserDetail";
 import { DevelopNavbar } from "../components/developer/DevelopNavbar";
@@ -26,6 +25,9 @@ import { CreateProject } from "../pages/project/CreateProject";
 import { EditProject } from "../pages/project/EditProject";
 import { ProjectDetails } from "../pages/project/ProjectDetails";
 import { Projects } from "../pages/project/Projects";
+import { AllComments } from "../pages/bug/AllComments";
+import { Project } from "../components/developer/Project";
+import { DevDashboard } from "../components/developer/DevDashboard";
 
 const router = createBrowserRouter([
     {path:'/' , element:<Login/>},
@@ -58,9 +60,11 @@ const router = createBrowserRouter([
         <DevelopNavbar/>
         </ProtectedRoutes>,
         children:[
-            {path:'projects',element:<Projects/>},
+            {index: true,element:<Navigate to="dashboard" replace />},
+            {path:'dashboard',element:<DevDashboard/>},
+            {path:'project/:id',element:<Project/>},
             {path:'bugs',element:<Bugs/>},
-            {path:'profile/:id',element:<ProfileUser/>}
+            {path:'profile/:id',element:<EditUser/>}
         ]
     },
     {
@@ -74,6 +78,7 @@ const router = createBrowserRouter([
             {path:'bug',element:<Bugs/>},
             {path:'bug/bugdetail/:id',element:<BugDetails/>},
             {path:'bug/comment/:id',element:<AddComment/>},
+            {path:'bug/allcomment/:id',element:<AllComments/>},
             {path:'profile/:id',element:<EditUser/>},
             {path:'bug/editbug/:id',element:<Editbug/>}
         ]
@@ -84,6 +89,10 @@ const router = createBrowserRouter([
             {index: true,element:<Navigate to="dashboard" replace />},
             {path:'dashboard',element:<PmDashboard/>},
             {path:'bugs',element:<Bugs/>},
+            {path:'bugs/bugdetail/:id',element:<BugDetails/>},
+            {path:'bugs/editbug/:id',element:<Editbug/>},
+            {path:'bugs/comment/:id',element:<AddComment/>},
+            {path:'bugs/allcomment/:id',element:<AllComments/>},
             {path:'projects',element:<Projects/>},
             {path:'projects/details/:id',element:<ProjectDetails/>},
             {path:'projects/createproject',element:<CreateProject/>},

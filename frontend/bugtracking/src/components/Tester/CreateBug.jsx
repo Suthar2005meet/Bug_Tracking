@@ -28,13 +28,13 @@ export const CreateBug = () => {
       formData.append("reproduce", data.reproduce);
       formData.append("expectedResult", data.expectedResult);
       formData.append("dueDate", data.dueDate);
-      formData.append("reportedBy", data.reportedBy);
+      // formData.append("reportedBy", data.reportedBy);
 
-      if (data.assigned) {
-        data.assigned.forEach((member) => {
-          formData.append("assigned", member);
-        });
-      }
+      // if (data.assigned) {
+      //   data.assigned.forEach((member) => {
+      //     formData.append("assigned", member);
+      //   });
+      // }
 
       formData.append("image", data.image[0]);
 
@@ -198,7 +198,7 @@ export const CreateBug = () => {
               )}
             </div>
 
-            <div className="bg-rose-50 border border-rose-200 border-l-4 border-l-rose-500 p-5 hover:bg-rose-100 hover:border-l-rose-600">
+            {/* <div className="bg-rose-50 border border-rose-200 border-l-4 border-l-rose-500 p-5 hover:bg-rose-100 hover:border-l-rose-600">
               <label className="block text-xs font-mono text-rose-600 uppercase tracking-widest mb-2">
                 Reported By
               </label>
@@ -216,7 +216,7 @@ export const CreateBug = () => {
               {errors.reportedBy && (
                 <p className="text-red-500 font-mono text-xs mt-1">{errors.reportedBy.message}</p>
               )}
-            </div>
+            </div> */}
 
           </div>
 
@@ -277,7 +277,7 @@ export const CreateBug = () => {
           </div>
 
           {/* Assign Developers */}
-          <div className="bg-rose-50 border border-rose-200 border-l-4 border-l-rose-500 p-5 hover:bg-rose-100 hover:border-l-rose-600">
+          {/* <div className="bg-rose-50 border border-rose-200 border-l-4 border-l-rose-500 p-5 hover:bg-rose-100 hover:border-l-rose-600">
             <label className="block text-xs font-mono text-rose-600 uppercase tracking-widest mb-3">
               Assign Developers
             </label>
@@ -297,7 +297,7 @@ export const CreateBug = () => {
                 </label>
               ))}
             </div>
-          </div>
+          </div> */}
 
           {/* Divider */}
           <div className="flex items-center gap-3 py-2">

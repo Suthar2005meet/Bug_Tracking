@@ -48,19 +48,7 @@ const BugSchema = new mongoose.Schema(
         type: mongoose.Schema.Types.ObjectId,
         ref: "projects",
         required: true,
-    },
-
-
-    reportedBy : {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "users",
-        required: true,
-    },
-
-    assigned : [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "users",
-    }]
+    }
 },
 { timestamps: true }
 );
