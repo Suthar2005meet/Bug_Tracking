@@ -1,5 +1,6 @@
 const ProjectSchema = require("../Models/ProjectModel");
 const uploadToCloudinary = require("../Utils/uploadToCloudinary");
+const mongoose = require('mongoose');
 
 const getAllProject = async (req, resp) => {
   const allProject = await ProjectSchema.find();
@@ -36,7 +37,8 @@ const createProject = async (req, resp) => {
       data: savedProject,
     });
   } catch (err) {
-    resp.json({
+    console.log(err);
+    resp.status(500).json({
       err: err,
     });
   }
@@ -44,8 +46,9 @@ const createProject = async (req, resp) => {
 
 const getProjectById = async (req, resp) => {
   const res = await ProjectSchema.findById(req.params.id).populate([
-    { path: "assignedMembers" },
+    { path: "assignedDevelopers" },
     { path: "assignedTester" },
+    { path: "createdBy" },
   ]);
   try {
     resp.json({
@@ -99,46 +102,98 @@ const getProjectByStatus = async (req, resp) => {
   }
 };
 
-    const getProjectsByUser = async (req, res) => {
-    try {
-        // ✅ 1. Get userId from URL params
-        const { id } = req.params;
+const getProjectsByUser = async (req, res) => {
+  try {
+    // ✅ 1. Get userId from URL params
+    const { id } = req.params;
 
-        if (!id) {
-        return res.status(400).json({
-            success: false,
-            message: "User ID is required in URL",
-        });
-        }
-
-        // ✅ 2. Find projects where assignedMembers array contains userId
-        const projects = await ProjectSchema.find({
-        assignedMembers: id,
-        })
-        .populate("assignedMembers", "name email")
-        .populate("assignedTester", "name email");
-
-        // ✅ 3. Send response
-        res.status(200).json({
-        success: true,
-        totalProjects: projects.length,
-        data: projects,
-        });
-    } catch (error) {
-        console.log(error)
-        res.status(500).json({
+    if (!id) {
+      return res.status(400).json({
         success: false,
-        message: error.message,
-        });
+        message: "User ID is required in URL",
+      });
     }
-    };
 
+    // ✅ 2. Find projects where assignedMembers array contains userId
+    const projects = await ProjectSchema.find({
+      assignedDevelopers: id,
+    })
+      .populate("assignedDevelopers", "name email")
+      .populate("assignedTester", "name email");
+
+    // ✅ 3. Send response
+    res.status(200).json({
+      success: true,
+      totalProjects: projects.length,
+      data: projects,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+
+const startTesting = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // ✅ Check valid ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid Project ID"
+      });
+    }
+
+    // ✅ Find project
+    const project = await ProjectSchema.findById(id);
+
+    if (!project) {
+      return res.status(404).json({
+        success: false,
+        message: "Project Not Found"
+      });
+    }
+
+    // ✅ If already in testing
+    if (project.inTesting === true) {
+      return res.status(400).json({
+        success: false,
+        message: "Project is already in Testing"
+      });
+    }
+
+    // ✅ Update only if false
+    project.inTesting = true;
+    project.inTesting = "true";
+
+    await project.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Project moved to Testing successfully",
+      data: project
+    });
+
+  } catch (error) {
+    console.log("Start Testing Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server Error"
+    });
+  }
+};
 
 module.exports = {
-    getAllProject,
-    createProject,
-    getProjectById,
-    updateById,
-    getProjectByStatus,
-    getProjectsByUser
+  getAllProject,
+  createProject,
+  getProjectById,
+  updateById,
+  getProjectByStatus,
+  getProjectsByUser,
+  startTesting
 };

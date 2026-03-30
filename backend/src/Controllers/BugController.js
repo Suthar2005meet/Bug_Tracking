@@ -101,34 +101,46 @@
             });
         }
     };
+    
+    const getBugsByUser = async (req, res) => {
+    try {
+        // ✅ 1. Get userId from URL params
+        const { id } = req.params;
 
-    const getBugByUser = async(req,resp) => {
-        try{
-            const { id } = req.params;
-            
-            if(!id){
-                return resp.status(400).json({
-                    success : false,
-                    message : "userId is required"
-                })
-            },
-
-            const bug = BugSchema.find({assignedTester: id})
-            .populate("assignedMembers","name email")
-            .populate("assignedTester" , "name email")
-
-            resp.status(200).json({
-                success : true,
-                totalBugs : bug.length,
-                data
-            })
-        }catch(err){
-            resp.status(500).json({
-                message : "Error while fetching the Bug",
-                err : err
-            })
+        if (!id) {
+        return res.status(400).json({
+            success: false,
+            message: "User ID is required in URL",
+        });
         }
+
+        // ✅ 2. Find projects where assignedMembers array contains userId
+        const bugs = await BugSchema.find({
+        assigned: id,
+        }).populate([
+            {path: "assigned"},
+            {path: "reportedBy"}
+        ])
+        // .populate("assigned", "name email")
+        // .populate("reportedBy", "name email");
+
+        // ✅ 3. Send response
+        res.status(200).json({
+        success: true,
+        totalBugs : bugs.length,
+        data: bugs,
+        });
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({
+        success: false,
+        message: error.message,
+        });
     }
+    };
+
+    
+
 
     module.exports = {
         addBug,
@@ -136,4 +148,5 @@
         getBugById,
         uppdateBug,
         getBugByStatus,
+        getBugsByUser
     }

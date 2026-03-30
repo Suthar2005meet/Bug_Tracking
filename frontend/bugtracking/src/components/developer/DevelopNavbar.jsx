@@ -17,7 +17,7 @@ export const DevelopNavbar = () => {
   const navLinks = [
     { name: "Dashboard",  path: "dashboard" },
     { name: "Project",   path: `project/${userId}` },
-    { name: "Manage Bug", path: "bugs" },
+    { name: "Bug", path: `bugs/${userId}` },
     { name: "Reports",    path: "reports" },
   ];
 

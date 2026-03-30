@@ -2,7 +2,7 @@
 
     const ProjectSchema = new mongoose.Schema(
     {
-        projectName: {
+        title : {
             type: String,
             required: true,
             trim: true,
@@ -10,6 +10,12 @@
 
         description: {
             type: String,
+        },
+
+        createdBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "users",
+            required: true,
         },
 
         priority : {
@@ -36,13 +42,7 @@
             require : true
         },
 
-        // createdBy: {
-        //     type: mongoose.Schema.Types.ObjectId,
-        //     ref: "user",
-        //     required: true,
-        // },
-
-        assignedMembers : [
+        assignedDevelopers : [
             {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "users",
@@ -54,7 +54,12 @@
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "users"
             }
-        ]
+        ],
+
+        inTesting : {
+            type : Boolean,
+            default : false
+        }
     },
     { timestamps: true }
     );

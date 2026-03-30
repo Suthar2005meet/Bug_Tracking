@@ -1,7 +1,7 @@
-    import React, { useState, useRef, useEffect } from "react";
-    import { NavLink, Outlet } from "react-router-dom";
-    import { FaBars, FaTimes, FaBug } from "react-icons/fa";
-    import { FiChevronDown, FiUser, FiSettings, FiLogOut } from "react-icons/fi";
+    import { useEffect, useRef, useState } from "react";
+import { FaBars, FaBug, FaTimes } from "react-icons/fa";
+import { FiChevronDown, FiLogOut, FiSettings, FiUser } from "react-icons/fi";
+import { NavLink, Outlet } from "react-router-dom";
 
     export const PmNavbar = () => {
     const [menuOpen, setMenuOpen] = useState(false);

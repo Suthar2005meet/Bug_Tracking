@@ -8,6 +8,8 @@ router.post('/create',upload.single("image"),BugController.addBug)
 router.get('/bug/:id',BugController.getBugById)
 router.put('/update/:id',BugController.uppdateBug)
 router.get('/status',BugController.getBugByStatus)
+router.get('/user/:id',BugController.getBugsByUser)
+
 
 
 module.exports = router

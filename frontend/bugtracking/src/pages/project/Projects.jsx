@@ -143,7 +143,7 @@ export const Projects = () => {
                   <div className='flex-grow p-6 md:p-8 flex flex-col justify-between bg-gradient-to-br from-white to-gray-50'>
                     <div>
                       <h2 className='text-xl md:text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-2 group-hover:from-blue-600 group-hover:to-purple-600 transition-all truncate'>
-                        {project.projectName || 'Untitled Project'}
+                        {project.title || 'Untitled Project'}
                       </h2>
                       <p className='text-gray-600 text-sm md:text-base line-clamp-2 group-hover:text-gray-700 transition-colors'>
                         {project.description || 'No description provided'}

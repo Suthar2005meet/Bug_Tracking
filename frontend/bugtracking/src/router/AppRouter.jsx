@@ -13,12 +13,12 @@ import { Login } from "../components/Login";
 import { PmDashboard } from "../components/projetcmanager/PmDashboard";
 import { PmNavbar } from "../components/projetcmanager/PmNavbar";
 import { ProtectedRoutes } from "../components/ProtectedRoutes";
-import { CreateBug } from "../components/Tester/CreateBug";
+import { CreateBug } from "../components/Admin/CreateBug";
 import { TestDashBoard } from "../components/Tester/TestDashBoard";
 import { TesterNavbar } from "../components/Tester/TesterNavbar";
 import { AddComment } from "../pages/bug/AddComment";
 import { BugDetails } from "../pages/bug/BugDetails";
-import { Bugs } from "../pages/bug/Bugs";
+import { Bugs } from "../components/Admin/Bugs";
 import { Editbug } from "../pages/bug/Editbug";
 import { AddUser } from "../pages/project/AddUser";
 import { CreateProject } from "../pages/project/CreateProject";
@@ -28,6 +28,7 @@ import { Projects } from "../pages/project/Projects";
 import { AllComments } from "../pages/bug/AllComments";
 import { Project } from "../components/developer/Project";
 import { DevDashboard } from "../components/developer/DevDashboard";
+import { Bug } from "../pages/bug/Bug";
 
 const router = createBrowserRouter([
     {path:'/' , element:<Login/>},
@@ -63,7 +64,7 @@ const router = createBrowserRouter([
             {index: true,element:<Navigate to="dashboard" replace />},
             {path:'dashboard',element:<DevDashboard/>},
             {path:'project/:id',element:<Project/>},
-            {path:'bugs',element:<Bugs/>},
+            {path:'bugs/:id',element:<Bug/>},
             {path:'profile/:id',element:<EditUser/>}
         ]
     },
@@ -75,7 +76,7 @@ const router = createBrowserRouter([
             {index: true,element:<Navigate to="dashboard" replace />},
             {path:'dashboard',element:<TestDashBoard/>},
             {path:'createbug',element:<CreateBug/>},
-            {path:'bug',element:<Bugs/>},
+            {path:'bug/:id',element:<Bug/>},
             {path:'bug/bugdetail/:id',element:<BugDetails/>},
             {path:'bug/comment/:id',element:<AddComment/>},
             {path:'bug/allcomment/:id',element:<AllComments/>},
@@ -98,7 +99,8 @@ const router = createBrowserRouter([
             {path:'projects/createproject',element:<CreateProject/>},
             {path:'projects/edit/:id',element:<EditProject/>},
             {path:'projects/assign/:id',element:<AssignProject/>},
-            {path:'user',element:<ShowUser/>}
+            {path:'user',element:<ShowUser/>},
+            {path:'user/adduser',element:<AddUser/>}
 
         ]
     }

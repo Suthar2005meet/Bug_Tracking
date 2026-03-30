@@ -1,10 +1,12 @@
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { AuthContext } from '../../AuthProvider';
 
 export const CreateProject = () => {
+  const { name, userId } = useContext(AuthContext)
   const navigate = useNavigate();
   const { register, handleSubmit, formState: { errors } } = useForm();
   const [developer, setdeveloper] = useState([]);
@@ -26,8 +28,9 @@ export const CreateProject = () => {
   const submitHandle = async (data) => {
     try {
       const formData = new FormData();
-      formData.append("projectName", data.projectName);
+      formData.append("title", data.title);
       formData.append("description", data.description);
+      formData.append("createdBy", data.createdBy);
       formData.append("priority", data.priority);
       formData.append("status", data.status);
       formData.append("startDate", data.startDate);
@@ -45,10 +48,10 @@ export const CreateProject = () => {
       const res = await axios.post("/project/create", formData, {
         headers: { "Content-Type": "multipart/form-data" }
       });
-
       if (res.status === 201) {
         toast.success("Project created successfully!");
-        navigate('/admin/project');
+        navigate(-1);
+        console.log(formData)
       }
     } catch (error) {
       console.log(error);
@@ -76,7 +79,7 @@ export const CreateProject = () => {
             <input
               type="text"
               placeholder="Enter project name"
-              {...register("projectName", { required: "Project name is required" })}
+              {...register("title", { required: "Project name is required" })}
               className="w-full bg-white border border-sky-200 px-3 py-2 font-mono text-sm text-slate-700 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-200"
             />
             {errors.projectName && (
@@ -97,6 +100,15 @@ export const CreateProject = () => {
             {errors.document && (
               <p className="mt-2 text-xs font-mono text-red-500">{errors.document.message}</p>
             )}
+          </div>
+
+          <div className="bg-white border border-slate-200 shadow-sm px-6 py-5 border-l-4 border-l-red-400">
+          <p className="text-xs uppercase tracking-widest text-slate-400 mb-2">
+            Created By : <br /><br /> <span className="px-3 py-1 text-sm bg-indigo-50 text-indigo-700 rounded-full border border-indigo-200" >{name}</span>
+          </p>
+
+          {/* Hidden field - will not show in UI but will submit */}
+          <input type="hidden" {...register('createdBy')} value={userId} />
           </div>
 
           {/* Description */}

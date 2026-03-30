@@ -34,7 +34,7 @@ export const EditProject = () => {
   const submitHandle = async (data) => {
     try {
       const res = await axios.put(`/project/update/${id}`, data);
-      navigate('/admin/project');
+      navigate(-1);
       toast.success("Update Data Successfully");
     } catch (err) {
       console.log(err);
@@ -67,7 +67,7 @@ export const EditProject = () => {
             </label>
             <input
               type="text"
-              {...register('projectName')}
+              {...register('title')}
               className="w-full bg-white border border-sky-200 px-3 py-2 font-mono text-sm text-slate-700 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-200"
             />
           </div>
@@ -192,7 +192,7 @@ export const EditProject = () => {
           <div className="flex gap-3">
             <button
               type="button"
-              onClick={() => navigate('/admin/project')}
+              onClick={() => navigate(-1)}
               className="flex-1 py-3 bg-white text-slate-600 font-mono text-xs uppercase tracking-widest border border-slate-300 border-l-4 border-l-slate-400 hover:bg-slate-50 hover:text-slate-800 hover:border-l-slate-600"
             >
               Cancel

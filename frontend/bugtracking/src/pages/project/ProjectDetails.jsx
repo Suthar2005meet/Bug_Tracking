@@ -1,6 +1,7 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { AuthContext } from "../../AuthProvider";
 
 export const ProjectDetails = () => {
   const [project, setProject] = useState(null);
@@ -125,7 +126,7 @@ export const ProjectDetails = () => {
               Project Name
             </p>
             <h1 className="text-2xl font-bold text-slate-800 leading-tight">
-              {project.projectName}
+              {project.title}
             </h1>
           </div>
         </div>
@@ -140,13 +141,20 @@ export const ProjectDetails = () => {
           </p>
         </div>
 
+        <div className="bg-white border border-slate-200 border-t-0 shadow-sm mb-1 px-6 py-5 border-l-4 border-l-green-400">
+          <p className="text-xs uppercase tracking-widest text-slate-400 mb-2">
+            Created By
+          </p>
+          <span className="px-3 py-1 text-sm bg-indigo-50 text-indigo-700 rounded-full border border-indigo-200" >{project.createdBy?.name}</span>
+        </div>
+
         <div className="bg-white border border-slate-200 shadow-sm px-6 py-5 border-l-4 border-l-indigo-400">
           <p className="text-xs uppercase tracking-widest text-slate-400 mb-2">
             Assigned Members
           </p>
-          {project.assignedMembers && project.assignedMembers.length > 0 ? (
+          {project.assignedDevelopers && project.assignedDevelopers.length > 0 ? (
             <div className="flex flex-wrap gap-2">
-              {project.assignedMembers.map((member, index) => (
+              {project.assignedDevelopers.map((member, index) => (
                 <span key={index} className="px-3 py-1 text-sm bg-indigo-50 text-indigo-700 rounded-full border border-indigo-200">
                   {member.name || member}
                 </span>

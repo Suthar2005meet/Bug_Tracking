@@ -151,7 +151,7 @@ import { toast } from 'react-toastify'
     const handleDevToggle = (updater) => {
         setSelectedDevs(prev => {
         const next = typeof updater === 'function' ? updater(prev) : updater
-        setValue('assignedMembers', next)
+        setValue('assignedDevelopers', next)
         return next
         })
     }

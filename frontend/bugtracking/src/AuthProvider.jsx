@@ -7,6 +7,7 @@
     const [token, setToken] = useState(null);
     const [userId, setUserId] = useState(null);
     const [role, setRole] = useState(null);
+    const [name, setname] = useState(null)
 
     // 🔥 Run when app loads
     useEffect(() => {
@@ -19,6 +20,7 @@
             setToken(storedToken);
             setUserId(decoded._id); // ✅ FIXED
             setRole(decoded.role); // ✅ OK
+            setname(decoded.name)
         } catch (err) {
             console.log("Invalid Token");
             localStorage.removeItem("token");
@@ -52,7 +54,7 @@
     };
 
     return (
-        <AuthContext.Provider value={{ token, userId, role, login, logout }}>
+        <AuthContext.Provider value={{ token, userId, role, login, logout, name }}>
         {children}
         </AuthContext.Provider>
     );
