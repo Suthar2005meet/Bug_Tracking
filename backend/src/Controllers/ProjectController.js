@@ -188,6 +188,27 @@ const startTesting = async (req, res) => {
   }
 };
 
+const getProjectByTester = async (req,resp) => {
+  const {id} = req.params
+  try{
+    const res = await ProjectSchema.find({assignedTester: id ,inTesting : "true"}).populate([
+      {path: "createdBy" },
+      {path : "assignedDevelopers"},
+      {path : "assignedTester"}
+    ])
+    resp.json({
+      message : "Tester Project Find Successfully",
+      data : res
+    })
+  }catch(err){
+    console.log(err)
+    resp.status(500).json({
+      message : "Error while Fetching the testerassign project",
+      err : err
+    })
+  }
+}
+
 module.exports = {
   getAllProject,
   createProject,
@@ -195,5 +216,6 @@ module.exports = {
   updateById,
   getProjectByStatus,
   getProjectsByUser,
-  startTesting
+  startTesting,
+  getProjectByTester
 };

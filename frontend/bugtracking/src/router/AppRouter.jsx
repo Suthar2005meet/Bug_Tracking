@@ -1,34 +1,35 @@
 import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
 import { AdDash } from "../components/Admin/AdDash";
 import { AdminSidebar } from "../components/Admin/AdminSidbar";
+import { Bugs } from "../components/Admin/Bugs";
+import { CreateBug } from "../components/Admin/CreateBug";
 import { ForgotPassword } from "../components/Admin/ForgotPassword";
-import { AssignProject } from "../components/projetcmanager/AssignProject";
 import { ResetPassword } from "../components/Admin/ResetPassword";
 import { SignUp } from "../components/Admin/SignUp";
 import { EditUser } from "../components/Admin/users/EditUser";
 import { ShowUser } from "../components/Admin/users/ShowUser";
 import { UserDetail } from "../components/Admin/users/UserDetail";
+import { DevDashboard } from "../components/developer/DevDashboard";
 import { DevelopNavbar } from "../components/developer/DevelopNavbar";
+import { Project } from "../components/developer/Project";
 import { Login } from "../components/Login";
+import { AssignProject } from "../components/projetcmanager/AssignProject";
 import { PmDashboard } from "../components/projetcmanager/PmDashboard";
 import { PmNavbar } from "../components/projetcmanager/PmNavbar";
 import { ProtectedRoutes } from "../components/ProtectedRoutes";
-import { CreateBug } from "../components/Admin/CreateBug";
 import { TestDashBoard } from "../components/Tester/TestDashBoard";
 import { TesterNavbar } from "../components/Tester/TesterNavbar";
+import { TesterProject } from "../components/Tester/TesterProject";
 import { AddComment } from "../pages/bug/AddComment";
+import { AllComments } from "../pages/bug/AllComments";
+import { Bug } from "../pages/bug/Bug";
 import { BugDetails } from "../pages/bug/BugDetails";
-import { Bugs } from "../components/Admin/Bugs";
 import { Editbug } from "../pages/bug/Editbug";
 import { AddUser } from "../pages/project/AddUser";
 import { CreateProject } from "../pages/project/CreateProject";
 import { EditProject } from "../pages/project/EditProject";
 import { ProjectDetails } from "../pages/project/ProjectDetails";
 import { Projects } from "../pages/project/Projects";
-import { AllComments } from "../pages/bug/AllComments";
-import { Project } from "../components/developer/Project";
-import { DevDashboard } from "../components/developer/DevDashboard";
-import { Bug } from "../pages/bug/Bug";
 
 const router = createBrowserRouter([
     {path:'/' , element:<Login/>},
@@ -65,6 +66,9 @@ const router = createBrowserRouter([
             {path:'dashboard',element:<DevDashboard/>},
             {path:'project/:id',element:<Project/>},
             {path:'bugs/:id',element:<Bug/>},
+            {path:'bugs/:id/details/:id',element:<BugDetails/>},
+            {path:'bugs/:id/addcomment/:id',element:<AddComment/>},
+            {path:'bugs/:id/allcomment/:id',element:<AllComments/>},
             {path:'profile/:id',element:<EditUser/>}
         ]
     },
@@ -75,11 +79,13 @@ const router = createBrowserRouter([
         children:[
             {index: true,element:<Navigate to="dashboard" replace />},
             {path:'dashboard',element:<TestDashBoard/>},
-            {path:'createbug',element:<CreateBug/>},
+            {path:'project/:id',element:<TesterProject/>},
+            {path:'project/:id/createbug',element:<CreateBug/>},
+            // {path:'createbug',element:<CreateBug/>},
             {path:'bug/:id',element:<Bug/>},
             {path:'bug/bugdetail/:id',element:<BugDetails/>},
-            {path:'bug/comment/:id',element:<AddComment/>},
-            {path:'bug/allcomment/:id',element:<AllComments/>},
+            {path:'bug/:id/addcomment/:id',element:<AddComment/>},
+            {path:'bug/:id/allcomment/:id',element:<AllComments/>},
             {path:'profile/:id',element:<EditUser/>},
             {path:'bug/editbug/:id',element:<Editbug/>}
         ]

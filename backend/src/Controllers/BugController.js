@@ -46,8 +46,8 @@
 
     const getBugById = async(req,resp) => {
         const bugdetail = await BugSchema.findById(req.params.id).populate([
-            {path : "projectName",populate : [
-                {path : "assignedMembers"},
+            {path : "projectId",populate : [
+                {path : "assignedDevelopers"},
                 {path : "assignedTester"}
             ]}
         ])
@@ -116,9 +116,12 @@
 
         // ✅ 2. Find projects where assignedMembers array contains userId
         const bugs = await BugSchema.find({
-        assigned: id,
+            $or: [
+                { assignedDeveloper: id },
+                { reportedBy: id }
+        ]
         }).populate([
-            {path: "assigned"},
+            {path: "assignedDeveloper"},
             {path: "reportedBy"}
         ])
         // .populate("assigned", "name email")

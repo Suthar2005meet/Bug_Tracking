@@ -9,5 +9,6 @@ router.put('/update/:id',ProjectController.updateById)
 router.get('/status',ProjectController.getProjectByStatus)
 router.get("/user/:id", ProjectController.getProjectsByUser);
 router.put('/testing/:id',ProjectController.startTesting)
+router.get('/tester/:id',ProjectController.getProjectByTester)
 
 module.exports = router

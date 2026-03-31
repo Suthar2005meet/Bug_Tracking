@@ -1,15 +1,20 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { AuthContext } from "../../AuthProvider";
 
 export const CreateBug = () => {
+  const { userId } = useContext(AuthContext)
   const [projects, setProjects] = useState([]);
   const [reported, setReported] = useState([]);
   const [developer, setdeveloper] = useState([]);
   const navigate = useNavigate();
-
+  const location = useLocation()
+  const projectIds = projects.map(project => project._id);
+  const developerIds = projects.map(project => project?.assignedDevelopers.map(dev => (dev._id)));
+  console.log(projectIds,developerIds)
   const {
     register,
     handleSubmit,
@@ -22,29 +27,25 @@ export const CreateBug = () => {
 
       formData.append("title", data.title);
       formData.append("description", data.description);
-      formData.append("projectName", data.projectName);
       formData.append("type", data.type);
       formData.append("priority", data.priority);
-      formData.append("reproduce", data.reproduce);
       formData.append("expectedResult", data.expectedResult);
       formData.append("dueDate", data.dueDate);
-      // formData.append("reportedBy", data.reportedBy);
+      formData.append("reportedBy", data.reportedBy);
+      formData.append("assignedDeveloper", projects[0]?.assignedDevelopers[1]?._id);
+      formData.append("projectId", projects[0]?._id);
 
-      // if (data.assigned) {
-      //   data.assigned.forEach((member) => {
-      //     formData.append("assigned", member);
-      //   });
-      // }
 
       formData.append("image", data.image[0]);
-
+      console.log(data)
       const res = await axios.post("/bug/create", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
       if (res.status === 201) {
         toast.success("Bug Created Successfully!");
-        navigate("/admin/bug");
+        navigate(-1);
+        console.log(res)
       }
     } catch (err) {
       console.log(err);
@@ -52,15 +53,15 @@ export const CreateBug = () => {
     }
   };
 
-  const fetchAllProjects = async () => {
-    try {
-      const res = await axios.get("/project/all");
-      setProjects(res.data.data);
-    } catch (err) {
-      console.log(err);
-      toast.error("Failed to fetch projects");
+  const getProjectTOTester = async () => {
+    try{
+      const res = await axios.get(`project/tester/${userId}`)
+      console.log(res.data.data)
+      setProjects(res.data.data)
+    }catch(err){
+      console.log(err)
     }
-  };
+  }
 
   const fetchAllReported = async () => {
     try {
@@ -71,19 +72,9 @@ export const CreateBug = () => {
     }
   };
 
-  const fetchAllDeveloper = async () => {
-    try {
-      const res = await axios.get("/user/developer");
-      setdeveloper(res.data.data);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
   useEffect(() => {
-    fetchAllProjects();
     fetchAllReported();
-    fetchAllDeveloper();
+    getProjectTOTester();
   }, []);
 
   return (
@@ -128,20 +119,6 @@ export const CreateBug = () => {
             )}
           </div>
 
-          {/* Steps to Reproduce */}
-          <div className="bg-orange-50 border border-orange-200 border-l-4 border-l-orange-400 p-5 hover:bg-orange-100 hover:border-l-orange-500">
-            <label className="block text-xs font-mono text-orange-500 uppercase tracking-widest mb-2">
-              Steps to Reproduce
-            </label>
-            <textarea
-              rows={3}
-              {...register("reproduce", { required: "Steps to reproduce are required" })}
-              className="w-full bg-white border border-orange-200 px-3 py-2 font-mono text-sm text-slate-700 outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-200 resize-none"
-            />
-            {errors.reproduce && (
-              <p className="text-red-500 font-mono text-xs mt-1">{errors.reproduce.message}</p>
-            )}
-          </div>
 
           {/* Expected Result */}
           <div className="bg-emerald-50 border border-emerald-200 border-l-4 border-l-emerald-500 p-5 hover:bg-emerald-100 hover:border-l-emerald-600">
@@ -175,50 +152,11 @@ export const CreateBug = () => {
             )}
           </div>
 
-          {/* Project & Reported By Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <input type="hidden" {...register('projectId')} defaultValue={projectIds} />
+          
+          <input type="hidden" {...register('assignedDeveloper')} value={developerIds} />
 
-            <div className="bg-cyan-50 border border-cyan-200 border-l-4 border-l-cyan-500 p-5 hover:bg-cyan-100 hover:border-l-cyan-600">
-              <label className="block text-xs font-mono text-cyan-600 uppercase tracking-widest mb-2">
-                Project
-              </label>
-              <select
-                {...register("projectName", { required: "Project selection is required" })}
-                className="w-full bg-white border border-cyan-200 px-3 py-2 font-mono text-sm text-slate-700 outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-200"
-              >
-                <option value="">Select project</option>
-                {projects.map((project) => (
-                  <option key={project._id} value={project._id}>
-                    {project.projectName}
-                  </option>
-                ))}
-              </select>
-              {errors.projectName && (
-                <p className="text-red-500 font-mono text-xs mt-1">{errors.projectName.message}</p>
-              )}
-            </div>
-
-            {/* <div className="bg-rose-50 border border-rose-200 border-l-4 border-l-rose-500 p-5 hover:bg-rose-100 hover:border-l-rose-600">
-              <label className="block text-xs font-mono text-rose-600 uppercase tracking-widest mb-2">
-                Reported By
-              </label>
-              <select
-                {...register("reportedBy", { required: "Reporter is required" })}
-                className="w-full bg-white border border-rose-200 px-3 py-2 font-mono text-sm text-slate-700 outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-200"
-              >
-                <option value="">Select reporter</option>
-                {reported.map((report) => (
-                  <option key={report._id} value={report._id}>
-                    {report.name}
-                  </option>
-                ))}
-              </select>
-              {errors.reportedBy && (
-                <p className="text-red-500 font-mono text-xs mt-1">{errors.reportedBy.message}</p>
-              )}
-            </div> */}
-
-          </div>
+          <input type="hidden" {...register('reportedBy')} value={userId} />
 
           {/* Component & Priority & Due Date Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

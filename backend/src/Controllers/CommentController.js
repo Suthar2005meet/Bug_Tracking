@@ -33,9 +33,8 @@ const addComment = async (req,resp) => {
 const getCommentById = async(req,resp) => {
     try{
         const res = await CommentSchema.findById(req.params.id).populate([
-            {path : "bugId",populate :{path : "projectName"}},
-            {path : "testerId"},
-            {path : "developerId"}
+            {path : "bugId", populate :{path : "projectId"}},
+            {path : "userId"}
         ])
         resp.json({
             message : "Comment Data Fetched",
@@ -50,9 +49,29 @@ const getCommentById = async(req,resp) => {
     }
 }
 
+const getCommentByBug = async (req,resp) => {
+    const {id} = req.params
+    try{
+        const res = await CommentSchema.find({bugId : id}).populate([
+            {path: "bugId", populate : {path : "projectId"} },
+            {path: "userId"}
+        ])
+        resp.json({
+            message : "All Comments Find",
+            data : res
+        })
+    }catch(err){
+        console.log(err)
+        resp.status(500).json({
+            message : "Server Error",
+            err : err
+        })
+    }
+}
 
 module.exports = {
     getAllComment,
     addComment,
-    getCommentById
+    getCommentById,
+    getCommentByBug
 }

@@ -1,22 +1,20 @@
-import { jwtDecode } from "jwt-decode";
+
 import { useContext, useEffect, useRef, useState } from "react";
 import { FaBug, FaUserCircle } from "react-icons/fa";
 import { Link, NavLink, Outlet } from "react-router-dom";
 import { AuthContext } from "../../AuthProvider";
 
 export const TesterNavbar = () => {
-  const { userID } = useContext(AuthContext)
+  const { userId } = useContext(AuthContext)
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef(null);
 
-  // const token = localStorage.getItem("token")
-  // const decode = jwtDecode(token)
-  // const id = decode._id
 
   const navLinks = [
     { name: "Dashboard", path: "dashboard" },
-    { name: "All Bugs", path: `bug/${userID}` },
-    { name: "Create Bug", path: "createbug" },
+    { name: "Projects", path: `project/${userId}`},
+    { name: "All Bugs", path: `bug/${userId}` },
+    
   ];
 
   // Close profile dropdown on outside click

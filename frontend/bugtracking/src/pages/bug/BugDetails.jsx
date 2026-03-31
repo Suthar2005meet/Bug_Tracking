@@ -6,205 +6,161 @@ export const BugDetails = () => {
   const [bug, setBug] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [developer, setdeveloper] = useState([]);
-  const [project, setproject] = useState([]);
-  const [tester, settester] = useState([]);
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const fetchAllDeveloper = async () => {
-    try {
-      const res = await axios.get("/user/developer");
-      console.log(res.data.data);
-      setdeveloper(res.data.data);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const fetchAllProject = async () => {
-    try {
-      const res = await axios.get("/project/all");
-      console.log(res.data.data);
-      setproject(res.data.data);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const fetchAllTester = async () => {
-    try {
-      const res = await axios.get("/user/tester");
-      console.log(res.data.data);
-      settester(res.data.data);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const getBug = async () => {
+  const fetchBugData = async () => {
     try {
       setLoading(true);
       setError(null);
+      // Fetch the specific bug by ID
       const res = await axios.get(`/bug/bug/${id}`);
       setBug(res.data.data);
     } catch (err) {
-      setError(err.message || "Failed to fetch bug details");
+      console.error("Fetch error:", err);
+      setError(err.response?.data?.message || "Failed to fetch bug details");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (id) {
-      getBug();
-      fetchAllDeveloper();
-      fetchAllProject();
-      fetchAllTester();
-    }
+    if (id) fetchBugData();
   }, [id]);
 
-  // Loading
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-slate-100">
-        <h2 className="text-lg font-mono font-bold tracking-widest text-slate-600 uppercase">
-          Loading...
-        </h2>
+      <div className="flex items-center justify-center min-h-screen bg-slate-50">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-amber-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <h2 className="text-lg font-mono font-bold tracking-widest text-slate-600 uppercase">Loading Bug Data...</h2>
+        </div>
       </div>
     );
   }
 
-  // Error
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-slate-100 gap-4">
-        <p className="text-red-600 font-mono text-sm">{error}</p>
-        <button
-          onClick={getBug}
-          className="px-5 py-2 bg-red-100 text-red-700 font-mono text-xs uppercase tracking-widest border border-red-400 hover:bg-red-200 hover:border-red-600"
-        >
-          Retry
+      <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50 gap-4">
+        <p className="text-red-600 font-mono font-bold">{error}</p>
+        <button onClick={fetchBugData} className="px-6 py-2 bg-white border border-red-400 text-red-600 font-mono text-xs uppercase hover:bg-red-50">
+          Retry Fetch
         </button>
       </div>
     );
   }
 
-  // No data
-  if (!bug) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-slate-100">
-        <p className="text-slate-400 font-mono text-sm tracking-widest uppercase">No Bug Found</p>
-      </div>
-    );
-  }
+  if (!bug) return null;
 
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-800 px-4 py-10">
-      <div className="max-w-3xl mx-auto">
-
-        {/* Back Button */}
+    <div className="min-h-screen bg-slate-100 text-slate-800 px-4 py-10 font-mono">
+      <div className="max-w-4xl mx-auto">
+        
+        {/* Navigation */}
         <button
           onClick={() => navigate(-1)}
-          className="mb-8 px-4 py-2 bg-white text-slate-600 font-mono text-xs uppercase tracking-widest border-l-4 border-amber-400 shadow-sm hover:bg-amber-50 hover:text-amber-700"
+          className="mb-6 px-4 py-2 bg-white border-l-4 border-amber-400 shadow-sm text-xs uppercase tracking-widest hover:bg-amber-50 transition-colors"
         >
-          ← Back
+          ← Return to List
         </button>
 
-        {/* Title Block */}
-        <div className="mb-8 bg-white border-l-4 border-amber-400 pl-5 pr-4 py-4 shadow-sm">
-          <p className="text-xs font-mono text-amber-500 uppercase tracking-widest mb-1">Bug Report</p>
-          <h1 className="text-2xl font-mono font-bold text-slate-800">
-            {bug.title}
-          </h1>
+        {/* HEADER SECTION */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="md:col-span-2 bg-white p-6 border-l-4 border-amber-400 shadow-sm">
+            <span className="text-[10px] text-amber-600 font-bold uppercase tracking-[0.2em]">Bug Entry #{bug._id.slice(-6)}</span>
+            <h1 className="text-2xl font-bold text-slate-900 mt-1 uppercase">{bug.title}</h1>
+            <div className="flex gap-2 mt-4">
+              <span className={`px-3 py-1 text-[10px] font-bold text-white uppercase ${bug.priority === 'High' ? 'bg-red-500' : 'bg-amber-500'}`}>
+                {bug.priority} Priority
+              </span>
+              <span className="px-3 py-1 text-[10px] font-bold bg-slate-800 text-white uppercase">
+                {bug.status}
+              </span>
+              <span className="px-3 py-1 text-[10px] font-bold bg-sky-500 text-white uppercase">
+                {bug.type}
+              </span>
+            </div>
+          </div>
+          
+          {/* IMAGE PREVIEW */}
+          <div className="bg-white p-2 border border-slate-200 shadow-sm flex items-center justify-center">
+            {bug.image ? (
+              <a href={bug.image} target="_blank" rel="noreferrer">
+                <img src={bug.image} alt="Bug" className="max-h-32 w-full object-cover grayscale hover:grayscale-0 transition-all cursor-zoom-in" />
+              </a>
+            ) : (
+              <span className="text-slate-300 text-[10px] uppercase">No Image Attached</span>
+            )}
+          </div>
         </div>
 
-        {/* Description Block */}
-        <div className="bg-sky-50 border border-sky-200 border-l-4 border-l-sky-500 p-5 mb-4 hover:bg-sky-100 hover:border-l-sky-600">
-          <p className="text-xs font-mono text-sky-600 uppercase tracking-widest mb-2">Description</p>
-          <p className="text-slate-700 font-mono text-sm leading-relaxed">{bug.description}</p>
-        </div>
+        {/* DETAILS GRID */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          {/* LEFT COLUMN: BUG SPECIFICS */}
+          <div className="space-y-6">
+            <div className="bg-sky-50 border-l-4 border-sky-500 p-5 shadow-sm">
+              <h3 className="text-xs font-bold text-sky-700 uppercase mb-3 tracking-widest">Description</h3>
+              <p className="text-sm text-slate-700 leading-relaxed">{bug.description}</p>
+            </div>
 
-        {/* Reproduce Block */}
-        <div className="bg-orange-50 border border-orange-200 border-l-4 border-l-orange-500 p-5 mb-4 hover:bg-orange-100 hover:border-l-orange-600">
-          <p className="text-xs font-mono text-orange-600 uppercase tracking-widest mb-2">Steps to Reproduce</p>
-          <p className="text-slate-700 font-mono text-sm leading-relaxed">{bug.reproduce}</p>
-        </div>
-
-        {/* Expected Result Block */}
-        <div className="bg-emerald-50 border border-emerald-200 border-l-4 border-l-emerald-500 p-5 mb-6 hover:bg-emerald-100 hover:border-l-emerald-600">
-          <p className="text-xs font-mono text-emerald-600 uppercase tracking-widest mb-2">Expected Result</p>
-          <p className="text-slate-700 font-mono text-sm leading-relaxed">{bug.expectedResult}</p>
-        </div>
-
-        {/* Divider */}
-        <div className="flex items-center gap-3 mb-6">
-          <div className="h-px flex-1 bg-slate-300" />
-          <span className="text-xs font-mono text-slate-400 uppercase tracking-widest">Meta</span>
-          <div className="h-px flex-1 bg-slate-300" />
-        </div>
-
-        {/* Meta Info Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
-
-          <div className="bg-amber-50 border border-amber-200 p-4 hover:bg-amber-100 hover:border-amber-400">
-            <p className="text-xs font-mono text-amber-600 uppercase tracking-widest mb-2">Priority</p>
-            <p className="text-slate-800 font-mono font-bold text-sm">{bug.priority}</p>
+            <div className="bg-emerald-50 border-l-4 border-emerald-500 p-5 shadow-sm">
+              <h3 className="text-xs font-bold text-emerald-700 uppercase mb-3 tracking-widest">Expected Result</h3>
+              <p className="text-sm text-slate-700 leading-relaxed">{bug.expectedResult}</p>
+            </div>
+            
+            <div className="bg-white border border-slate-200 p-5 shadow-sm">
+              <h3 className="text-xs font-bold text-slate-500 uppercase mb-3 tracking-widest">Timestamps</h3>
+              <div className="text-[11px] space-y-2">
+                <div className="flex justify-between"><span>REPORTED:</span> <span>{new Date(bug.createdAt).toLocaleString()}</span></div>
+                <div className="flex justify-between font-bold text-orange-600"><span>DUE DATE:</span> <span>{bug.dueDate}</span></div>
+              </div>
+            </div>
           </div>
 
-          <div className="bg-sky-50 border border-sky-200 p-4 hover:bg-sky-100 hover:border-sky-400">
-            <p className="text-xs font-mono text-sky-600 uppercase tracking-widest mb-2">Status</p>
-            <p className="text-slate-800 font-mono font-bold text-sm">{bug.status}</p>
-          </div>
+          {/* RIGHT COLUMN: PROJECT & TEAM */}
+          <div className="space-y-6">
+            <div className="bg-slate-800 text-slate-100 p-5 shadow-lg border-t-4 border-amber-400">
+              <h3 className="text-xs font-bold text-amber-400 uppercase mb-3 tracking-widest">Linked Project</h3>
+              <p className="text-lg font-bold mb-1">{bug.projectId?.title}</p>
+              <p className="text-[11px] text-slate-400 line-clamp-3 mb-4">{bug.projectId?.description}</p>
+              
+              <div className="border-t border-slate-700 pt-4">
+                <h4 className="text-[10px] text-slate-500 uppercase mb-2">Assigned Developers</h4>
+                <div className="space-y-2">
+                  {bug.projectId?.assignedDevelopers?.map((dev) => (
+                    <div key={dev._id} className="flex items-center gap-3 bg-slate-700/50 p-2 rounded">
+                      <img src={dev.image} alt={dev.name} className="w-6 h-6 rounded-full border border-amber-400" />
+                      <div>
+                        <p className="text-[11px] font-bold">{dev.name}</p>
+                        <p className="text-[9px] text-slate-400">{dev.email}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
 
-          <div className="bg-violet-50 border border-violet-200 p-4 hover:bg-violet-100 hover:border-violet-400">
-            <p className="text-xs font-mono text-violet-600 uppercase tracking-widest mb-2">Type</p>
-            <p className="text-slate-800 font-mono font-bold text-sm">{bug.type}</p>
-          </div>
-
-        </div>
-
-        {/* People & Project Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-
-          <div className="bg-emerald-50 border border-emerald-200 p-4 hover:bg-emerald-100 hover:border-emerald-400">
-            <p className="text-xs font-mono text-emerald-600 uppercase tracking-widest mb-2">Assigned To</p>
-            <p className="text-slate-700 font-mono text-sm">
-              {Array.isArray(bug.assigned)
-                ? bug.assigned.map((dev) => dev.name).join(", ")
-                : bug.assigned?.name}
-            </p>
-          </div>
-
-          <div className="bg-rose-50 border border-rose-200 p-4 hover:bg-rose-100 hover:border-rose-400">
-            <p className="text-xs font-mono text-rose-600 uppercase tracking-widest mb-2">Reported By</p>
-            <p className="text-slate-700 font-mono text-sm">{bug.reportedBy?.name}</p>
-          </div>
-
-          <div className="bg-cyan-50 border border-cyan-200 p-4 hover:bg-cyan-100 hover:border-cyan-400">
-            <p className="text-xs font-mono text-cyan-600 uppercase tracking-widest mb-2">Project</p>
-            <p className="text-slate-700 font-mono text-sm">{bug.projectName?.projectName}</p>
-          </div>
-
-          <div className="bg-orange-50 border border-orange-200 p-4 hover:bg-orange-100 hover:border-orange-400">
-            <p className="text-xs font-mono text-orange-600 uppercase tracking-widest mb-2">Due Date</p>
-            <p className="text-slate-700 font-mono text-sm">{bug.dueDate}</p>
+            <div className="bg-white border border-slate-200 p-5 shadow-sm">
+              <h3 className="text-xs font-bold text-slate-500 uppercase mb-3 tracking-widest">Assigned Tester</h3>
+              {bug.projectId?.assignedTester?.map((tester) => (
+                <div key={tester._id} className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                  <span className="text-sm">{tester.name}</span>
+                </div>
+              ))}
+            </div>
           </div>
 
         </div>
 
-        {/* Bug Screenshot */}
+        {/* FULL SCREENSHOT SECTION */}
         {bug.image && (
-          <div className="bg-violet-50 border border-violet-200 border-l-4 border-l-violet-500 p-5 hover:bg-violet-100 hover:border-l-violet-600">
-            <p className="text-xs font-mono text-violet-600 uppercase tracking-widest mb-4">Bug Screenshot</p>
-            <img
-              src={bug.image}
-              alt="Bug Screenshot"
-              className="w-72 border border-violet-200 shadow-sm"
-            />
+          <div className="mt-8 bg-white border border-slate-200 p-6 shadow-sm">
+            <h3 className="text-xs font-bold text-slate-500 uppercase mb-4 tracking-widest text-center">Visual Evidence</h3>
+            <img src={bug.image} alt="Full evidence" className="w-full border border-slate-100" />
           </div>
         )}
-
       </div>
     </div>
   );

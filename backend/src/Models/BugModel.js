@@ -31,10 +31,6 @@ const BugSchema = new mongoose.Schema(
         default: "Open",
     },
 
-    reproduce : {
-        type : String,
-        required : true
-    },
 
     expectedResult : {
         type : String,
@@ -44,7 +40,7 @@ const BugSchema = new mongoose.Schema(
     dueDate : {
         type : String
     },
-    projectName : {
+    projectId : {
         type: mongoose.Schema.Types.ObjectId,
         ref: "projects",
         required: true,
@@ -57,10 +53,10 @@ const BugSchema = new mongoose.Schema(
         }
     ],
 
-    reportedBy : {
+    reportedBy : [{
         type : mongoose.Schema.Types.ObjectId,
         ref : "users"
-    }
+    }]
 
 },
 { timestamps: true }
