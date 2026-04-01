@@ -42,17 +42,10 @@
             require : true
         },
 
-        assignedDevelopers : [
+        members : [
             {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "users",
-            },
-        ],
-
-        assignedTester : [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "users"
+                type : mongoose.Schema.Types.ObjectId,
+                ref : "users"
             }
         ],
 

@@ -25,6 +25,12 @@ app.use('/project',ProjectRoute)
 const CommentRoute = require("./src/Routes/CommentRoute")
 app.use('/comment',CommentRoute)
 
+const IssueRoute = require("./src/Routes/IssueRoute")
+app.use('/issue',IssueRoute)
+
+const SprintRoute = require("./src/Routes/SprintRoute")
+app.use('/sprint',SprintRoute)
+
 const PORT = process.env.PORT
 app.listen(PORT,()=>{
     console.log(`Server Has been start at port ${PORT}`);

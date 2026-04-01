@@ -180,10 +180,10 @@ export const Projects = () => {
                       Edit
                     </Link>
                     <Link
-                      to={`assign/${project._id}`}
+                      to={`sprint/${project._id}`}
                       className='px-3 py-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg font-semibold text-center text-sm transition-all active:scale-95 shadow-sm hover:shadow-md'
                     >
-                      Assign
+                      Sprint
                     </Link>
                   </div>
 

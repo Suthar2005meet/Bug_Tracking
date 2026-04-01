@@ -142,7 +142,33 @@
     }
     };
 
-    
+    const updateBugStatus = async(req,resp) => {
+        try{
+            const { status } = req.body
+
+            const res = await BugSchema.findById(req.params.id)
+            if(res){
+                res.status = status;
+                await res.save();
+
+                resp.status(200).json({
+                    success: true,
+                    message: "Status updated successfully",
+                    data: res
+                });
+            }else{
+                resp.status(404).json({
+                    message: "Bug Not Find"
+                })
+            }
+        }catch(err){
+            console.log(err)
+            resp.status(500).json({
+                message : "Server Error",
+                err : err
+            })
+        }
+    }
 
 
     module.exports = {
@@ -151,5 +177,6 @@
         getBugById,
         uppdateBug,
         getBugByStatus,
-        getBugsByUser
+        getBugsByUser,
+        updateBugStatus
     }

@@ -57,8 +57,8 @@ export const AllComments = () => {
             <div key={c._id} className="flex gap-4 bg-white p-5 rounded-xl shadow-sm border border-gray-100">
               {/* User Avatar */}
               <img 
-                src={c.userId?.image} 
-                alt={c.userId?.name} 
+                src={c.userId?.image}
+                alt={c.userId?.name}
                 className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
               />
               
