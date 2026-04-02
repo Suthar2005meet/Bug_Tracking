@@ -104,6 +104,21 @@ const developerUser = async(req,resp) => {
     }
 }
 
+const projectmanagerUser = async(req,resp) => {
+    try{
+        const res = await UserSchema.find({role:"ProjectManager"})
+        resp.json({
+            message : "ProjectManager Details Find",
+            data : res
+        })
+    }catch(err){
+        resp.status(500).json({
+            message : "Server Error",
+            err : err
+        })
+    }
+}
+
 const getUserById = async(req,resp) => {
     try{
         const res = await UserSchema.findById(req.params.id)
@@ -214,5 +229,6 @@ module.exports = {
     updateUser,
     forgotPassword,
     resetPassword,
-    getUserByRole
+    getUserByRole,
+    projectmanagerUser
 }

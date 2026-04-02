@@ -35,19 +35,18 @@ const IssueSchema = new Schema (
             ref : "users"
         },
 
-        assigend : [{
+        assigend : {
             type : mongoose.Schema.Types.ObjectId,
             ref : "users"
-        }],
+        },
 
         sprintId : {
             type : mongoose.Schema.Types.ObjectId,
-            ref : "sprint"
+            ref : "sprints"
         },
 
-        attachements : {
-            type : String,
-            required : true
+        document : {
+            type : String
         },
 
         dueDate : {

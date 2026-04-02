@@ -28,7 +28,7 @@ import { AddUser } from "../pages/project/AddUser";
 import { CreateProject } from "../pages/project/CreateProject";
 import { EditProject } from "../pages/project/EditProject";
 import { ProjectDetails } from "../pages/project/ProjectDetails";
-import { Projects } from "../pages/project/Projects";
+import { Projects } from "../components/projetcmanager/Projects";
 import { SprintProject } from "../components/projetcmanager/SprintProject";
 import { AddSprint } from "../components/projetcmanager/AddSprint";
 import { AddTask } from "../components/projetcmanager/AddTask";
@@ -107,7 +107,7 @@ const router = createBrowserRouter([
             {path:'projects/createproject',element:<CreateProject/>},
             {path:'projects/edit/:id',element:<EditProject/>},
             {path:'projects/sprint/:id',element:<SprintProject/>},
-            {path:'projects/sprint/:id/addtask',element:<AddTask/>},
+            {path:'projects/sprint/:projectId/addtask/:sprintId',element:<AddTask/>},
             {path:'projects/sprint/:id/addsprint',element:<AddSprint/>},
             {path:'user',element:<ShowUser/>},
             {path:'user/adduser',element:<AddUser/>}

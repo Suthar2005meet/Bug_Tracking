@@ -36,9 +36,7 @@
 
 import axios from "axios";
 import { useEffect } from "react";
-import { ToastContainer, Zoom } from "react-toastify";
 import AppRouter from "./router/AppRouter";
-
 function App() {
 
   useEffect(() => {
@@ -65,13 +63,6 @@ function App() {
   return (
     <>
       <AppRouter />
-
-      <ToastContainer
-        position="top-center"
-        autoClose={500}
-        theme="dark"
-        transition={Zoom}
-      />
     </>
   );
 }

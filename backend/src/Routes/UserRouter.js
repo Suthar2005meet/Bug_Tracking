@@ -12,5 +12,6 @@ router.put('/update/:id',UserController.updateUser)
 router.post('/forgotpassword',UserController.forgotPassword)
 router.put('/resetpassword',UserController.resetPassword)
 router.get('/role',UserController.getUserByRole)
+router.get('/projectmanager',UserController.projectmanagerUser)
 
 module.exports = router
