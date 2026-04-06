@@ -32,6 +32,7 @@ import { AddSprint } from "../components/projetcmanager/AddSprint";
 import { AddTask } from "../components/projetcmanager/AddTask";
 import { Task } from "../components/developer/Task"
 import { TesterTask } from "../components/Tester/TesterTask";
+import { Setting } from "../pages/Setting";
 
 const router = createBrowserRouter([
     {path:'/' , element:<Login/>},
@@ -71,7 +72,8 @@ const router = createBrowserRouter([
             {path:'bugs/:id/details/:id',element:<BugDetails/>},
             {path:'bugs/:id/addcomment/:id',element:<AddComment/>},
             {path:'bugs/:id/allcomment/:id',element:<AllComments/>},
-            {path:'profile/:id',element:<EditUser/>}
+            {path:'profile/:id',element:<EditUser/>},
+            {path:'setting/:id',element:<Setting/>}
         ]
     },
     {
@@ -89,7 +91,8 @@ const router = createBrowserRouter([
             {path:'bug/:id/addcomment/:id',element:<AddComment/>},
             {path:'bug/:id/allcomment/:id',element:<AllComments/>},
             {path:'profile/:id',element:<EditUser/>},
-            {path:'bug/editbug/:id',element:<Editbug/>}
+            {path:'bug/editbug/:id',element:<Editbug/>},
+            {path:'setting/:id',element:<Setting/>}
         ]
     },
     {
@@ -110,7 +113,8 @@ const router = createBrowserRouter([
             {path:'projects/sprint/:projectId/addtask/:sprintId',element:<AddTask/>},
             {path:'projects/sprint/:id/addsprint',element:<AddSprint/>},
             {path:'user',element:<ShowUser/>},
-            {path:'user/adduser',element:<AddUser/>}
+            {path:'user/adduser',element:<AddUser/>},
+            {path:'setting/:id',element:<Setting/>}
 
         ]
     }

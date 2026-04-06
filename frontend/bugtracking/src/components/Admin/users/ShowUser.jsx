@@ -131,8 +131,8 @@ export const ShowUser = () => {
                 >
                   {/* Avatar & Name */}
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-700 font-bold text-lg uppercase">
-                      {user.name?.charAt(0) || '?'}
+                    <div >
+                      <img src={user.image} className="h-9 w-9 rounded-full overflow-hidden border border-slate-200 bg-slate-100 flex-shrink-0" />
                     </div>
                     <div>
                       <p className="font-semibold text-gray-800 text-sm">{user.name}</p>

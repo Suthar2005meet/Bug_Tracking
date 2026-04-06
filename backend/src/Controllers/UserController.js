@@ -2,6 +2,7 @@ const UserSchema = require('../Models/UserModel')
 const bcrypt = require('bcrypt')
 const mailSend = require('../Utils/MailUtils')
 const jwt = require("jsonwebtoken")
+const uploadToCloudinary = require('../Utils/uploadToCloudinary')
 require('dotenv').config()
 const secret = process.env.JWT_SECRET
 
@@ -25,7 +26,7 @@ const AddUser = async (req,resp) => {
 
             const hashedPassword = await bcrypt.hash(req.body.password,10)
             const savedUser = await UserSchema.create({...req.body,password:hashedPassword})
-            await mailSend(savedUser.email,"wellcome to our app","welcome.html")
+            await mailSend(savedUser.email,"welcome to our app","welcome.html")
             resp.status(201).json({
             message : 'User Data Saved',
             data : savedUser
@@ -59,7 +60,7 @@ const loginUser = async(req,resp) => {
             })
             }else{
                 resp.status(401).json({
-                message : "Invelid Password"
+                message : "Invalid Password"
                 })
             }
         }else{
@@ -99,7 +100,7 @@ const developerUser = async(req,resp) => {
         })
     }catch(err){
         resp.status(500).json({
-            message : "Developer Detail not been exixted"
+            message : "Developer details not found"
         })
     }
 }
@@ -108,7 +109,7 @@ const projectmanagerUser = async(req,resp) => {
     try{
         const res = await UserSchema.find({role:"ProjectManager"})
         resp.json({
-            message : "ProjectManager Details Find",
+            message : "ProjectManager details found",
             data : res
         })
     }catch(err){
@@ -136,17 +137,31 @@ const getUserById = async(req,resp) => {
 
 const updateUser = async(req,resp) => {
     try{
-        const cloudinaryResponse = await uploadToCloudinary(req.file.buffer)
-        console.log(req.file.path);
-        console.log('Response.....', cloudinaryResponse)
-        const res = await UserSchema.findByIdAndUpdate({...req.body,image: cloudinaryResponse.secure_url})
+        const updateData = { ...req.body }
+
+        if (req.file && req.file.buffer) {
+            const cloudinaryResponse = await uploadToCloudinary(req.file.buffer)
+            console.log(req.file.path)
+            console.log('Response.....', cloudinaryResponse)
+            updateData.image = cloudinaryResponse.secure_url
+        }
+
+        const res = await UserSchema.findByIdAndUpdate(req.params.id, updateData, { new: true })
+
+        if (!res) {
+            return resp.status(404).json({
+                message: 'User not found'
+            })
+        }
+
         resp.json({
-            message : "Update data Successfully",
+            message : "User updated successfully",
             data : res
         })
     }catch(err){
+        console.log(err)
         resp.status(500).json({
-            message : "User not update",
+            message : "User not updated",
             err : err
         })
     }
@@ -166,7 +181,7 @@ const forgotPassword = async(req,resp) => {
         const token = jwt.sign(foundUserFromEmail.toObject(),secret,{expiresIn:60*10})
         await mailSend(foundUserFromEmail.email,"Reset Password Link","forgetPassword.html",token)
         resp.status(201).json({
-            message : "Mail Send Successfull",
+            message : "Mail sent successfully",
             token : token
         })
     }else{
@@ -189,7 +204,7 @@ const resetPassword = async(req,resp) => {
     }catch(err){
         console.log(err)
         resp.status(500).json({
-            message : "Password not sucessfully"
+            message : "Password reset failed"
         })
     }
 }

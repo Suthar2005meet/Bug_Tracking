@@ -1,23 +1,46 @@
-
 import { useContext, useEffect, useRef, useState } from "react";
-import { FaBug, FaUserCircle } from "react-icons/fa";
-import { Link, NavLink, Outlet } from "react-router-dom";
+import { FaBug, FaUserCircle, FaBars, FaTimes } from "react-icons/fa";
+import { FiChevronDown, FiLogOut, FiSettings, FiUser, FiBell } from "react-icons/fi";
+import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../AuthProvider";
+import axios from "axios";
 
 export const TesterNavbar = () => {
-  const { userId } = useContext(AuthContext)
-  const [profileOpen, setProfileOpen] = useState(false);
-  const profileRef = useRef(null);
+  const { userId, setUserId } = useContext(AuthContext);
+  const navigate = useNavigate();
 
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const profileRef = useRef(null);
 
   const navLinks = [
     { name: "Dashboard", path: "dashboard" },
-    { name: "Tasks", path: `task/${userId}`},
+    { name: "Tasks", path: `task/${userId}` },
     { name: "All Bugs", path: `bug/${userId}` },
-    
   ];
 
-  // Close profile dropdown on outside click
+  // 🔹 Fetch User Details
+  const getUser = async () => {
+    if (!userId) return;
+
+    try {
+      const res = await axios.get(`/user/details/${userId}`);
+      setUser(res.data.data);
+    } catch (err) {
+      console.log("User fetch error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getUser();
+  }, [userId]);
+
+  // 🔹 Close dropdown outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (profileRef.current && !profileRef.current.contains(e.target)) {
@@ -28,114 +51,150 @@ export const TesterNavbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // 🔹 Logout
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setUserId(null);
+    navigate("/");
+  };
+
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Navbar */}
-      <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm shadow-slate-200/60">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-
-            {/* Logo */}
-            <div className="flex items-center gap-3 group cursor-pointer">
-              <div className="bg-indigo-100 p-2 rounded-lg border border-indigo-200 group-hover:bg-indigo-200 group-hover:border-indigo-300 transition-all duration-300">
-                <FaBug size={16} className="text-indigo-600 group-hover:text-indigo-700 transition-colors" />
-              </div>
-              <span className="text-lg font-bold tracking-tight text-slate-800">
-                Tester <span className="text-indigo-600">Panel</span>
-              </span>
-            </div>
-
-            {/* Nav Links */}
-            <ul className="flex items-center gap-1">
-              {navLinks.map((link, index) => (
-                <li key={index}>
-                  <NavLink
-                    to={link.path}
-                    className={({ isActive }) =>
-                      `relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                        isActive
-                          ? "text-indigo-700 bg-indigo-50 border border-indigo-200"
-                          : "text-slate-500 hover:text-slate-800 hover:bg-slate-100"
-                      }`
-                    }
-                  >
-                    {link.name}
-                  </NavLink>
-                </li>
-              ))}
-            </ul>
-
-            {/* Profile */}
-            <div className="flex items-center" ref={profileRef}>
-              <div className="relative">
-                <button
-                  onClick={() => setProfileOpen(!profileOpen)}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 border border-transparent hover:border-slate-200 transition-all duration-200"
-                >
-                  <FaUserCircle size={22} className="text-indigo-500" />
-                  <span className="text-sm font-medium text-slate-700">Account</span>
-                  <svg
-                    className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${profileOpen ? "rotate-180" : ""}`}
-                    fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-
-                {/* Dropdown */}
-                {profileOpen && (
-                  <div className="absolute right-0 top-12 w-52 bg-white border border-slate-200 rounded-xl shadow-lg shadow-slate-200/80 overflow-hidden z-50">
-                    {/* User Info Header */}
-                    <div className="px-4 py-3 border-b border-slate-100 bg-slate-50">
-                      <p className="text-sm font-semibold text-slate-800">John Tester</p>
-                      <p className="text-xs text-slate-400 truncate">john@example.com</p>
-                    </div>
-
-                    {/* Menu Items */}
-                    <div className="py-1">
-                      <Link to={`/tester/profile/${userID}`}
-                        onClick={() => setProfileOpen(false)}
-                        className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-slate-600 hover:text-indigo-700 hover:bg-indigo-50 transition-all duration-150 group"
-                      >
-                        <svg className="w-4 h-4 text-slate-400 group-hover:text-indigo-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
-                        View Profile
-                      </Link>
-
-                      <Link
-                        to="/settings"
-                        onClick={() => setProfileOpen(false)}
-                        className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all duration-150 group"
-                      >
-                        <svg className="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        Settings
-                      </Link>
-                    </div>
-
-                    {/* Logout */}
-                    <div className="border-t border-slate-100 py-1">
-                      <button className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-red-500 hover:text-red-600 hover:bg-red-50 transition-all duration-150">
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                        </svg>
-                        Logout
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
+      {/* ── TOP WHITE HEADER (BRANDING) ── */}
+      <header className="bg-white border-b border-slate-100 px-6 py-3 flex items-center justify-between sticky top-0 z-[60]">
+        
+        {/* Logo Section */}
+        <div className="flex items-center gap-3">
+          <div className="h-9 w-9 bg-[#71dd37] rounded-lg flex items-center justify-center text-white text-xl shadow-sm">
+            <FaBug />
+          </div>
+          <div className="hidden sm:block">
+            <h4 className="text-xl font-bold text-slate-800 leading-none tracking-tight">BugTrack</h4>
+            <span className="text-[10px] uppercase tracking-widest text-slate-400 font-semibold mt-1">Tester Panel</span>
           </div>
         </div>
+
+        {/* Right Section Tools */}
+        <div className="flex items-center gap-4">
+          
+          <button className="relative p-2 text-slate-400 hover:text-[#71dd37] transition-colors">
+            <FiBell size={20} />
+            <span className="absolute top-2 right-2 h-2 w-2 bg-pink-500 rounded-full border-2 border-white"></span>
+          </button>
+
+          <div className="h-8 w-px bg-slate-200 mx-1 hidden sm:block"></div>
+
+          {/* Profile Section */}
+          <div className="relative" ref={profileRef}>
+            <button 
+              onClick={() => setProfileOpen(!profileOpen)}
+              className="flex items-center gap-3 focus:outline-none group"
+            >
+              <div className="h-9 w-9 rounded-full overflow-hidden border border-slate-200 bg-slate-100 flex-shrink-0 flex items-center justify-center text-slate-400">
+                {user?.image ? (
+                  <img
+                    src={user.image}
+                    alt="profile"
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <FaUserCircle size={24} />
+                )}
+              </div>
+              <div className="hidden md:block text-left">
+                <p className="text-sm font-bold text-slate-700 leading-none group-hover:text-[#71dd37] transition-colors">
+                  {loading ? "Loading..." : user?.name || "Account"}
+                </p>
+              </div>
+              <FiChevronDown className={`text-slate-400 text-xs transition-transform duration-200 ${profileOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {/* Dropdown */}
+            {profileOpen && (
+              <div className="absolute right-0 mt-3 w-60 bg-white border border-slate-100 rounded-xl shadow-xl z-[70] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="p-4 bg-slate-50 border-b border-slate-100">
+                  <p className="text-sm font-bold text-slate-800 truncate">{user?.name || "Tester User"}</p>
+                  <p className="text-[10px] text-slate-400 lowercase truncate">{user?.email || "No Email Provided"}</p>
+                </div>
+
+                <div className="p-1">
+                  <Link
+                    to={`setting/${userId}`}
+                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 hover:bg-sky-50 hover:text-sky-600 rounded-lg transition-colors"
+                    onClick={() => setProfileOpen(false)}
+                  >
+                    <FiSettings size={14} /> Settings
+                  </Link>
+
+                  <hr className="my-1 border-slate-100" />
+
+                  <button 
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-rose-500 hover:bg-rose-50 rounded-lg transition-colors"
+                  >
+                    <FiLogOut size={14} /> Logout
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </header>
+
+      {/* ── DARK NAVIGATION BAR (LINKS) ── */}
+      <nav className="bg-[#191c24] sticky top-[61px] z-50">
+        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-12">
+          
+          {/* Desktop Nav Links */}
+          <ul className="hidden md:flex items-center gap-8 h-full">
+            {navLinks.map((link, index) => (
+              <li key={index} className="h-full">
+                <NavLink
+                  to={link.path}
+                  className={({ isActive }) =>
+                    `h-full flex items-center px-1 text-[11px] font-bold uppercase tracking-widest border-b-2 transition-all duration-200
+                    ${isActive 
+                      ? "text-[#71dd37] border-[#71dd37]" 
+                      : "text-slate-400 border-transparent hover:text-white"}`
+                  }
+                >
+                  {link.name}
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+
+          {/* Mobile Toggle */}
+          <button 
+            className="md:hidden ml-auto p-2 text-slate-300 hover:text-white transition-colors"
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            {menuOpen ? <FaTimes size={18} /> : <FaBars size={18} />}
+          </button>
+        </div>
+
+        {/* Mobile Menu Content */}
+        {menuOpen && (
+          <div className="md:hidden bg-[#191c24] border-t border-slate-800 px-6 py-4 space-y-4 shadow-xl">
+            {navLinks.map((link, index) => (
+              <NavLink
+                key={index}
+                to={link.path}
+                className={({ isActive }) =>
+                  `block text-xs font-bold uppercase tracking-tighter transition-colors
+                  ${isActive ? "text-[#71dd37]" : "text-slate-400"}`
+                }
+                onClick={() => setMenuOpen(false)}
+              >
+                {link.name}
+              </NavLink>
+            ))}
+          </div>
+        )}
       </nav>
 
-      {/* Page Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      {/* ── PAGE CONTENT ── */}
+      <main className="p-0">
         <Outlet />
       </main>
     </div>

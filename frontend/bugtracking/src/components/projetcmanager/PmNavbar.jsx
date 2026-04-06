@@ -1,175 +1,197 @@
-    import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { FaBars, FaBug, FaTimes } from "react-icons/fa";
-import { FiChevronDown, FiLogOut, FiSettings, FiUser } from "react-icons/fi";
-import { NavLink, Outlet } from "react-router-dom";
+import { FiChevronDown, FiLogOut, FiSettings, FiUser, FiBell } from "react-icons/fi";
+import { NavLink, Outlet, Link } from "react-router-dom";
+import { AuthContext } from "../../AuthProvider";
+import axios from "axios";
 
-    export const PmNavbar = () => {
+export const PmNavbar = () => {
+    const { userId } = useContext(AuthContext);
+
     const [menuOpen, setMenuOpen] = useState(false);
     const [profileOpen, setProfileOpen] = useState(false);
+    const [user, setUser] = useState(null);
+
     const profileRef = useRef(null);
 
     const navLinks = [
-        { name: "Dashboard",       path: "dashboard" },
-        { name: "Projects",        path: "projects" },
-        { name: "Manage Bugs",     path: "bugs" },
+        { name: "Dashboard", path: "dashboard" },
+        { name: "Projects", path: "projects" },
+        { name: "Manage Bugs", path: "bugs" },
         { name: "User Management", path: "user" },
     ];
 
-    // Close profile dropdown on outside click
+    // ✅ Get User Details
+    const getUser = async () => {
+        if (!userId) return;
+
+        try {
+            const res = await axios.get(`/user/details/${userId}`);
+            setUser(res.data.data);
+        } catch (err) {
+            console.log("User Fetch Error:", err);
+        }
+    };
+
+    useEffect(() => {
+        getUser();
+    }, [userId]);
+
+    // ✅ Close dropdown when clicking outside
     useEffect(() => {
         const handler = (e) => {
-        if (profileRef.current && !profileRef.current.contains(e.target)) {
-            setProfileOpen(false);
-        }
+            if (profileRef.current && !profileRef.current.contains(e.target)) {
+                setProfileOpen(false);
+            }
         };
+
         document.addEventListener("mousedown", handler);
         return () => document.removeEventListener("mousedown", handler);
     }, []);
 
     return (
         <div className="min-h-screen bg-slate-50">
-
-        <nav className="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-50">
-            <div className="max-w-7xl mx-auto px-6">
-            <div className="flex items-center justify-between h-16">
-
-                {/* Logo */}
-                <div className="flex items-center gap-2.5">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sky-500 text-white shadow-sm shadow-sky-200">
-                    <FaBug className="text-sm" />
-                </div>
-                <div>
-                    <p className="text-sm font-bold text-slate-800 leading-none">BugTrack</p>
-                    <p className="text-[10px] text-slate-400 tracking-wider uppercase mt-0.5">PM Panel</p>
-                </div>
-                </div>
-
-                {/* Desktop Nav Links */}
-                <ul className="hidden md:flex items-center gap-1">
-                {navLinks.map((link, index) => (
-                    <li key={index}>
-                    <NavLink
-                        to={link.path}
-                        className={({ isActive }) =>
-                        `relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150
-                        ${isActive
-                            ? "bg-sky-50 text-sky-600"
-                            : "text-slate-500 hover:bg-slate-100 hover:text-slate-800"
-                        }`
-                        }
-                    >
-                        {({ isActive }) => (
-                        <>
-                            {link.name}
-                            {isActive && (
-                            <span className="absolute bottom-1 left-1/2 -translate-x-1/2 h-0.5 w-4 rounded-full bg-sky-500" />
-                            )}
-                        </>
-                        )}
-                    </NavLink>
-                    </li>
-                ))}
-                </ul>
-
-                {/* Right side — Profile */}
-                <div className="hidden md:flex items-center gap-3">
-
-                {/* Notification dot */}
-                <button className="relative flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:border-sky-300 hover:text-sky-500 transition-all duration-150">
-                    🔔
-                    <span className="absolute -right-1 -top-1 h-3.5 w-3.5 flex items-center justify-center rounded-full bg-red-500 text-[8px] font-bold text-white">3</span>
-                </button>
-
-                {/* Profile dropdown */}
-                <div className="relative" ref={profileRef}>
-                    <button
-                    onClick={() => setProfileOpen(!profileOpen)}
-                    className="flex items-center gap-2.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 hover:border-sky-300 hover:bg-sky-50 transition-all duration-150"
-                    >
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-sky-400 to-blue-500 text-xs font-bold text-white">
-                        P
-                    </div>
-                    <span className="text-xs font-semibold text-slate-700">PM User</span>
-                    <FiChevronDown className={`text-slate-400 text-xs transition-transform duration-200 ${profileOpen ? "rotate-180" : ""}`} />
-                    </button>
-
-                    {profileOpen && (
-                    <div className="absolute right-0 top-12 w-44 rounded-xl border border-slate-200 bg-white shadow-lg shadow-slate-200/60 py-1.5 overflow-hidden">
-                        <div className="px-3 py-2 border-b border-slate-100 mb-1">
-                        <p className="text-xs font-semibold text-slate-700">PM User</p>
-                        <p className="text-[10px] text-slate-400">Project Manager</p>
-                        </div>
-                        <button className="flex w-full items-center gap-2.5 px-3 py-2 text-xs text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors">
-                        <FiUser className="text-slate-400" /> Profile
-                        </button>
-                        <button className="flex w-full items-center gap-2.5 px-3 py-2 text-xs text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors">
-                        <FiSettings className="text-slate-400" /> Settings
-                        </button>
-                        <div className="h-px bg-slate-100 my-1" />
-                        <button className="flex w-full items-center gap-2.5 px-3 py-2 text-xs text-red-500 hover:bg-red-50 transition-colors">
-                        <FiLogOut /> Logout
-                        </button>
-                    </div>
-                    )}
-                </div>
-                </div>
-
-                {/* Mobile hamburger */}
-                <button
-                className="md:hidden flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-100 transition-colors"
-                onClick={() => setMenuOpen(!menuOpen)}
-                >
-                {menuOpen ? <FaTimes size={16} /> : <FaBars size={16} />}
-                </button>
-            </div>
-            </div>
-
-            {/* Mobile Menu */}
-            {menuOpen && (
-            <div className="md:hidden border-t border-slate-100 bg-white px-4 pb-4 pt-3">
-                <ul className="space-y-1">
-                {navLinks.map((link, index) => (
-                    <li key={index}>
-                    <NavLink
-                        to={link.path}
-                        onClick={() => setMenuOpen(false)}
-                        className={({ isActive }) =>
-                        `flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-all duration-150
-                        ${isActive
-                            ? "bg-sky-50 text-sky-600"
-                            : "text-slate-500 hover:bg-slate-100 hover:text-slate-800"
-                        }`
-                        }
-                    >
-                        {link.name}
-                    </NavLink>
-                    </li>
-                ))}
-                </ul>
-
-                {/* Mobile profile row */}
-                <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-sky-400 to-blue-500 text-xs font-bold text-white">
-                    P
+            {/* --- TOP WHITE HEADER --- */}
+            <header className="bg-white border-b border-slate-100 px-6 py-3 flex items-center justify-between sticky top-0 z-[60]">
+                
+                {/* Logo Section */}
+                <div className="flex items-center gap-3">
+                    <div className="h-9 w-9 bg-[#71dd37] rounded-lg flex items-center justify-center text-white text-xl shadow-sm">
+                        <FaBug />
                     </div>
                     <div>
-                    <p className="text-xs font-semibold text-slate-700">PM User</p>
-                    <p className="text-[10px] text-slate-400">Project Manager</p>
+                        <p className="text-xl font-bold text-slate-800 leading-none tracking-tight">BugTrack</p>
+                        <p className="text-[10px] uppercase tracking-widest text-slate-400 font-semibold mt-1">PM Panel</p>
                     </div>
                 </div>
-                <button className="text-xs text-red-500 font-medium hover:text-red-600 transition-colors">
-                    Logout
-                </button>
-                </div>
-            </div>
-            )}
-        </nav>
 
-        {/* Page content */}
-        <main>
-            <Outlet />
-        </main>
+                {/* Right Side Tools */}
+                <div className="flex items-center gap-4">
+                    
+                    {/* Notification */}
+                    <button className="relative p-2 text-slate-400 hover:text-[#71dd37] transition-colors">
+                        <FiBell size={20} />
+                        <span className="absolute top-2 right-2 h-2 w-2 bg-pink-500 rounded-full border-2 border-white"></span>
+                    </button>
+
+                    <div className="h-8 w-px bg-slate-200 mx-1 hidden sm:block"></div>
+
+                    {/* Profile Dropdown */}
+                    <div className="relative" ref={profileRef}>
+                        <button 
+                            className="flex items-center gap-3 focus:outline-none group"
+                            onClick={() => setProfileOpen(!profileOpen)}
+                        >
+                            {/* ✅ Profile Image Rendering */}
+                            <div className="h-9 w-9 rounded-full overflow-hidden border border-slate-200 bg-slate-100 flex-shrink-0">
+                                {user?.image ? (
+                                    <img
+                                        src={user.image}
+                                        alt="profile"
+                                        className="h-full w-full object-cover"
+                                    />
+                                ) : (
+                                    <div className="h-full w-full flex items-center justify-center bg-sky-500 text-white font-bold text-sm">
+                                        {user?.name?.charAt(0) || "P"}
+                                    </div>
+                                )}
+                            </div>
+                            
+                            <div className="hidden md:block text-left">
+                                <p className="text-sm font-bold text-slate-700 leading-none group-hover:text-[#71dd37] transition-colors">
+                                    {user?.name || "Loading..."}
+                                </p>
+                            </div>
+                            <FiChevronDown className={`text-slate-400 text-xs transition-transform duration-200 ${profileOpen ? 'rotate-180' : ''}`} />
+                        </button>
+
+                        {profileOpen && (
+                            <div className="absolute right-0 mt-3 w-56 bg-white border border-slate-100 rounded-xl shadow-xl z-[70] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                                <div className="p-4 bg-slate-50 border-b border-slate-100">
+                                    <p className="text-sm font-bold text-slate-800">{user?.name || "PM User"}</p>
+                                    <p className="text-[10px] text-slate-400 uppercase font-medium tracking-wider">Project Manager</p>
+                                </div>
+
+                                <div className="p-1">
+
+                                    <Link
+                                        to={`setting/${userId}`}
+                                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 hover:bg-sky-50 hover:text-sky-600 rounded-lg transition-colors"
+                                        onClick={() => setProfileOpen(false)}
+                                    >
+                                        <FiSettings size={14} /> Settings
+                                    </Link>
+
+                                    <hr className="my-1 border-slate-100" />
+
+                                    <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-rose-500 hover:bg-rose-50 rounded-lg transition-colors">
+                                        <FiLogOut size={14} /> Logout
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </header>
+
+            {/* --- DARK NAVIGATION BAR --- */}
+            <nav className="bg-[#191c24] sticky top-[61px] z-50">
+                <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-12">
+                    
+                    {/* Desktop Links */}
+                    <ul className="hidden md:flex items-center gap-8 h-full">
+                        {navLinks.map((link, index) => (
+                            <li key={index} className="h-full">
+                                <NavLink 
+                                    to={link.path}
+                                    className={({ isActive }) =>
+                                        `h-full flex items-center px-1 text-[11px] font-bold uppercase tracking-widest border-b-2 transition-all duration-200
+                                        ${isActive 
+                                            ? "text-[#71dd37] border-[#71dd37]" 
+                                            : "text-slate-400 border-transparent hover:text-white"}`
+                                    }
+                                >
+                                    {link.name}
+                                </NavLink>
+                            </li>
+                        ))}
+                    </ul>
+
+                    {/* Mobile Toggle */}
+                    <button 
+                        className="md:hidden ml-auto text-slate-300 hover:text-white transition-colors"
+                        onClick={() => setMenuOpen(!menuOpen)}
+                    >
+                        {menuOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
+                    </button>
+                </div>
+
+                {/* Mobile Menu Content */}
+                {menuOpen && (
+                    <div className="md:hidden bg-[#191c24] border-t border-slate-800 px-6 py-4 space-y-4">
+                        {navLinks.map((link, index) => (
+                            <NavLink
+                                key={index}
+                                to={link.path}
+                                className={({ isActive }) =>
+                                    `block text-xs font-bold uppercase tracking-tighter transition-colors
+                                    ${isActive ? "text-[#71dd37]" : "text-slate-400"}`
+                                }
+                                onClick={() => setMenuOpen(false)}
+                            >
+                                {link.name}
+                            </NavLink>
+                        ))}
+                    </div>
+                )}
+            </nav>
+
+            {/* --- PAGE CONTENT --- */}
+            <main className="p-6">
+                <div className="max-w-7xl mx-auto">
+                    <Outlet />
+                </div>
+            </main>
         </div>
     );
-    };
+};
