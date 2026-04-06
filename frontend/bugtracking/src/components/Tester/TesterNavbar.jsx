@@ -12,7 +12,7 @@ export const TesterNavbar = () => {
 
   const navLinks = [
     { name: "Dashboard", path: "dashboard" },
-    { name: "Projects", path: `project/${userId}`},
+    { name: "Tasks", path: `task/${userId}`},
     { name: "All Bugs", path: `bug/${userId}` },
     
   ];

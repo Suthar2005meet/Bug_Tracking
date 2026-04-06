@@ -11,14 +11,12 @@ import { ShowUser } from "../components/Admin/users/ShowUser";
 import { UserDetail } from "../components/Admin/users/UserDetail";
 import { DevDashboard } from "../components/developer/DevDashboard";
 import { DevelopNavbar } from "../components/developer/DevelopNavbar";
-import { Project } from "../components/developer/Project";
 import { Login } from "../components/Login";
 import { PmDashboard } from "../components/projetcmanager/PmDashboard";
 import { PmNavbar } from "../components/projetcmanager/PmNavbar";
 import { ProtectedRoutes } from "../components/ProtectedRoutes";
 import { TestDashBoard } from "../components/Tester/TestDashBoard";
 import { TesterNavbar } from "../components/Tester/TesterNavbar";
-import { TesterProject } from "../components/Tester/TesterProject";
 import { AddComment } from "../pages/bug/AddComment";
 import { AllComments } from "../pages/bug/AllComments";
 import { Bug } from "../pages/bug/Bug";
@@ -32,6 +30,8 @@ import { Projects } from "../components/projetcmanager/Projects";
 import { SprintProject } from "../components/projetcmanager/SprintProject";
 import { AddSprint } from "../components/projetcmanager/AddSprint";
 import { AddTask } from "../components/projetcmanager/AddTask";
+import { Task } from "../components/developer/Task"
+import { TesterTask } from "../components/Tester/TesterTask";
 
 const router = createBrowserRouter([
     {path:'/' , element:<Login/>},
@@ -66,7 +66,7 @@ const router = createBrowserRouter([
         children:[
             {index: true,element:<Navigate to="dashboard" replace />},
             {path:'dashboard',element:<DevDashboard/>},
-            {path:'project/:id',element:<Project/>},
+            {path:'task/:id',element:<Task/>},
             {path:'bugs/:id',element:<Bug/>},
             {path:'bugs/:id/details/:id',element:<BugDetails/>},
             {path:'bugs/:id/addcomment/:id',element:<AddComment/>},
@@ -81,8 +81,8 @@ const router = createBrowserRouter([
         children:[
             {index: true,element:<Navigate to="dashboard" replace />},
             {path:'dashboard',element:<TestDashBoard/>},
-            {path:'project/:id',element:<TesterProject/>},
-            {path:'project/:id/createbug',element:<CreateBug/>},
+            {path:'task/:id',element:<TesterTask/>},
+            {path:'task/:id/createbug/:id',element:<CreateBug/>},
             // {path:'createbug',element:<CreateBug/>},
             {path:'bug/:id',element:<Bug/>},
             {path:'bug/:id/details/:id',element:<BugDetails/>},

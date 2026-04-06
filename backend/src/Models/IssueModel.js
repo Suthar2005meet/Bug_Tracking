@@ -6,7 +6,6 @@ const IssueSchema = new Schema (
     {
         title : {
             type : String,
-            required : true
         },
 
         issueType : {
@@ -35,10 +34,10 @@ const IssueSchema = new Schema (
             ref : "users"
         },
 
-        assigend : {
+        assigend : [{
             type : mongoose.Schema.Types.ObjectId,
             ref : "users"
-        },
+        }],
 
         sprintId : {
             type : mongoose.Schema.Types.ObjectId,
