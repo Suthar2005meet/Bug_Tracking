@@ -115,14 +115,6 @@ const loginUser = async (req, resp) => {
             action: "LOGIN"
         })
 
-        // ✅ Notification
-        await NotificationModel.create({
-            receiver: foundUserFromEmail._id,
-            sender: foundUserFromEmail._id,
-            type: "LOGIN",
-            message: `You logged in successfully`
-        })
-
         resp.status(200).json({
             message: "Login Successfully",
             token: token,

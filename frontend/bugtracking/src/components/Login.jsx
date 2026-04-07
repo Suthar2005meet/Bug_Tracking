@@ -39,7 +39,15 @@ export const Login = () => {
     setLoading(true)
     try {
       const res = await axios.post('/user/login', data)
+      console.log('🌐 Backend login response:', res.data);
+      console.log('🔑 Backend token:', res.data.token ? 'present' : 'MISSING');
+      console.log('👤 Backend role:', res.data.role);
+      
       if (res.status === 200 || res.status === 201) {
+        if (!res.data.token) {
+          toast.error('Login failed: No token in response');
+          return;
+        }
         login(res.data.token)
         toast.success('Login Successfully 🎉')
         switch (res.data.role) {

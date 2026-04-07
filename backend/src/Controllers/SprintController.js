@@ -24,38 +24,25 @@ const AddSprint = async (req, resp) => {
         const sprint = await SprintSchema.create(req.body)
 
         // ✅ 2. Create Activity Log
-        const currentUserId = req.user?._id || req.body.createdBy
-        
         await ActivityLogModel.create({
-            user: currentUserId,
-            action: "SPRINT_CREATED",
-            project: req.body.projectId,
-            sprint: sprint._id
+        user: req.body.userId,
+        action: "SPRINT_CREATED",
+        project: req.body.projectId,
+        sprint: sprint._id
         })
 
-        // ✅ 3. Notify Project Members
-        const project = await ProjectModel.findById(req.body.projectId)
-        
-        if (project?.members?.length > 0) {
-            const notifications = project.members
-                .filter(member => member.toString() !== currentUserId?.toString())
-                .map(member => ({
-                    receiver: member,
-                    sender: currentUserId,
-                    type: "SPRINT_ADDED",
-                    project: req.body.projectId,
-                    sprint: sprint._id,
-                    message: `Sprint "${req.body.name}" has been created`
-                }))
-            
-            if (notifications.length > 0) {
-                await NotificationModel.insertMany(notifications)
-            }
-        }
-
+        // ✅ 3. Create Notification
+        await NotificationModel.insertMany([{
+        receiver: req.body.userId,
+        sender: req.body.userId,
+        type: "SPRINT_ADDED",
+        project: req.body.projectId,
+        sprint: sprint._id,
+        message: `Sprint "${req.body.name}" has been created`
+    }])
         resp.status(201).json({
-            message: "Sprint Added Successfully",
-            data: sprint
+        message: "Sprint Added Successfully",
+        data: sprint
         })
 
     } catch (err) {

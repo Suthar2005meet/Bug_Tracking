@@ -32,6 +32,10 @@ app.use('/issue',IssueRoute)
 const SprintRoute = require("./src/Routes/SprintRoute")
 app.use('/sprint',SprintRoute)
 
+const NotificationRoute = require("./src/Routes/NotificationRoute")
+app.use('/notification',NotificationRoute)
+
+
 const PORT = process.env.PORT
 app.listen(PORT,()=>{
     console.log(`Server Has been start at port ${PORT}`);

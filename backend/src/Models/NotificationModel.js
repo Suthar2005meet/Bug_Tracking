@@ -51,7 +51,7 @@
 
         task: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "issue",
+        ref: "issues",
         },
 
         sprint: {
@@ -73,6 +73,6 @@
     { timestamps: true },
     );
 
-    const NotificationModel = mongoose.model("Notification", NotificationSchema);
+    const NotificationModel = mongoose.model("notifications", NotificationSchema);
 
     module.exports = NotificationModel;

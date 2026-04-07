@@ -3,8 +3,8 @@ const NotificationModel = require('../Models/NotificationModel');
 // Get all notifications for a user
 const getUserNotifications = async (req, resp) => {
     try {
-        const { userId } = req.params;
-        const notifications = await NotificationModel.find({ receiver: userId })
+        const { id } = req.params;
+        const notifications = await NotificationModel.find({ receiver: id })
             .populate('sender', 'name email')
             .populate('bug', 'title')
             .populate('project', 'name')

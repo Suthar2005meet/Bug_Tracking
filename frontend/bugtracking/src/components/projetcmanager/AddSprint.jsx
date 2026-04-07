@@ -10,6 +10,7 @@ export const AddSprint = () => {
 
   const [formData, setFormData] = useState({
     name: "",
+    userId : "",
     projectId: id,
     startDate: "",
     dueDate: "",

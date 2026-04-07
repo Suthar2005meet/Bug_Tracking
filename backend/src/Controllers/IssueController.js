@@ -350,7 +350,7 @@
     const { id } = req.params;
     try {
         const res = await IssueSchema.find({
-        assigend: id,
+        assigned: id,
         status: ["In Testing", "Resolved", "Closed", "Re-Open"],
         });
 

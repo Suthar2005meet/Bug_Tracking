@@ -40,9 +40,9 @@ const BugSchema = new mongoose.Schema(
     dueDate : {
         type : String
     },
-    projectId : {
+    taskId : {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "projects",
+        ref: "tasks",
         required: true,
     },
 

@@ -1,5 +1,5 @@
     import { jwtDecode } from "jwt-decode";
-    import { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 
     export const AuthContext = createContext();
 
@@ -12,34 +12,64 @@
     // 🔥 Run when app loads
     useEffect(() => {
         const storedToken = localStorage.getItem("token");
+        console.log('📱 App load - storedToken:', storedToken ? 'present' : 'MISSING');
+        console.log('📱 localStorage userId on load:', localStorage.getItem('userId'));
 
         if (storedToken) {
         try {
             const decoded = jwtDecode(storedToken);
-
+            console.log('📦 Load decoded:', decoded);
+            
+            const userId = decoded._id || decoded.id || decoded.sub || decoded.userId;
             setToken(storedToken);
-            setUserId(decoded._id); // ✅ FIXED
-            setRole(decoded.role); // ✅ OK
-            setname(decoded.name)
+            setUserId(userId);
+            setRole(decoded.role);
+            setname(decoded.name);
+            console.log('✅ Loaded userId to state:', userId);
         } catch (err) {
-            console.log("Invalid Token");
+            console.error('❌ Load - Invalid Token:', err);
             localStorage.removeItem("token");
+            localStorage.removeItem("userId");
+            localStorage.removeItem("role");
         }
         }
     }, []);
 
     // 🔥 Login function
     const login = (newToken) => {
+        console.log('🔑 Login called with token:', newToken ? 'present' : 'MISSING');
+        
+        if (!newToken) {
+            console.error('❌ No token provided to login()');
+            return;
+        }
+        
         localStorage.setItem("token", newToken);
-
-        const decoded = jwtDecode(newToken);
-
-        localStorage.setItem("userId", decoded._id); // ✅ FIXED
-        localStorage.setItem("role", decoded.role);
-
-        setToken(newToken);
-        setUserId(decoded._id); // ✅ FIXED
-        setRole(decoded.role);
+        
+        try {
+            const decoded = jwtDecode(newToken);
+            console.log('📦 Decoded JWT payload:', decoded);
+            
+            const userId = decoded._id || decoded.id || decoded.sub || decoded.userId;
+            console.log('🆔 Extracted userId:', userId);
+            
+            if (!userId) {
+                console.error('❌ No userId found in token! Payload keys:', Object.keys(decoded));
+                return;
+            }
+            
+            localStorage.setItem("userId", userId);
+            localStorage.setItem("role", decoded.role);
+            console.log('💾 Saved to localStorage:', { userId, role: decoded.role });
+            console.log('🔍 Verify localStorage userId:', localStorage.getItem('userId'));
+            
+            setToken(newToken);
+            setUserId(userId);
+            setRole(decoded.role);
+        } catch (err) {
+            console.error('❌ JWT decode failed:', err);
+            localStorage.removeItem('token');
+        }
     };
 
     // 🔥 Logout function

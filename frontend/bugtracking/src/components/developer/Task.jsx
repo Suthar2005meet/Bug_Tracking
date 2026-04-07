@@ -54,7 +54,7 @@ export const Task = () => {
       }
       setLoading(true);
       await axios.put(`/issue/adduser/${issueId}`, {
-        userId: selectedTester[issueId],
+        assigned: selectedTester[issueId],
       });
       await axios.put(`/issue/update/${issueId}`, {
         status: "In Testing",

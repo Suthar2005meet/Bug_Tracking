@@ -1,0 +1,1 @@
+To test: 1. npm run dev 2. Open http://localhost:5173 3. Login with your credentials 4. Open DevTools (F12)  tab - look for 🔑📦🆔 logs 5. Check Application  Storage  (or localhost:5173)  6. Refresh page - check if userId persists 7. Reply with console output 
