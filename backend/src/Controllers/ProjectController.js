@@ -1,10 +1,58 @@
 const ProjectSchema = require("../Models/ProjectModel");
 const uploadToCloudinary = require("../Utils/uploadToCloudinary");
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
+
+const ActivityLogModel = require("../Models/ActivityLogModel");
+const NotificationModel = require("../Models/NotificationModel");
+
+// ================= HELPERS =================
+
+// ✅ Activity Logger
+const logActivity = async ({ user, action, project }) => {
+  try {
+    await ActivityLogModel.create({
+      user,
+      action,
+      project: project || null,
+    });
+  } catch (err) {
+    console.log("Activity Error:", err.message);
+  }
+};
+
+// ✅ Notification Sender
+const sendNotification = async ({
+  receivers = [],
+  sender,
+  type,
+  project,
+  message,
+}) => {
+  try {
+    const notifications = receivers
+      .filter((id) => id.toString() !== sender.toString()) // ❌ prevent self notify
+      .map((receiver) => ({
+        receiver,
+        sender,
+        type,
+        project,
+        message,
+      }));
+
+    if (notifications.length > 0) {
+      await NotificationModel.insertMany(notifications);
+    }
+  } catch (err) {
+    console.log("Notification Error:", err.message);
+  }
+};
+
+// ================= CONTROLLERS =================
 
 const getAllProject = async (req, resp) => {
-  const allProject = await ProjectSchema.find();
   try {
+    const allProject = await ProjectSchema.find();
+
     resp.json({
       message: "All Project Details",
       data: allProject,
@@ -18,26 +66,44 @@ const getAllProject = async (req, resp) => {
 
 const createProject = async (req, resp) => {
   try {
-    console.log("BODY", req.body);
-    console.log("FILE", req.file);
     if (!req.file) {
       return resp.status(400).json({
         error: "file not upload",
       });
     }
+
     const cloudinaryResponse = await uploadToCloudinary(req.file.buffer);
-    console.log(req.file.buffer);
-    console.log("response.....", cloudinaryResponse);
+
     const savedProject = await ProjectSchema.create({
       ...req.body,
       document: cloudinaryResponse.secure_url,
     });
+
+    // 🔥 Activity
+    await logActivity({
+      user: req.body.createdBy,
+      action: "PROJECT_CREATED",
+      project: savedProject._id,
+    });
+
+    // 🔥 Notification (developers + testers)
+    await sendNotification({
+      receivers: [
+        ...(savedProject.assignedDevelopers || []),
+        ...(savedProject.assignedTester || []),
+      ],
+      sender: req.body._id,
+      type: "PROJECT_ADDED",
+      project: savedProject._id,
+      message: "You have been added to a new project",
+    });
+
     resp.status(201).json({
       message: "project create Successfully",
       data: savedProject,
     });
   } catch (err) {
-    console.log(err);
+    console.log(err)
     resp.status(500).json({
       err: err,
     });
@@ -45,17 +111,17 @@ const createProject = async (req, resp) => {
 };
 
 const getProjectById = async (req, resp) => {
-  const res = await ProjectSchema.findById(req.params.id).populate([
-    { path: "assignedDevelopers" },
-    { path: "assignedTester" },
-    { path: "createdBy" },
-  ]);
   try {
+    const res = await ProjectSchema.findById(req.params.id).populate([
+      { path: "createdBy" },
+    ]);
+
     resp.json({
       message: "Project Details Fetched",
       data: res,
     });
   } catch (err) {
+    console.log(err)
     resp.status(500).json({
       message: "Error while fetched the details",
     });
@@ -67,11 +133,20 @@ const updateById = async (req, resp) => {
     const res = await ProjectSchema.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
     });
+
+    // 🔥 Activity
+    await logActivity({
+      user: req.body._id,
+      action: "PROJECT_UPDATED",
+      project: res._id,
+    });
+
     resp.json({
       message: "Update Succesfully",
       data: res,
     });
   } catch (err) {
+    console.log(err)
     resp.status(500).json({
       message: "error while fetching the data",
       err: err,
@@ -89,12 +164,12 @@ const getProjectByStatus = async (req, resp) => {
         },
       },
     ]);
+
     resp.status(200).json({
       success: true,
       data: statusData,
     });
   } catch (err) {
-    console.log(err);
     resp.status(500).json({
       message: "Data not Found",
       data: err.message,
@@ -104,7 +179,6 @@ const getProjectByStatus = async (req, resp) => {
 
 const getProjectsByUser = async (req, res) => {
   try {
-    // ✅ 1. Get userId from URL params
     const { id } = req.params;
 
     if (!id) {
@@ -114,21 +188,18 @@ const getProjectsByUser = async (req, res) => {
       });
     }
 
-    // ✅ 2. Find projects where assignedMembers array contains userId
     const projects = await ProjectSchema.find({
       assignedDevelopers: id,
     })
       .populate("assignedDevelopers", "name email")
       .populate("assignedTester", "name email");
 
-    // ✅ 3. Send response
     res.status(200).json({
       success: true,
       totalProjects: projects.length,
       data: projects,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({
       success: false,
       message: error.message,
@@ -136,78 +207,90 @@ const getProjectsByUser = async (req, res) => {
   }
 };
 
-
 const startTesting = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // ✅ Check valid ObjectId
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid Project ID"
+        message: "Invalid Project ID",
       });
     }
 
-    // ✅ Find project
     const project = await ProjectSchema.findById(id);
 
     if (!project) {
       return res.status(404).json({
         success: false,
-        message: "Project Not Found"
+        message: "Project Not Found",
       });
     }
 
-    // ✅ If already in testing
     if (project.inTesting === true) {
       return res.status(400).json({
         success: false,
-        message: "Project is already in Testing"
+        message: "Project is already in Testing",
       });
     }
 
-    // ✅ Update only if false
+    // ✅ FIXED: only boolean
     project.inTesting = true;
-    project.inTesting = "true";
 
     await project.save();
+
+    // 🔥 Activity
+    await logActivity({
+      user: req.body._id,
+      action: "PROJECT_UPDATED",
+      project: project._id,
+    });
+
+    // 🔥 Notify testers
+    await sendNotification({
+      receivers: project.assigend || [],
+      sender: req.body._id,
+      type: "PROJECT_ADDED",
+      project: project._id,
+      message: "Project moved to testing phase",
+    });
 
     return res.status(200).json({
       success: true,
       message: "Project moved to Testing successfully",
-      data: project
+      data: project,
     });
-
   } catch (error) {
-    console.log("Start Testing Error:", error);
     return res.status(500).json({
       success: false,
-      message: "Server Error"
+      message: "Server Error",
     });
   }
 };
 
-const getProjectByTester = async (req,resp) => {
-  const {id} = req.params
-  try{
-    const res = await ProjectSchema.find({assignedTester: id ,inTesting : "true"}).populate([
-      {path: "createdBy" },
-      {path : "assignedDevelopers"},
-      {path : "assignedTester"}
-    ])
+const getProjectByTester = async (req, resp) => {
+  const { id } = req.params;
+  try {
+    const res = await ProjectSchema.find({
+      assignedTester: id,
+      inTesting: true,
+    }).populate([
+      { path: "createdBy" },
+      { path: "assignedDevelopers" },
+      { path: "assignedTester" },
+    ]);
+
     resp.json({
-      message : "Tester Project Find Successfully",
-      data : res
-    })
-  }catch(err){
-    console.log(err)
+      message: "Tester Project Find Successfully",
+      data: res,
+    });
+  } catch (err) {
     resp.status(500).json({
-      message : "Error while Fetching the testerassign project",
-      err : err
-    })
+      message: "Error while Fetching the testerassign project",
+      err: err,
+    });
   }
-}
+};
 
 module.exports = {
   getAllProject,
@@ -217,5 +300,5 @@ module.exports = {
   getProjectByStatus,
   getProjectsByUser,
   startTesting,
-  getProjectByTester
+  getProjectByTester,
 };

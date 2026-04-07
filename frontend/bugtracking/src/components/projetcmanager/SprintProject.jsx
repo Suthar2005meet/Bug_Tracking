@@ -137,8 +137,8 @@ export const SprintProject = () => {
   const getStatusStats = (tasks) => {
     return {
       "Open": tasks.filter((t) => t.status === "Open").length,
-      "In-Progress": tasks.filter((t) => t.status === "In-Progress").length,
-      "In-Testing": tasks.filter((t) => t.status === "In-Testing").length,
+      "In-Progress": tasks.filter((t) => t.status === "In Progress").length,
+      "In-Testing": tasks.filter((t) => t.status === "In Testing").length,
       "Resolved": tasks.filter((t) => t.status === "Resolved").length,
       "Closed": tasks.filter((t) => t.status === "Closed").length,
       "Re-Open": tasks.filter((t) => t.status === "Re-Open").length,

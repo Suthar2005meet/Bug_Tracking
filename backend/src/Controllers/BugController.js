@@ -1,182 +1,292 @@
-    const BugSchema = require('../Models/BugModel')
-    const uploadToCloudinary = require('../Utils/uploadToCloudinary')
+const BugSchema = require("../Models/BugModel");
+const ActivityLogModel = require("../Models/ActivityLogModel");
+const NotificationModel = require("../Models/NotificationModel");
+const uploadToCloudinary = require("../Utils/uploadToCloudinary");
 
+const normalizeToArray = value => {
+    if (Array.isArray(value)) return value;
+    if (!value) return [];
+    return [value];
+};
 
-    const allbugs = async(req,resp) => {
-        const bugs = await BugSchema.find()
-        try{
-            resp.json({
-            message : 'all bugs details',
-            data : bugs
-        })
-        }catch(err){
-            resp.status(500).json({
-                err:err
-            })
-        }
-    }
-
-    const addBug = async (req, resp) => {
+// =====================================================
+// 1️⃣ Get All Bugs
+// =====================================================
+const allbugs = async (req, resp) => {
     try {
-            console.log("BODY:", req.body);
-            console.log("FILE:", req.file);
+        const bugs = await BugSchema.find();
+
+        resp.json({
+            message: "all bugs details",
+            data: bugs
+        });
+
+    } catch (err) {
+        resp.status(500).json({ err });
+    }
+};
+
+
+// =====================================================
+// 2️⃣ Add Bug + Activity + Notification
+// =====================================================
+const addBug = async (req, resp) => {
+    try {
 
         if (!req.file) {
-        return resp.status(400).json({
-            error: "File not uploaded"
+            return resp.status(400).json({
+                error: "File not uploaded",
+                
+            });
+        }
+
+        const cloudinaryResponse = await uploadToCloudinary(req.file.buffer);
+
+        const savedbug = await BugSchema.create({
+            ...req.body,
+            image: cloudinaryResponse.secure_url
         });
-    }
-        //console.log('Response.....', cloudinaryResponse)
-        const cloudinaryResponse = await uploadToCloudinary(req.file.buffer)
-        console.log(req.file.path);
-        console.log('Response.....', cloudinaryResponse)
-        const savedbug = await BugSchema.create({...req.body,image: cloudinaryResponse.secure_url})
+
+        const reporterId = Array.isArray(req.body.reportedBy)
+            ? req.body.reportedBy[0]
+            : req.body.reportedBy;
+
+        // =====================================================
+        // 🔥 Activity Log
+        // =====================================================
+        await ActivityLogModel.create({
+            user: reporterId,
+            action: "BUG_CREATED",
+            bug: savedbug._id,
+            task: req.body.taskId || null
+        });
+
+        // =====================================================
+        // 🔔 Notification to Assigned Developers
+        // =====================================================
+        const assignedUsers = normalizeToArray(savedbug.assignedId);
+        if (assignedUsers.length > 0) {
+            const notifications = assignedUsers.map(dev => ({
+                receiver: dev,
+                sender: reporterId,
+                type: "BUG_ASSIGNED",
+                bug: savedbug._id,
+                task: req.body.taskId || null,
+                message: "You have been assigned a new bug"
+            }));
+
+            await NotificationModel.insertMany(notifications);
+        }
 
         resp.status(201).json({
-        message: 'bug detail saved',
-        data: savedbug
-        })
+            message: "bug detail saved",
+            data: savedbug
+        });
+
     } catch (err) {
-        console.error('addBug failed:', err.message)
+        console.error("addBug failed:", err.message);
         resp.status(500).json({
-        error: err.message || err
-        })
+            error: err.message || err
+        });
     }
-    }
+};
 
-    const getBugById = async(req,resp) => {
+
+// =====================================================
+// 3️⃣ Get Bug By ID
+// =====================================================
+const getBugById = async (req, resp) => {
+    try {
         const bugdetail = await BugSchema.findById(req.params.id).populate([
-            {path : "projectId",populate : [
-                {path : "assignedDevelopers"},
-                {path : "assignedTester"}
-            ]}
-        ])
-        try{
-            resp.json({
-            message : "bug Details Fetched",
-            data : bugdetail
-        })
-        }catch(err){
-            resp.status(500).json({
-                err:err
-            })
-        }
-        
-    }
+            {
+                path: "projectId",
+                populate: [
+                    { path: "assignedDevelopers" },
+                    { path: "assignedTester" }
+                ]
+            }
+        ]);
 
-    const uppdateBug = async(req,resp) => {
-        const updatedData = await BugSchema.findByIdAndUpdate(req.params.id, req.body, { new: true })
-        try{
-            resp.status(200).json({
-                message : "Update bug details succesfully",
-                data : updatedData
-            })
-        }catch(err){
-            resp.status(500).json({
-                err:err
-            })
-        }
-    }
+        resp.json({
+            message: "bug Details Fetched",
+            data: bugdetail
+        });
 
-    const getBugByStatus = async (req, res) => {
-        try {
-            const statusData = await BugSchema.aggregate([
+    } catch (err) {
+        resp.status(500).json({ err });
+    }
+};
+
+
+// =====================================================
+// 4️⃣ Update Bug + Activity
+// =====================================================
+const uppdateBug = async (req, resp) => {
+    try {
+
+        const oldBug = await BugSchema.findById(req.params.id);
+
+        const updatedData = await BugSchema.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            { new: true }
+        );
+
+        if (!updatedData) {
+            return resp.status(404).json({
+                message: "Bug Not Found"
+            });
+        }
+
+        // 🔥 Activity Log
+        await ActivityLogModel.create({
+            user: req.body.updatedBy,
+            action: "BUG_UPDATED",
+            bug: updatedData._id,
+            task: updatedData.taskId
+        });
+
+        resp.status(200).json({
+            message: "Update bug details successfully",
+            data: updatedData
+        });
+
+    } catch (err) {
+        resp.status(500).json({ err });
+    }
+};
+
+
+// =====================================================
+// 5️⃣ Bug Status Analytics
+// =====================================================
+const getBugByStatus = async (req, res) => {
+    try {
+        const statusData = await BugSchema.aggregate([
             {
                 $group: {
-                _id: "$status",      // group by status field
-                total: { $sum: 1 }   // count documents
+                    _id: "$status",
+                    total: { $sum: 1 }
                 }
             }
-            ]);
+        ]);
 
-            res.status(200).json({
+        res.status(200).json({
             success: true,
             data: statusData
-            });
+        });
 
-        } catch (err) {
-            res.status(500).json({
+    } catch (err) {
+        res.status(500).json({
             message: "Data not found",
             error: err.message
-            });
-        }
-    };
-    
-    const getBugsByUser = async (req, res) => {
+        });
+    }
+};
+
+
+// =====================================================
+// 6️⃣ Get Bugs By User
+// =====================================================
+const getBugsByUser = async (req, res) => {
     try {
-        // ✅ 1. Get userId from URL params
+
         const { id } = req.params;
 
         if (!id) {
-        return res.status(400).json({
-            success: false,
-            message: "User ID is required in URL",
-        });
+            return res.status(400).json({
+                success: false,
+                message: "User ID is required in URL"
+            });
         }
 
-        // ✅ 2. Find projects where assignedMembers array contains userId
         const bugs = await BugSchema.find({
             $or: [
-                { assignedDeveloper: id },
+                { assignedId: id },
                 { reportedBy: id }
-        ]
+            ]
         }).populate([
-            {path: "assignedDeveloper"},
-            {path: "reportedBy"}
-        ])
-        // .populate("assigned", "name email")
-        // .populate("reportedBy", "name email");
+            { path: "assignedId" },
+            { path: "reportedBy" }
+        ]);
 
-        // ✅ 3. Send response
         res.status(200).json({
-        success: true,
-        totalBugs : bugs.length,
-        data: bugs,
+            success: true,
+            totalBugs: bugs.length,
+            data: bugs
         });
+
     } catch (error) {
-        console.log(error)
         res.status(500).json({
-        success: false,
-        message: error.message,
+            success: false,
+            message: error.message
         });
     }
-    };
+};
 
-    const updateBugStatus = async(req,resp) => {
-        try{
-            const { status } = req.body
 
-            const res = await BugSchema.findById(req.params.id)
-            if(res){
-                res.status = status;
-                await res.save();
+// =====================================================
+// 7️⃣ Update Bug Status + Activity + Notification
+// =====================================================
+const updateBugStatus = async (req, resp) => {
+    try {
 
-                resp.status(200).json({
-                    success: true,
-                    message: "Status updated successfully",
-                    data: res
-                });
-            }else{
-                resp.status(404).json({
-                    message: "Bug Not Find"
-                })
-            }
-        }catch(err){
-            console.log(err)
-            resp.status(500).json({
-                message : "Server Error",
-                err : err
-            })
+        const { status, updatedBy } = req.body;
+
+        const bug = await BugSchema.findById(req.params.id);
+
+        if (!bug) {
+            return resp.status(404).json({
+                message: "Bug Not Find"
+            });
         }
+
+        bug.status = status;
+        await bug.save();
+
+        // 🔥 Activity Log
+        await ActivityLogModel.create({
+            user: updatedBy,
+            action: "BUG_STATUS_CHANGED",
+            bug: bug._id,
+            task: bug.projectId
+        });
+
+        // 🔔 Notify Reporter
+        if (bug.reportedBy?.length > 0) {
+            const notifications = bug.reportedBy.map(user => ({
+                receiver: user,
+                sender: updatedBy,
+                type: "BUG_STATUS_CHANGED",
+                bug: bug._id,
+                task: bug.projectId,
+                message: `Bug status changed to ${status}`
+            }));
+
+            await NotificationModel.insertMany(notifications);
+        }
+
+        resp.status(200).json({
+            success: true,
+            message: "Status updated successfully",
+            data: bug
+        });
+
+    } catch (err) {
+        resp.status(500).json({
+            message: "Server Error",
+            err: err
+        });
     }
+};
 
 
-    module.exports = {
-        addBug,
-        allbugs,
-        getBugById,
-        uppdateBug,
-        getBugByStatus,
-        getBugsByUser,
-        updateBugStatus
-    }
+module.exports = {
+    addBug,
+    allbugs,
+    getBugById,
+    uppdateBug,
+    getBugByStatus,
+    getBugsByUser,
+    updateBugStatus
+};

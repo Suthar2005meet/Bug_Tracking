@@ -46,7 +46,7 @@ const BugSchema = new mongoose.Schema(
         required: true,
     },
 
-    assignedDeveloper : [
+    assignedId : [
         {
             type : mongoose.Schema.Types.ObjectId,
             ref : "users"

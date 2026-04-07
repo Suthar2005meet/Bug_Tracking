@@ -32,11 +32,21 @@
             "TASK_CREATED",
             "TASK_UPDATED",
             "TASK_COMPLETED",
+            "TASK_STATUS_CHANGED",
+            // 🔹 Sprint Actions
+            "SPRINT_CREATED",
+            "SPRINT_UPDATED",
+            "SPRINT_COMPLETED",
+            // 🔹 Sprint Actions
+            "SPRINT_CREATED",
+            "SPRINT_UPDATED",
+            "SPRINT_COMPLETED",
 
             // 🔹 User Actions
             "USER_CREATED",
             "USER_UPDATED",
             "USER_DELETED",
+            "USER_PASSWORD_CHANGED",
 
             // 🔹 Comments
             "COMMENT_ADDED",
@@ -52,6 +62,16 @@
         project: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "projects",
+        },
+
+        task: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "issue",
+        },
+
+        sprint: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "sprints",
         },
     },
     { timestamps: true }

@@ -1,5 +1,4 @@
 const mongoose = require("mongoose")
-const { schema } = require("./BugModel")
 
 const Schema = mongoose.Schema
 

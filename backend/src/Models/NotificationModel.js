@@ -27,8 +27,13 @@
             "BUG_COMMENTED",
             "TASK_ASSIGNED",
             "TASK_COMPLETED",
+            "TASK_STATUS_CHANGED",
             "PROJECT_ADDED",
+            "SPRINT_ADDED",
             "USER_ADDED",
+            "USER_PASSWORD_CHANGED",
+            "USER_UPDATED",
+            "LOGIN",
         ],
         },
 
@@ -42,6 +47,16 @@
         project: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "projects",
+        },
+
+        task: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "issue",
+        },
+
+        sprint: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "sprints",
         },
 
         // 🔹 Custom message (Optional but useful)

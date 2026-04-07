@@ -11,6 +11,7 @@ const validateToken = (req,resp,next) => {
                 const tokenValue = token.split(" ")[1]
                 const decodedData = jwt.verify(tokenValue,secret)
                 console.log(decodedData)
+                req.user = decodedData
                 next()
             }else{
                 resp.status(401).json({

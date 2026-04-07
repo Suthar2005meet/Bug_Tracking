@@ -124,28 +124,6 @@ export const CreateProject = () => {
             />
           </div>
 
-          {/* Assigned Members */}
-          {/* <div className="bg-rose-50 border border-rose-200 border-l-4 border-l-rose-500 p-5 hover:bg-rose-100 hover:border-l-rose-600">
-            <label className="block text-xs font-mono text-rose-600 uppercase tracking-widest mb-3">
-              Assign Members <span className="text-red-400">*</span>
-            </label>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {developer.map((dev) => (
-                <label
-                  key={dev._id}
-                  className="flex items-center gap-2 bg-white border border-rose-200 px-3 py-2 cursor-pointer hover:bg-rose-50 hover:border-rose-400"
-                >
-                  <input
-                    type="checkbox"
-                    value={dev._id}
-                    {...register("assignedMembers", { required: true })}
-                    className="accent-rose-500"
-                  />
-                  <span className="font-mono text-sm text-slate-700">{dev.name}</span>
-                </label>
-              ))}
-            </div>
-          </div> */}
 
           {/* Priority & Status */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

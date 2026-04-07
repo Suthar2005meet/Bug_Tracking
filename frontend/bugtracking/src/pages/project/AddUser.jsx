@@ -25,7 +25,7 @@ export const AddUser = () => {
             console.log(res.data.data)
             if (res.status == 201) {
                 toast.success("User Created Successfully!");
-                navigate("/admin/user");
+                navigate(-1);
             }
         } catch (err) {
             toast.error(err.response?.data?.message || "Registration failed");

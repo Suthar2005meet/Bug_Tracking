@@ -34,7 +34,7 @@ const IssueSchema = new Schema (
             ref : "users"
         },
 
-        assigend : [{
+        assigned : [{
             type : mongoose.Schema.Types.ObjectId,
             ref : "users"
         }],

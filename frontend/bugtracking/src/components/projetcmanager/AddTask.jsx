@@ -18,7 +18,7 @@ export const AddTask = () => {
         issueType: 'Task',
         priority: 'Medium',
         status: 'Open',
-        assigend: '',
+        assigned: '',
         dueDate: '',
     });
 
@@ -158,7 +158,7 @@ export const AddTask = () => {
                         <div>
                             <label className={labelClass}>Assignee</label>
                             <select
-                                name="assigend"
+                                name="assigned"
                                 required
                                 onChange={handleChange}
                                 defaultValue=""

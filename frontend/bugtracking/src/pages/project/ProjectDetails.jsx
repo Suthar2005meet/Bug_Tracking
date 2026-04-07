@@ -148,40 +148,6 @@ export const ProjectDetails = () => {
           <span className="px-3 py-1 text-sm bg-indigo-50 text-indigo-700 rounded-full border border-indigo-200" >{project.createdBy?.name}</span>
         </div>
 
-        <div className="bg-white border border-slate-200 shadow-sm px-6 py-5 border-l-4 border-l-indigo-400">
-          <p className="text-xs uppercase tracking-widest text-slate-400 mb-2">
-            Assigned Members
-          </p>
-          {project.assignedDevelopers && project.assignedDevelopers.length > 0 ? (
-            <div className="flex flex-wrap gap-2">
-              {project.assignedDevelopers.map((member, index) => (
-                <span key={index} className="px-3 py-1 text-sm bg-indigo-50 text-indigo-700 rounded-full border border-indigo-200">
-                  {member.name || member}
-                </span>
-              ))}
-            </div>
-          ) : (
-            <span className="text-sm text-slate-400">No members assigned</span>
-          )}
-        </div>
-
-        <div className="bg-white border border-slate-200 shadow-sm px-6 py-5 border-l-4 border-l-red-400">
-          <p className="text-xs uppercase tracking-widest text-slate-400 mb-2">
-            Assigned Tester
-          </p>
-          {project.assignedTester && project.assignedTester.length > 0 ? (
-            <div className="flex flex-wrap gap-2">
-              {project.assignedTester.map((tester, index) => (
-                <span key={index} className="px-3 py-1 text-sm bg-indigo-50 text-indigo-700 rounded-full border border-indigo-200">
-                  {tester.name || tester}
-                </span>
-              ))}
-            </div>
-          ) : (
-            <span className="text-sm text-slate-400">No members assigned</span>
-          )}
-        </div>
-
         {/* Priority + Status row */}
         <div className="grid grid-cols-2 gap-1 mb-1">
           <div
