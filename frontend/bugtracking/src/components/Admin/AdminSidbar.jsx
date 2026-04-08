@@ -1,18 +1,20 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { FaBars, FaBox, FaBug, FaChevronRight, FaCog, FaUsers } from "react-icons/fa";
 import { FaDatabase } from "react-icons/fa6";
 import { Link, NavLink, Outlet } from "react-router-dom";
+import { AuthContext } from "../../AuthProvider";
 
 export const AdminSidebar = () => {
+  const { userId } = useContext(AuthContext);
 
   const [isOpen, setIsOpen] = useState(true);
 
   const menuItems = [
-    { name: "Dashboard", path: "/admin/dashboard",icon: <FaDatabase />,                badge: null },
+    { name: "Dashboard", path: `/admin/dashboard/${userId ?? ""}`,icon: <FaDatabase />,                badge: null },
     { name: "Users",     path: "/admin/user",     icon: <FaUsers />,         badge: null },
-    { name: "Bugs",      path: "/admin/Bug",      icon: <FaBug />,           badge: null },
+    { name: "Bugs",      path: "/admin/bug",      icon: <FaBug />,           badge: null },
     { name: "Projects",  path: "/admin/project",  icon: <FaBox />,           badge: null },
-    { name: "Settings",  path: "/admin/settings", icon: <FaCog />,           badge: null },
+    { name: "Settings",  path: `/admin/setting/${userId ?? ""}`, icon: <FaCog />, badge: null },
   ];
 
   return (
@@ -143,7 +145,7 @@ export const AdminSidebar = () => {
         {/* Top navbar strip */}
         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200/80 bg-white/80 px-8 py-3 backdrop-blur-sm shadow-sm shadow-blue-100/40">
           <p className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-            Admin · <Link to="/admin/dash" >Dashboard</Link>
+            Admin · <Link to={`/admin/dashboard/${userId ?? ""}`} >Dashboard</Link>
           </p>
           <div className="flex items-center gap-3">
             {/* Notification bell */}

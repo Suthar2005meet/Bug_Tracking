@@ -273,6 +273,7 @@ const updateBugStatus = async (req, resp) => {
         });
 
     } catch (err) {
+        console.log(err)
         resp.status(500).json({
             message: "Server Error",
             err: err

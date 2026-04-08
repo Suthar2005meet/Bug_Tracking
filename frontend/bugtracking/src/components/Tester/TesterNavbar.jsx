@@ -6,7 +6,7 @@ import { AuthContext } from "../../AuthProvider";
 import axios from "axios";
 
 export const TesterNavbar = () => {
-  const { userId, setUserId } = useContext(AuthContext);
+  const { userId, logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const [menuOpen, setMenuOpen] = useState(false);
@@ -22,7 +22,7 @@ export const TesterNavbar = () => {
   const notificationRef = useRef(null); // ✅ Ref for outside click
 
   const navLinks = [
-    { name: "Dashboard", path: "dashboard" },
+    { name: "Dashboard", path: `dashboard/${userId}` },
     { name: "Tasks", path: `task/${userId}` },
     { name: "All Bugs", path: `bug/${userId}` },
   ];
@@ -43,7 +43,7 @@ export const TesterNavbar = () => {
   const getNotifications = async () => {
     if (!userId) return;
     try {
-      const res = await axios.get(`http://localhost:2500/notification/all/${userId}`);
+      const res = await axios.get(`/notification/all/${userId}`);
       setNotifications(res.data.data || []);
     } catch (err) { console.log("Fetch error:", err); }
   };
@@ -51,7 +51,7 @@ export const TesterNavbar = () => {
   const getUnreadCount = async () => {
     if (!userId) return;
     try {
-      const res = await axios.get(`http://localhost:2500/notification/user/${userId}/unread-count`);
+      const res = await axios.get(`/notification/user/${userId}/unread-count`);
       setUnreadCount(res.data.count || 0);
     } catch (err) { console.log("Count error:", err); }
   };
@@ -62,7 +62,7 @@ export const TesterNavbar = () => {
     try {
       // 1. Mark as read in DB if unread
       if (!n.isRead) {
-        await axios.put(`http://localhost:2500/notification/${n._id}/read`);
+        await axios.put(`/notification/${n._id}/read`);
       }
 
       // 2. UI Refresh
@@ -78,14 +78,14 @@ export const TesterNavbar = () => {
       } else if (type.includes("TASK") || title.includes("task")) {
         navigate(`task/${userId}`);
       } else {
-        navigate("dashboard");
+        navigate(`dashboard/${userId}`);
       }
     } catch (err) { console.error("Nav error:", err); }
   };
 
   const markAllRead = async () => {
     try {
-      await axios.put(`http://localhost:2500/notification/user/${userId}/read-all`);
+      await axios.put(`/notification/user/${userId}/read-all`);
       getNotifications();
       setUnreadCount(0);
     } catch (err) { console.log(err); }
@@ -109,8 +109,7 @@ export const TesterNavbar = () => {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    setUserId(null);
+    logout();
     navigate("/");
   };
 
@@ -119,7 +118,7 @@ export const TesterNavbar = () => {
       {/* ── TOP WHITE HEADER (BRANDING) ── */}
       <header className="bg-white border-b border-slate-100 px-6 py-3 flex items-center justify-between sticky top-0 z-[60]">
         
-        <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate("dashboard")}>
+        <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate(`dashboard/${userId}`)}>
           <div className="h-9 w-9 bg-[#71dd37] rounded-lg flex items-center justify-center text-white text-xl shadow-sm">
             <FaBug />
           </div>

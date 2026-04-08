@@ -50,11 +50,11 @@ export const Login = () => {
         }
         login(res.data.token)
         toast.success('Login Successfully 🎉')
-        switch (res.data.role) {
+        switch ((res.data.role || "").toLowerCase().replace(/\s+/g, "")) {
           case 'admin':          navigate('/admin');          break
-          case 'ProjectManager': navigate('/projectmanager'); break
-          case 'Developer':      navigate('/developer');      break
-          case 'Tester':         navigate('/tester');         break
+          case 'projectmanager': navigate('/projectmanager'); break
+          case 'developer':      navigate('/developer');      break
+          case 'tester':         navigate('/tester');         break
           default:
             toast.error('Invalid Role')
             navigate('/')

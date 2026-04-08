@@ -35,6 +35,9 @@ app.use('/sprint',SprintRoute)
 const NotificationRoute = require("./src/Routes/NotificationRoute")
 app.use('/notification',NotificationRoute)
 
+const DashboardRoute = require('./src/Routes/DashboardRoute')
+app.use('/dashboard',DashboardRoute)
+
 
 const PORT = process.env.PORT
 app.listen(PORT,()=>{

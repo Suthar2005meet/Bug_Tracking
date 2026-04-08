@@ -11,7 +11,7 @@ const getAllComment = async (req, resp) => {
     try {
         const res = await CommentSchema.find()
             .populate([
-                { path: "bugId", populate: { path: "projectId" } },
+                { path: "bugId"},
                 { path: "userId" }
             ]);
 
@@ -111,7 +111,7 @@ const getCommentById = async (req, resp) => {
     try {
         const res = await CommentSchema.findById(req.params.id)
             .populate([
-                { path: "bugId", populate: { path: "projectId" } },
+                { path: "bugId"},
                 { path: "userId" }
             ]);
 
@@ -139,7 +139,7 @@ const getCommentByBug = async (req, resp) => {
     try {
         const res = await CommentSchema.find({ bugId: id })
             .populate([
-                { path: "bugId", populate: { path: "projectId" } },
+                { path: "bugId"},
                 { path: "userId" }
             ]);
 

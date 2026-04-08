@@ -6,7 +6,7 @@ import { AuthContext } from "../../AuthProvider";
 import axios from "axios";
 
 export const DevelopNavbar = () => {
-  const { userId } = useContext(AuthContext);
+  const { userId, logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const [menuOpen, setMenuOpen] = useState(false);
@@ -30,14 +30,14 @@ export const DevelopNavbar = () => {
 
   const getNotifications = async () => {
     try {
-      const res = await axios.get(`http://localhost:2500/notification/all/${userId}`);
+      const res = await axios.get(`/notification/all/${userId}`);
       setNotifications(res.data.data || []);
     } catch (err) { console.log("Notification fetch error:", err); }
   };
 
   const getUnreadCount = async () => {
     try {
-      const res = await axios.get(`http://localhost:2500/notification/user/${userId}/unread-count`);
+      const res = await axios.get(`/notification/user/${userId}/unread-count`);
       setUnreadCount(res.data.count || 0);
     } catch (err) { console.log("Unread count error:", err); }
   };
@@ -49,7 +49,7 @@ export const DevelopNavbar = () => {
     try {
       // 1. Mark as read
       if (!notification.isRead) {
-        await axios.put(`http://localhost:2500/notification/${notification._id}/read`);
+        await axios.put(`/notification/${notification._id}/read`);
       }
       
       // 2. Refresh count and close panel
@@ -74,14 +74,14 @@ export const DevelopNavbar = () => {
 
   const markAllAsRead = async () => {
     try {
-      await axios.put(`http://localhost:2500/notification/user/${userId}/read-all`);
+      await axios.put(`/notification/user/${userId}/read-all`);
       getNotifications();
       setUnreadCount(0);
     } catch (err) { console.log(err); }
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    logout();
     navigate("/");
   };
 
@@ -99,10 +99,10 @@ export const DevelopNavbar = () => {
   }, [userId]);
 
   const navLinks = [
-    { name: "Dashboard", path: "dashboard" },
+    { name: "Dashboard", path: `dashboard/${userId}` },
     { name: "Tasks", path: `task/${userId}` },
     { name: "Bug", path: `bugs/${userId}` },
-    { name: "Reports", path: "reports" },
+    { name: "Settings", path: `setting/${userId}` },
   ];
 
   return (
@@ -111,7 +111,7 @@ export const DevelopNavbar = () => {
         
         <div 
           className="flex items-center gap-3 group cursor-pointer" 
-          onClick={() => navigate("dashboard")}
+          onClick={() => navigate(`dashboard/${userId}`)}
         >
           <div className="h-9 w-9 bg-gradient-to-br from-[#71dd37] to-[#5bbd2b] rounded-lg flex items-center justify-center text-white text-xl shadow-lg shadow-green-100 transition-transform group-hover:scale-105">
             <FaCode />

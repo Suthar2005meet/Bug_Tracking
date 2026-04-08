@@ -6,7 +6,7 @@ import { AuthContext } from "../../AuthProvider";
 import axios from "axios";
 
 export const PmNavbar = () => {
-    const { userId } = useContext(AuthContext);
+    const { userId, logout } = useContext(AuthContext);
     const navigate = useNavigate(); // ✅ Initialize navigate
 
     const [menuOpen, setMenuOpen] = useState(false);
@@ -21,7 +21,7 @@ export const PmNavbar = () => {
     const notificationRef = useRef(null);
 
     const navLinks = [
-        { name: "Dashboard", path: "dashboard" },
+        { name: "Dashboard", path: `dashboard/${userId}` },
         { name: "Projects", path: "projects" },
         { name: "Manage Bugs", path: "bugs" },
         { name: "User Management", path: "user" },
@@ -39,7 +39,7 @@ export const PmNavbar = () => {
     const getNotifications = async () => {
         if (!userId) return;
         try {
-            const res = await axios.get(`http://localhost:2500/notification/all/${userId}`);
+            const res = await axios.get(`/notification/all/${userId}`);
             setNotifications(res.data.data || []);
         } catch (err) { console.log(err); }
     };
@@ -47,14 +47,14 @@ export const PmNavbar = () => {
     const getCount = async () => {
         if (!userId) return;
         try {
-            const res = await axios.get(`http://localhost:2500/notification/user/${userId}/unread-count`);
+            const res = await axios.get(`/notification/user/${userId}/unread-count`);
             setUnreadCount(res.data.count || 0);
         } catch (err) { console.log(err); }
     };
 
     const markAllRead = async () => {
         try {
-            await axios.put(`http://localhost:2500/notification/user/${userId}/read-all`);
+            await axios.put(`/notification/user/${userId}/read-all`);
             getNotifications();
             setUnreadCount(0);
         } catch (err) { console.log(err); }
@@ -66,7 +66,7 @@ export const PmNavbar = () => {
         try {
             // 1. Mark as read in DB if unread
             if (!n.isRead) {
-                await axios.put(`http://localhost:2500/notification/${n._id}/read`);
+                await axios.put(`/notification/${n._id}/read`);
             }
 
             // 2. UI Refresh
@@ -93,7 +93,7 @@ export const PmNavbar = () => {
                 case "TASK_ASSIGNED":
                 case "TASK_COMPLETED":
                 case "TASK_STATUS_CHANGED":
-                    navigate(`dashboard`); // General dashboard or task view
+                    navigate(`dashboard/${userId}`); // General dashboard or task view
                     break;
 
                 case "USER_ADDED":
@@ -105,7 +105,7 @@ export const PmNavbar = () => {
                     // Fallback to title keywords if type is generic
                     if (title.includes("bug")) navigate(`bugs`);
                     else if (title.includes("project")) navigate(`projects`);
-                    else navigate(`dashboard`);
+                    else navigate(`dashboard/${userId}`);
             }
         } catch (err) {
             console.error("Navigation error:", err);
@@ -131,7 +131,7 @@ export const PmNavbar = () => {
             {/* ================= HEADER ================= */}
             <header className="bg-white/80 backdrop-blur-md border-b border-slate-200/60 px-6 py-3 flex items-center justify-between sticky top-0 z-[60]">
 
-                <div className="flex items-center gap-3 group cursor-pointer" onClick={() => navigate("dashboard")}>
+                <div className="flex items-center gap-3 group cursor-pointer" onClick={() => navigate(`dashboard/${userId}`)}>
                     <div className="h-10 w-10 bg-gradient-to-br from-[#71dd37] to-[#5bbd2b] rounded-xl flex items-center justify-center text-white text-xl shadow-lg shadow-green-100 group-hover:scale-105 transition-transform">
                         <FaBug />
                     </div>
@@ -222,7 +222,7 @@ export const PmNavbar = () => {
                                     <FiSettings size={14} /> Settings
                                 </Link>
                                 <button 
-                                    onClick={() => { localStorage.removeItem("token"); navigate("/"); }}
+                                    onClick={() => { logout(); navigate("/"); }}
                                     className="w-full flex items-center gap-3 px-4 py-2 text-sm text-rose-500 hover:bg-rose-50 rounded-xl transition-colors mt-1"
                                 >
                                     <FiLogOut size={14} /> Logout

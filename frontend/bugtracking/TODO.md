@@ -1,11 +1,17 @@
-# Fix userId not saving to localStorage
+# Charts Not Showing Fix Plan
 
-## Steps:
-- [x] 1. Add diagnostic console.logs to AuthProvider.jsx and Login.jsx
-- [x] 2. Implement fallback for userId extraction (decoded._id || id || sub)
-- [ ] 3. Test login and check console/localStorage
-- [ ] 4. Verify persistence on page refresh
-- [ ] 5. Fix backend JWT payload if no _id
-- [ ] 6. Remove diagnostic logs once fixed
+## Current Status
+Charts work for ProjectManager role but fail for Tester/Developer. Unified Dashboard.jsx expects role-specific data from /dashboard/all API.
 
-**Next**: Run `npm run dev`, login, check Browser Console (F12) & Application > Local Storage > userId value. Share console logs here.
+## Steps
+- [x] Understand files (Dashboard.jsx, charts)
+- [ ] Step 1: Add mock data and console.log to src/pages/Dashboard.jsx for all roles
+- [ ] Step 2: Edit Dashboard.jsx to use real data if available, mock if empty
+- [ ] Step 3: Run `npm run dev`, login as Tester/Developer, verify charts show mock data, check console for API response
+- [ ] Step 4: Check Network tab for /dashboard/all data structure
+- [ ] Step 5: Fix backend to return complete role-specific charts data
+- [ ] Step 6: Remove mocks after backend fix
+- [ ] Step 7: Test all roles (Admin, PM, Dev, Tester)
+- [ ] Step 8: attempt_completion
+
+Next: Step 1-2

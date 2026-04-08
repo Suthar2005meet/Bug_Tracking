@@ -1,5 +1,5 @@
 import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
-import { AdDash } from "../components/Admin/AdDash";
+// import { AdDash } from "../components/Admin/AdDash";
 import { AdminSidebar } from "../components/Admin/AdminSidbar";
 import { Bugs } from "../components/Admin/Bugs";
 import { CreateBug } from "../components/Admin/CreateBug";
@@ -9,13 +9,13 @@ import { SignUp } from "../components/Admin/SignUp";
 import { EditUser } from "../components/Admin/users/EditUser";
 import { ShowUser } from "../components/Admin/users/ShowUser";
 import { UserDetail } from "../components/Admin/users/UserDetail";
-import { DevDashboard } from "../components/developer/DevDashboard";
+// import { DevDashboard } from "../components/developer/DevDashboard";
 import { DevelopNavbar } from "../components/developer/DevelopNavbar";
 import { Login } from "../components/Login";
-import { PmDashboard } from "../components/projetcmanager/PmDashboard";
+// import { PmDashboard } from "../components/projetcmanager/PmDashboard";
 import { PmNavbar } from "../components/projetcmanager/PmNavbar";
 import { ProtectedRoutes } from "../components/ProtectedRoutes";
-import { TestDashBoard } from "../components/Tester/TestDashBoard";
+// import { TestDashBoard } from "../components/Tester/TestDashBoard";
 import { TesterNavbar } from "../components/Tester/TesterNavbar";
 import { AddComment } from "../pages/bug/AddComment";
 import { AllComments } from "../pages/bug/AllComments";
@@ -33,6 +33,7 @@ import { AddTask } from "../components/projetcmanager/AddTask";
 import { Task } from "../components/developer/Task"
 import { TesterTask } from "../components/Tester/TesterTask";
 import { Setting } from "../pages/Setting";
+import Dashboard from "../pages/Dashboard";
 
 const router = createBrowserRouter([
     {path:'/' , element:<Login/>},
@@ -40,10 +41,11 @@ const router = createBrowserRouter([
     {path:"/forgetpassword",element:<ForgotPassword/>},
     {path:"/resetpassword/:token",element:<ResetPassword/>},
     {
-        path:'/admin', element:<AdminSidebar/>,
+        path:'/admin', element:<ProtectedRoutes userRoles={["Admin", "admin"]}><AdminSidebar/></ProtectedRoutes>,
         children: [
             {index: true,element:<Navigate to="dashboard" replace />},
-            {path:'dashboard',element:<AdDash/>},
+            {path:'dashboard',element:<Dashboard/>},
+            {path:'dashboard/:id',element:<Dashboard/>},
             {path:'bug',element:<Bugs/>},
             {path:'bug/createbug',element:<CreateBug/>},
             {path:'bug/editbug/:id',element:<Editbug/>},
@@ -57,6 +59,7 @@ const router = createBrowserRouter([
             {path:'user/userdetail/:id',element:<UserDetail/>},
             {path:'user/adduser',element:<AddUser/>},
             {path:'user/edituser/:id',element:<EditUser/>},
+            {path:'setting/:id',element:<Setting/>},
             
         ]
     },
@@ -66,7 +69,8 @@ const router = createBrowserRouter([
         </ProtectedRoutes>,
         children:[
             {index: true,element:<Navigate to="dashboard" replace />},
-            {path:'dashboard',element:<DevDashboard/>},
+            {path:'dashboard',element:<Dashboard/>},
+            {path:'dashboard/:id',element:<Dashboard/>},
             {path:'task/:id',element:<Task/>},
             {path:'bugs/:id',element:<Bug/>},
             {path:'bugs/:id/details/:id',element:<BugDetails/>},
@@ -82,7 +86,8 @@ const router = createBrowserRouter([
         </ProtectedRoutes>,
         children:[
             {index: true,element:<Navigate to="dashboard" replace />},
-            {path:'dashboard',element:<TestDashBoard/>},
+            {path:'dashboard',element:<Dashboard/>},
+            {path:'dashboard/:id',element:<Dashboard/>},
             {path:'task/:id',element:<TesterTask/>},
             {path:'task/:id/createbug/:id',element:<CreateBug/>},
             // {path:'createbug',element:<CreateBug/>},
@@ -99,7 +104,8 @@ const router = createBrowserRouter([
         path:'/projectmanager', element:<ProtectedRoutes userRoles={['ProjectManager']}><PmNavbar/></ProtectedRoutes>,
         children:[
             {index: true,element:<Navigate to="dashboard" replace />},
-            {path:'dashboard',element:<PmDashboard/>},
+            {path:'dashboard',element:<Dashboard/>},
+            {path:'dashboard/:id',element:<Dashboard/>},
             {path:'bugs',element:<Bugs/>},
             {path:'bugs/bugdetail/:id',element:<BugDetails/>},
             {path:'bugs/editbug/:id',element:<Editbug/>},

@@ -66,7 +66,7 @@
 
         task: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "issue",
+        ref: "issues",
         },
 
         sprint: {
@@ -77,6 +77,6 @@
     { timestamps: true }
     );
 
-    const ActivityLogModel = mongoose.model("activitylog", ActivityLogSchema);
+    const ActivityLogModel = mongoose.model("activitylogs", ActivityLogSchema);
 
     module.exports = ActivityLogModel;
