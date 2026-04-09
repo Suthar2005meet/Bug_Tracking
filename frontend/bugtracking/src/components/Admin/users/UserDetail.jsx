@@ -2,6 +2,7 @@ import axios from 'axios'
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { FiUser, FiMail, FiPhone, FiShield, FiCalendar, FiEdit2, FiArrowLeft, FiCheckCircle, FiXCircle } from 'react-icons/fi'
+import { getRoleLabel, normalizeRole } from '../../../utils/roles'
 
 export const UserDetail = () => {
 
@@ -40,10 +41,11 @@ export const UserDetail = () => {
   const roleBadge = (role) => {
     const map = {
       admin:   "bg-violet-50 text-violet-600 border-violet-200",
-      manager: "bg-sky-50 text-sky-600 border-sky-200",
+      projectmanager: "bg-sky-50 text-sky-600 border-sky-200",
       developer: "bg-emerald-50 text-emerald-600 border-emerald-200",
+      tester: "bg-amber-50 text-amber-600 border-amber-200",
     }
-    return map[role?.toLowerCase()] ?? "bg-slate-100 text-slate-600 border-slate-200"
+    return map[normalizeRole(role)] ?? "bg-slate-100 text-slate-600 border-slate-200"
   }
 
   // ── LOADING ──
@@ -115,7 +117,7 @@ export const UserDetail = () => {
           <div className="flex items-center gap-3 flex-wrap">
             <h2 className="text-lg font-bold text-slate-800">{user.name ?? "—"}</h2>
             <span className={`rounded-full border px-2.5 py-0.5 text-[11px] font-semibold capitalize ${roleBadge(user.role)}`}>
-              {user.role ?? "—"}
+              {getRoleLabel(user.role)}
             </span>
           </div>
           <p className="text-xs text-slate-400 mt-0.5">{user.email ?? "—"}</p>
@@ -132,7 +134,7 @@ export const UserDetail = () => {
         <DetailCard icon={<FiPhone />} label="Mobile No" value={user.mobileno} color="text-violet-500" bg="bg-violet-50" />
 
         {/* Role */}
-        <DetailCard icon={<FiShield />} label="Role" value={<span className="capitalize">{user.role}</span>} color="text-emerald-500" bg="bg-emerald-50" />
+        <DetailCard icon={<FiShield />} label="Role" value={<span>{getRoleLabel(user.role)}</span>} color="text-emerald-500" bg="bg-emerald-50" />
 
         {/* User ID */}
         <DetailCard icon={<FiUser />} label="User ID" value={user._id ?? user.id} color="text-amber-500" bg="bg-amber-50" mono />

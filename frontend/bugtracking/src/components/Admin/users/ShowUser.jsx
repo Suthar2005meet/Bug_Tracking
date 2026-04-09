@@ -1,13 +1,20 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import axios from 'axios';
+import { getRoleLabel, hasRole, normalizeRole } from '../../../utils/roles';
 
 export const ShowUser = () => {
   const [users, setUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeRole, setActiveRole] = useState('All');
 
-  const roles = ['All', 'Developer', 'Tester', 'Project Manager'];
+  const roles = [
+    { label: 'All', value: 'All' },
+    { label: 'Developer', value: 'Developer' },
+    { label: 'Tester', value: 'Tester' },
+    { label: 'Project Manager', value: 'ProjectManager' },
+    { label: 'Admin', value: 'Admin' },
+  ];
 
   const getData = async () => {
     try {
@@ -25,7 +32,7 @@ export const ShowUser = () => {
   const filteredUsers = users.filter((user) => {
     const matchesRole =
       activeRole === 'All' ||
-      user.role?.toLowerCase() === activeRole.toLowerCase();
+      hasRole(user.role, activeRole);
 
     const matchesSearch =
       user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -47,16 +54,21 @@ export const ShowUser = () => {
       active: 'bg-amber-500 text-white border-amber-500',
       inactive: 'bg-white text-amber-600 border-amber-400 hover:bg-amber-50',
     },
-    'Project Manager': {
+    ProjectManager: {
       active: 'bg-purple-600 text-white border-purple-600',
       inactive: 'bg-white text-purple-600 border-purple-400 hover:bg-purple-50',
+    },
+    Admin: {
+      active: 'bg-violet-600 text-white border-violet-600',
+      inactive: 'bg-white text-violet-600 border-violet-400 hover:bg-violet-50',
     },
   };
 
   const roleBadgeStyles = {
+    admin: 'bg-violet-100 text-violet-700',
     developer: 'bg-blue-100 text-blue-700',
     tester: 'bg-amber-100 text-amber-700',
-    'project manager': 'bg-purple-100 text-purple-700',
+    projectmanager: 'bg-purple-100 text-purple-700',
   };
 
   return (
@@ -93,17 +105,17 @@ export const ShowUser = () => {
           {/* Role Filter Buttons */}
           <div className="flex flex-wrap gap-2 mt-4">
             {roles.map((role) => {
-              const style = roleStyles[role];
-              const isActive = activeRole === role;
+              const style = roleStyles[role.value];
+              const isActive = activeRole === role.value;
               return (
                 <button
-                  key={role}
-                  onClick={() => setActiveRole(role)}
+                  key={role.value}
+                  onClick={() => setActiveRole(role.value)}
                   className={`px-4 py-1.5 rounded-full border text-sm font-medium transition-all duration-200 ${
                     isActive ? style.active : style.inactive
                   }`}
                 >
-                  {role}
+                  {role.label}
                 </button>
               );
             })}
@@ -120,7 +132,7 @@ export const ShowUser = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {filteredUsers.map((user) => {
-              const roleLower = user.role?.toLowerCase();
+              const roleLower = normalizeRole(user.role);
               const badgeClass =
                 roleBadgeStyles[roleLower] || 'bg-gray-100 text-gray-600';
 
@@ -144,7 +156,7 @@ export const ShowUser = () => {
                   <span
                     className={`self-start text-xs font-semibold px-3 py-1 rounded-full ${badgeClass}`}
                   >
-                    {user.role}
+                    {getRoleLabel(user.role)}
                   </span>
 
                   {/* Actions */}

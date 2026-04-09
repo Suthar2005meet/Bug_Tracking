@@ -13,6 +13,7 @@ import {
   FiUser
 } from 'react-icons/fi'
 import { useNavigate, useParams } from 'react-router-dom'
+import { getCanonicalRole } from '../../../utils/roles'
 
 // ── FIELD CONFIG ──────────────────────────────────────────────────────────────
 // Central registry of all form fields. Add / remove / reorder here.
@@ -75,7 +76,7 @@ const FIELD_CONFIG = [
     rules: { required: 'Role is required' },
     options: [
       { value: '', label: 'Select a role' },
-      { value: 'admin', label: 'Admin' },
+      { value: 'Admin', label: 'Admin' },
       { value: 'ProjectManager', label: 'Project Manager' },
       { value: 'Developer', label: 'Developer' },
       { value: 'Tester', label: 'Tester' },
@@ -139,7 +140,11 @@ export const EditUser = () => {
       setUser(data)
       setImagePreview(data.image || null)
       const { image, ...formData } = data
-      reset({ ...formData, isActive: data.isActive ? 'true' : 'false' })
+      reset({
+        ...formData,
+        role: getCanonicalRole(data.role),
+        isActive: data.isActive ? 'true' : 'false',
+      })
     } catch (err) {
       setError('Failed to load user data.')
       console.error('Error fetching user data:', err)
@@ -157,7 +162,11 @@ export const EditUser = () => {
       const formData = new FormData()
       formData.append('isActive', data.isActive === 'true')
       Object.keys(data).forEach(key => {
-        if (key !== 'image' && key !== 'isActive') formData.append(key, data[key])
+        if (key === 'role') {
+          formData.append(key, getCanonicalRole(data[key]))
+        } else if (key !== 'image' && key !== 'isActive') {
+          formData.append(key, data[key])
+        }
       })
       if (data.image?.[0]) formData.append('image', data.image[0])
 

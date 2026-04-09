@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import bugimg from '../assets/bug.png'
 import { AuthContext } from '../AuthProvider'
+import { normalizeRole } from '../utils/roles'
 
 const Particle = ({ style }) => (
   <span
@@ -50,7 +51,7 @@ export const Login = () => {
         }
         login(res.data.token)
         toast.success('Login Successfully 🎉')
-        switch ((res.data.role || "").toLowerCase().replace(/\s+/g, "")) {
+        switch (normalizeRole(res.data.role)) {
           case 'admin':          navigate('/admin');          break
           case 'projectmanager': navigate('/projectmanager'); break
           case 'developer':      navigate('/developer');      break

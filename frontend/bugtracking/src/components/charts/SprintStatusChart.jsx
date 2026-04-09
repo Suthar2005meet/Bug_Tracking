@@ -9,6 +9,7 @@ import {
   Cell,
   LabelList
 } from "recharts"
+import { normalizeChartSeries } from "../../utils/chartData"
 
 const SPRINT_COLORS = ["#F59E0B", "#FCD34D", "#FBBF24", "#F97316", "#FDE68A", "#D97706"]
 
@@ -33,9 +34,9 @@ const CustomTooltip = ({ active, payload, label }) => {
 }
 
 const SprintStatusChart = ({ data = [] }) => {
-  const formattedData = data.map(item => ({
-    name: item._id || "Unknown",
-    value: item.count || 0
+  const formattedData = normalizeChartSeries(data).map(item => ({
+    name: item.name || "Unknown",
+    value: item.value || 0
   })).sort((a, b) => b.value - a.value)
 
   return (

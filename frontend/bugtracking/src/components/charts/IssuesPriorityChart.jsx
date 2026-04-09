@@ -9,6 +9,7 @@ import {
   Tooltip,
   Legend
 } from "recharts"
+import { normalizeChartSeries } from "../../utils/chartData"
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
@@ -31,9 +32,9 @@ const CustomTooltip = ({ active, payload, label }) => {
 }
 
 const IssuesPriorityChart = ({ data = [] }) => {
-  const formattedData = data.map(item => ({
-    subject: item._id || "Unknown",
-    value: item.count || 0,
+  const formattedData = normalizeChartSeries(data).map(item => ({
+    subject: item.name || "Unknown",
+    value: item.value || 0,
   }))
   const hasData = formattedData.some((item) => item.value > 0)
 

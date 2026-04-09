@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
+import { hasRole } from '../utils/roles'
 
 export const ProtectedRoutes = ({children,userRoles}) => {
 
@@ -13,11 +14,6 @@ export const ProtectedRoutes = ({children,userRoles}) => {
         setloading(false)
     },[])
 
-    const normalizedRole = role?.toLowerCase().replace(/\s+/g, "")
-    const normalizedAllowedRoles = userRoles.map((allowedRole) =>
-        allowedRole.toLowerCase().replace(/\s+/g, "")
-    )
-
     if(loading){
         return <h1>Loading....</h1>
     }
@@ -26,7 +22,7 @@ export const ProtectedRoutes = ({children,userRoles}) => {
         return <Navigate to="/" />
     }
 
-    if(!normalizedAllowedRoles.includes(normalizedRole)){
+    if(!userRoles.some((allowedRole) => hasRole(role, allowedRole))){
         return <Navigate to="/" />
     }
     return children

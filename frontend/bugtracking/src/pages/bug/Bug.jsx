@@ -2,6 +2,7 @@ import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../AuthProvider";
+import { hasRole } from "../../utils/roles";
 
 export const Bug = () => {
 
@@ -9,6 +10,8 @@ export const Bug = () => {
 
   const [loading, setLoading] = useState(true);
   const [bugList, setBugList] = useState([]);
+  const isDeveloper = hasRole(role, "Developer");
+  const isTester = hasRole(role, "Tester");
 
   // 🔹 Fetch Bugs Assigned to User
   const fetchUserBugs = async () => {
@@ -85,7 +88,7 @@ export const Bug = () => {
               </Link>
 
               {/* DEVELOPER ACTIONS */}
-              {role === "Developer" && bug.status === "Open" && (
+              {isDeveloper && bug.status === "Open" && (
                 <button
                   onClick={() => updateBugStatus(bug._id, "In Progress")}
                   className="w-full py-2.5 text-[10px] font-bold text-white uppercase bg-blue-600 hover:bg-blue-500 rounded-md"
@@ -94,7 +97,7 @@ export const Bug = () => {
                 </button>
               )}
 
-              {role === "Developer" && bug.status === "In Progress" && (
+              {isDeveloper && bug.status === "In Progress" && (
                 <button
                   onClick={() => updateBugStatus(bug._id, "Resolved")}
                   className="w-full py-2.5 text-[10px] font-bold text-white uppercase bg-emerald-600 hover:bg-emerald-500 rounded-md"
@@ -104,7 +107,7 @@ export const Bug = () => {
               )}
 
               {/* TESTER ACTIONS */}
-              {role === "Tester" && bug.status === "In Progress" && (
+              {isTester && bug.status === "In Progress" && (
                 <div className="grid grid-cols-1 gap-2">
                   <button
                     onClick={() => updateBugStatus(bug._id, "Closed")}

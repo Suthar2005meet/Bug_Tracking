@@ -11,6 +11,81 @@ import BugsStatusChart from "../components/charts/BugsStatusChart";
 import BugsPriorityChart from "../components/charts/BugsPriorityChart";
 import SprintStatusChart from "../components/charts/SprintStatusChart";
 import { AuthContext } from "../AuthProvider";
+import { findChartSeries, getChartCount } from "../utils/chartData";
+
+const ISSUE_STATUS_CHART_KEYS = [
+  ["issue", "status"],
+  ["issues", "status"],
+  ["issue", "state"],
+  ["issues", "state"],
+  ["task", "status"],
+  ["tasks", "status"],
+  ["task", "state"],
+  ["tasks", "state"],
+  ["assigned", "issue", "status"],
+  ["assigned", "issues", "status"],
+  ["assigned", "task", "status"],
+  ["assigned", "tasks", "status"],
+  ["my", "issue", "status"],
+  ["my", "issues", "status"],
+  ["my", "task", "status"],
+  ["my", "tasks", "status"],
+];
+
+const ISSUE_PRIORITY_CHART_KEYS = [
+  ["issue", "priority"],
+  ["issues", "priority"],
+  ["task", "priority"],
+  ["tasks", "priority"],
+  ["assigned", "issue", "priority"],
+  ["assigned", "issues", "priority"],
+  ["assigned", "task", "priority"],
+  ["assigned", "tasks", "priority"],
+  ["my", "issue", "priority"],
+  ["my", "issues", "priority"],
+  ["my", "task", "priority"],
+  ["my", "tasks", "priority"],
+];
+
+const BUG_STATUS_CHART_KEYS = [
+  ["bug", "status"],
+  ["bugs", "status"],
+  ["bug", "state"],
+  ["bugs", "state"],
+  ["my", "bug", "status"],
+  ["my", "bugs", "status"],
+  ["assigned", "bug", "status"],
+  ["assigned", "bugs", "status"],
+  ["tester", "bug", "status"],
+  ["tester", "bugs", "status"],
+  ["reported", "bug", "status"],
+  ["reported", "bugs", "status"],
+];
+
+const BUG_PRIORITY_CHART_KEYS = [
+  ["bug", "priority"],
+  ["bugs", "priority"],
+  ["my", "bug", "priority"],
+  ["my", "bugs", "priority"],
+  ["assigned", "bug", "priority"],
+  ["assigned", "bugs", "priority"],
+  ["tester", "bug", "priority"],
+  ["tester", "bugs", "priority"],
+  ["reported", "bug", "priority"],
+  ["reported", "bugs", "priority"],
+];
+
+const SPRINT_STATUS_CHART_KEYS = [
+  ["sprint", "status"],
+  ["sprints", "status"],
+  ["sprint", "state"],
+];
+
+const USERS_ROLE_CHART_KEYS = [
+  ["user", "role"],
+  ["users", "role"],
+  ["role"],
+];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -27,35 +102,116 @@ const firstDefined = (...values) => {
 };
 
 const totalCount = (items = []) =>
-  items.reduce((s, i) => s + (Number(i?.count) || 0), 0);
+  items.reduce((s, i) => s + getChartCount(i), 0);
+
+const normalizeRole = (value = "") => value.toLowerCase().replace(/[\s_]+/g, "");
+
+const pickChartData = (source = {}, keyGroups = []) => {
+  for (const tokens of keyGroups) {
+    const series = findChartSeries(source, tokens);
+    if (series.length > 0) return series;
+  }
+
+  return [];
+};
+
+const hasChartData = (source = {}, keys = []) =>
+  pickChartData(source, keys).length > 0;
+
+const preferDashboardValue = (primary, fallback) => {
+  if (Array.isArray(primary)) {
+    if (primary.length > 0) return primary;
+    return Array.isArray(fallback) ? fallback : primary;
+  }
+
+  return primary ?? fallback;
+};
+
+const mergeDashboardSection = (primary = {}, fallback = {}) => {
+  const merged = {};
+  const keys = new Set([
+    ...Object.keys(fallback || {}),
+    ...Object.keys(primary || {}),
+  ]);
+
+  for (const key of keys) {
+    merged[key] = preferDashboardValue(primary?.[key], fallback?.[key]);
+  }
+
+  return merged;
+};
+
+const mergeDashboardData = (primary, fallback) => {
+  if (!primary) return fallback || null;
+  if (!fallback) return primary;
+
+  return {
+    ...fallback,
+    ...primary,
+    meta: mergeDashboardSection(primary.meta, fallback.meta),
+    summary: mergeDashboardSection(primary.summary, fallback.summary),
+    charts: mergeDashboardSection(primary.charts, fallback.charts),
+    recentActivity: preferDashboardValue(primary.recentActivity, fallback.recentActivity) || [],
+    notifications: preferDashboardValue(primary.notifications, fallback.notifications) || [],
+  };
+};
+
+const shouldHydrateTesterCharts = (data, normalizedRole) => {
+  if (normalizedRole !== "tester") return false;
+
+  const source = data?.charts || {};
+
+  return (
+    !hasChartData(source, BUG_STATUS_CHART_KEYS) ||
+    !hasChartData(source, BUG_PRIORITY_CHART_KEYS)
+  );
+};
 
 // ─── Dashboard ────────────────────────────────────────────────────────────────
 
 const Dashboard = () => {
   const { id } = useParams();
-  const { userId } = useContext(AuthContext);
+  const { userId, role: authRole } = useContext(AuthContext);
   const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const dashboardUserId = id || userId;
+  const canHydrateFromCurrentUserDashboard = !id || dashboardUserId === userId;
 
   useEffect(() => {
     const fetchDashboard = async () => {
       setLoading(true);
       try {
-        const endpoints = dashboardUserId
-          ? [`/dashboard/all/${dashboardUserId}`, "/dashboard/all"]
-          : ["/dashboard/all"];
+        let scopedData = null;
+        let fallbackData = null;
 
-        let data = null;
-        for (const ep of endpoints) {
+        if (dashboardUserId) {
           try {
-            const res = await axios.get(ep);
-            if (res.data) { data = res.data; break; }
+            const res = await axios.get(`/dashboard/all/${dashboardUserId}`);
+            scopedData = res.data;
           } catch (err) {
-            if (ep === endpoints[endpoints.length - 1]) throw err;
+            scopedData = null;
           }
         }
+
+        const normalizedFetchRole = normalizeRole(scopedData?.meta?.role || authRole);
+        const needsFallbackDashboard =
+          !scopedData ||
+          (canHydrateFromCurrentUserDashboard &&
+            shouldHydrateTesterCharts(scopedData, normalizedFetchRole));
+
+        if (needsFallbackDashboard) {
+          try {
+            const res = await axios.get(`/dashboard/all/${userId}`);
+            fallbackData = res.data;
+          } catch (err) {
+            if (!scopedData) throw err;
+          }
+        }
+
+        const data = mergeDashboardData(scopedData, fallbackData);
+
+        if (!data) throw new Error("No dashboard data received");
         setDashboard(data);
       } catch (err) {
         console.error("Dashboard fetch error:", err);
@@ -65,7 +221,7 @@ const Dashboard = () => {
       }
     };
     fetchDashboard();
-  }, [dashboardUserId]);
+  }, [authRole, canHydrateFromCurrentUserDashboard, dashboardUserId]);
 
   if (loading) return <LoadingScreen />;
   if (!dashboard) return <ErrorScreen />;
@@ -76,7 +232,7 @@ const Dashboard = () => {
   } = dashboard;
 
   const role = meta?.role || "";
-  const normalizedRole = role.toLowerCase().replace(/[\s_]+/g, "");
+  const normalizedRole = normalizeRole(role);
   const roleTitle = normalizedRole === "projectmanager" ? "Project Manager" : role || "User";
 
   const isAdmin = normalizedRole === "admin";
@@ -84,27 +240,12 @@ const Dashboard = () => {
   const isDeveloper = normalizedRole === "developer";
   const isTester = normalizedRole === "tester";
 
-  const issuesStatusData = firstArray(
-    charts.myIssuesByStatus, charts.myTasksByStatus, charts.myTasksStatus,
-    charts.issuesByStatus, charts.tasksByStatus, charts.issueStatus, charts.taskStatus
-  );
-  const issuesPriorityData = firstArray(
-    charts.myIssuesByPriority, charts.myTasksByPriority, charts.myTaskPriority, charts.myTasksPriority,
-    charts.issuesByPriority, charts.tasksByPriority, charts.issuePriority
-  );
-  const bugsStatusData = firstArray(
-    charts.myBugsByStatus, charts.myBugStatus, charts.myBugsStatus,
-    charts.bugsByStatus, charts.bugStatus
-  );
-  const bugsPriorityData = firstArray(
-    charts.myBugsByPriority, charts.myBugsPriority, charts.myBugPriority,
-    charts.bugsByPriority, charts.bugPriority
-  );
-  const testerStatusData = firstArray(bugsStatusData, issuesStatusData);
-  const testerPriorityData = firstArray(bugsPriorityData, issuesPriorityData);
-  const testerShowsBugCharts = bugsStatusData.length > 0 || bugsPriorityData.length > 0;
-  const sprintStatusData = firstArray(charts.sprintStatus, charts.sprintsByStatus, charts.mySprintStatus);
-  const usersRoleData = firstArray(charts.usersByRole, charts.userRoles);
+  const issuesStatusData = pickChartData(charts, ISSUE_STATUS_CHART_KEYS);
+  const issuesPriorityData = pickChartData(charts, ISSUE_PRIORITY_CHART_KEYS);
+  const bugsStatusData = pickChartData(charts, BUG_STATUS_CHART_KEYS);
+  const bugsPriorityData = pickChartData(charts, BUG_PRIORITY_CHART_KEYS);
+  const sprintStatusData = pickChartData(charts, SPRINT_STATUS_CHART_KEYS);
+  const usersRoleData = pickChartData(charts, USERS_ROLE_CHART_KEYS);
 
   const myTasksCount = firstDefined(
     summary.myTasks, summary.myIssues, summary.assignedTasks, summary.assignedIssues,
@@ -210,16 +351,8 @@ const Dashboard = () => {
           </KpiRow>
           <TwoColLayout
             charts={<>
-              {testerShowsBugCharts ? (
-                <BugsStatusChart data={testerStatusData} />
-              ) : (
-                <IssuesStatusChart data={testerStatusData} />
-              )}
-              {testerShowsBugCharts ? (
-                <BugsPriorityChart data={testerPriorityData} />
-              ) : (
-                <IssuesPriorityChart data={testerPriorityData} />
-              )}
+              <BugsStatusChart data={bugsStatusData} />
+              <BugsPriorityChart data={bugsPriorityData} />
             </>}
             side={<NotificationPanel notifications={notifications} />}
           />

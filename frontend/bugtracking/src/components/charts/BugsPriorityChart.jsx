@@ -7,12 +7,17 @@ import {
   ResponsiveContainer,
   Legend
 } from "recharts"
+import { normalizeChartSeries } from "../../utils/chartData"
 
 const PRIORITY_COLORS = {
   Critical: "#FF2D55",
+  critical: "#FF2D55",
   High: "#FF6B2B",
+  high: "#FF6B2B",
   Medium: "#FFCC00",
+  medium: "#FFCC00",
   Low: "#30D158",
+  low: "#30D158",
   Unknown: "#636366"
 }
 
@@ -52,10 +57,10 @@ const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent
 }
 
 const BugsPriorityChart = ({ data = [] }) => {
-  const formattedData = data.map((item, i) => ({
-    name: item._id || "Unknown",
-    value: item.count || 0,
-    fill: PRIORITY_COLORS[item._id] || FALLBACK_COLORS[i % FALLBACK_COLORS.length]
+  const formattedData = normalizeChartSeries(data).map((item, i) => ({
+    name: item.name || "Unknown",
+    value: item.value || 0,
+    fill: PRIORITY_COLORS[item.name] || PRIORITY_COLORS[item.name?.toLowerCase?.()] || FALLBACK_COLORS[i % FALLBACK_COLORS.length]
   }))
   const hasData = formattedData.some((item) => item.value > 0)
 

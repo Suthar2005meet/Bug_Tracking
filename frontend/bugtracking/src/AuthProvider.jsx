@@ -1,5 +1,6 @@
     import { jwtDecode } from "jwt-decode";
 import { createContext, useEffect, useState } from "react";
+import { getCanonicalRole } from "./utils/roles";
 
     export const AuthContext = createContext();
 
@@ -21,9 +22,10 @@ import { createContext, useEffect, useState } from "react";
             console.log('📦 Load decoded:', decoded);
             
             const userId = decoded._id || decoded.id || decoded.sub || decoded.userId;
+            const role = getCanonicalRole(decoded.role);
             setToken(storedToken);
             setUserId(userId);
-            setRole(decoded.role);
+            setRole(role);
             setname(decoded.name);
             console.log('✅ Loaded userId to state:', userId);
         } catch (err) {
@@ -51,6 +53,7 @@ import { createContext, useEffect, useState } from "react";
             console.log('📦 Decoded JWT payload:', decoded);
             
             const userId = decoded._id || decoded.id || decoded.sub || decoded.userId;
+            const role = getCanonicalRole(decoded.role);
             console.log('🆔 Extracted userId:', userId);
             
             if (!userId) {
@@ -59,13 +62,13 @@ import { createContext, useEffect, useState } from "react";
             }
             
             localStorage.setItem("userId", userId);
-            localStorage.setItem("role", decoded.role);
-            console.log('💾 Saved to localStorage:', { userId, role: decoded.role });
+            localStorage.setItem("role", role);
+            console.log('💾 Saved to localStorage:', { userId, role });
             console.log('🔍 Verify localStorage userId:', localStorage.getItem('userId'));
             
             setToken(newToken);
             setUserId(userId);
-            setRole(decoded.role);
+            setRole(role);
         } catch (err) {
             console.error('❌ JWT decode failed:', err);
             localStorage.removeItem('token');

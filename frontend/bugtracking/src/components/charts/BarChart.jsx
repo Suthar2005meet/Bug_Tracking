@@ -8,6 +8,7 @@ import {
   ResponsiveContainer,
   Cell
 } from "recharts"
+import { normalizeChartSeries } from "../../utils/chartData"
 
 const COLORS = ["#6EE7F7", "#A78BFA", "#34D399", "#F472B6", "#FBBF24", "#60A5FA", "#F87171"]
 
@@ -32,9 +33,9 @@ const CustomTooltip = ({ active, payload, label }) => {
 }
 
 const BarChartComponent = ({ title, data = [] }) => {
-  const formattedData = data.map(item => ({
-    name: item._id || "Unknown",
-    value: item.count || 0
+  const formattedData = normalizeChartSeries(data).map(item => ({
+    name: item.name || "Unknown",
+    value: item.value || 0
   }))
 
   return (

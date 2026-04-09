@@ -6,6 +6,7 @@ import {
   Tooltip,
   ResponsiveContainer
 } from "recharts"
+import { normalizeChartSeries } from "../../utils/chartData"
 
 const ROLE_COLORS = ["#10B981", "#34D399", "#6EE7B7", "#059669", "#A7F3D0", "#047857"]
 
@@ -30,9 +31,9 @@ const CustomTooltip = ({ active, payload }) => {
 }
 
 const UsersRoleChart = ({ data = [] }) => {
-  const formattedData = data.map((item, i) => ({
-    name: item._id || "Unknown",
-    value: item.count || 0,
+  const formattedData = normalizeChartSeries(data).map((item, i) => ({
+    name: item.name || "Unknown",
+    value: item.value || 0,
     color: ROLE_COLORS[i % ROLE_COLORS.length]
   }))
 

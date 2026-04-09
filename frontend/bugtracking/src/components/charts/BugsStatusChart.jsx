@@ -1,21 +1,30 @@
 import React from "react"
+import { normalizeChartSeries, normalizeKey } from "../../utils/chartData"
 
 const STATUS_CONFIG = {
   Open:       { color: "#FF453A", emoji: "🔴" },
+  open:       { color: "#FF453A", emoji: "🔴" },
   "In Progress": { color: "#FF9F0A", emoji: "🟡" },
+  inprogress: { color: "#FF9F0A", emoji: "🟡" },
   Resolved:   { color: "#32D74B", emoji: "🟢" },
+  resolved:   { color: "#32D74B", emoji: "🟢" },
   Closed:     { color: "#636366", emoji: "⚫" },
+  closed:     { color: "#636366", emoji: "⚫" },
   Reopened:   { color: "#BF5AF2", emoji: "🟣" },
+  reopened:   { color: "#BF5AF2", emoji: "🟣" },
   Unknown:    { color: "#48484A", emoji: "⚪" },
 }
 
 const FALLBACK_COLORS = ["#FF453A", "#FF9F0A", "#32D74B", "#0A84FF", "#BF5AF2", "#636366"]
 
 const BugsStatusChart = ({ data = [] }) => {
-  const formattedData = data.map((item, i) => ({
-    name: item._id || "Unknown",
-    value: item.count || 0,
-    config: STATUS_CONFIG[item._id] || { color: FALLBACK_COLORS[i % FALLBACK_COLORS.length], emoji: "•" }
+  const formattedData = normalizeChartSeries(data).map((item, i) => ({
+    name: item.name || "Unknown",
+    value: item.value || 0,
+    config: STATUS_CONFIG[item.name] || STATUS_CONFIG[normalizeKey(item.name)] || {
+      color: FALLBACK_COLORS[i % FALLBACK_COLORS.length],
+      emoji: "•",
+    }
   }))
 
   const total = formattedData.reduce((sum, d) => sum + d.value, 0)

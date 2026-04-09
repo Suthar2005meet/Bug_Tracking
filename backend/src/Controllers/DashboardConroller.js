@@ -19,6 +19,10 @@ const toObjectId = (value) => {
     return new mongoose.Types.ObjectId(value);
 };
 
+const buildUserMatchValues = (userObjectId, loggedInUserId) => {
+    return [userObjectId, loggedInUserId].filter(Boolean);
+};
+
 /**
  * GET /dashboard/all
  * Returns role-specific analytics and summaries
@@ -142,6 +146,19 @@ const getDashboardData = async (req, res) => {
         }
 
         if (role === "Developer" || role === "Tester") {
+            const userMatchValues = buildUserMatchValues(userObjectId, loggedInUserId);
+
+            const taskMatch = {
+                assigned: { $in: userMatchValues }
+            };
+
+            const bugMatch = {
+                $or: [
+                    { assignedId: { $in: userMatchValues } },
+                    { reportedBy: { $in: userMatchValues } }
+                ]
+            };
+
             const [
                 issuesByStatus,
                 myTaskPriority,
@@ -150,19 +167,19 @@ const getDashboardData = async (req, res) => {
                 notifications
             ] = await Promise.all([
                 Issue.aggregate([
-                    { $match: { assigned: userObjectId } },
+                    { $match: taskMatch },
                     { $group: { _id: "$status", count: { $sum: 1 } } }
                 ]),
                 Issue.aggregate([
-                    { $match: { assigned: userObjectId } },
+                    { $match: taskMatch },
                     { $group: { _id: "$priority", count: { $sum: 1 } } }
                 ]),
                 Bug.aggregate([
-                    { $match: { assignedId: userObjectId } },
+                    { $match: bugMatch },
                     { $group: { _id: "$status", count: { $sum: 1 } } }
                 ]),
                 Bug.aggregate([
-                    { $match: { assignedId: userObjectId } },
+                    { $match: bugMatch },
                     { $group: { _id: "$priority", count: { $sum: 1 } } }
                 ]),
                 Notification.find({ receiver: userObjectId })
