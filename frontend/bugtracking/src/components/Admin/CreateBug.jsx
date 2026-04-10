@@ -3,7 +3,13 @@ import { AuthContext } from "../../AuthProvider";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { FiAlertCircle, FiUploadCloud, FiCalendar, FiUser, FiType } from "react-icons/fi";
+import {
+  FiAlertCircle,
+  FiUploadCloud,
+  FiCalendar,
+  FiUser,
+  FiType,
+} from "react-icons/fi";
 
 export const CreateBug = () => {
   const { userId } = useContext(AuthContext);
@@ -11,8 +17,9 @@ export const CreateBug = () => {
   const navigate = useNavigate();
 
   const [taskData, setTaskData] = useState(null);
-  const [developers, setDevelopers] = useState([]);
-  const [projectManagers, setProjectManagers] = useState([]);
+  const [user, setuser] = useState([]);
+  // const [developers, setDevelopers] = useState([]);
+  // const [projectManagers, setProjectManagers] = useState([]);
 
   const {
     register,
@@ -22,8 +29,9 @@ export const CreateBug = () => {
 
   useEffect(() => {
     getTaskDetails();
-    getDevelopers();
-    getProjectManagers();
+    getUser()
+    // getDevelopers();
+    // getProjectManagers();
   }, []);
 
   const getTaskDetails = async () => {
@@ -31,15 +39,30 @@ export const CreateBug = () => {
     setTaskData(res.data.data);
   };
 
-  const getDevelopers = async () => {
-    const res = await axios.get("/user/developer");
-    setDevelopers(res.data.data);
-  };
+  const getUser = async () => {
+  try {
+    const res = await axios.get(`/usermanage/pm-developer/${userId}`);
 
-  const getProjectManagers = async () => {
-    const res = await axios.get("/user/projectmanager");
-    setProjectManagers(res.data.data);
-  };
+    const { projectManager, developers } = res.data.data;
+
+    // Combine PM + Developers into one array
+    const combinedUsers = [];
+
+    if (projectManager) {
+      combinedUsers.push(projectManager);
+    }
+
+    if (developers && developers.length > 0) {
+      combinedUsers.push(...developers);
+    }
+
+    setuser(combinedUsers);
+
+  } catch (err) {
+    console.log(err);
+    setuser([]);
+  }
+};
 
   const onSubmit = async (data) => {
     try {
@@ -75,57 +98,80 @@ export const CreateBug = () => {
   return (
     <div className="max-w-4xl mx-auto py-10 px-4">
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-        
         {/* Header Section */}
         <div className="bg-slate-50 p-6 border-b border-slate-200">
           <div className="flex items-center gap-3 mb-2">
             <div className="p-2 bg-rose-100 text-rose-600 rounded-lg">
               <FiAlertCircle size={24} />
             </div>
-            <h2 className="text-2xl font-bold text-slate-800">Report New Bug</h2>
+            <h2 className="text-2xl font-bold text-slate-800">
+              Report New Bug
+            </h2>
           </div>
           {taskData && (
             <p className="text-slate-500 text-sm">
-              Linked to Task: <span className="font-semibold text-slate-700">{taskData.title}</span>
+              Linked to Task:{" "}
+              <span className="font-semibold text-slate-700">
+                {taskData.title}
+              </span>
             </p>
           )}
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="p-8 space-y-6">
-          
           {/* Title Input */}
           <div className="space-y-1">
-            <label className="text-sm font-semibold text-slate-700">Bug Title</label>
+            <label className="text-sm font-semibold text-slate-700">
+              Bug Title
+            </label>
             <input
               type="text"
               placeholder="e.g. Login button not responding on mobile"
               className={`w-full px-4 py-2.5 rounded-lg border bg-slate-50 focus:bg-white transition-all outline-none focus:ring-4 ${
-                errors.title ? "border-rose-300 focus:ring-rose-50" : "border-slate-200 focus:ring-indigo-50 focus:border-indigo-400"
+                errors.title
+                  ? "border-rose-300 focus:ring-rose-50"
+                  : "border-slate-200 focus:ring-indigo-50 focus:border-indigo-400"
               }`}
               {...register("title", { required: "Title is required" })}
             />
-            {errors.title && <p className="text-xs text-rose-500 font-medium">{errors.title.message}</p>}
+            {errors.title && (
+              <p className="text-xs text-rose-500 font-medium">
+                {errors.title.message}
+              </p>
+            )}
           </div>
 
           {/* Description Textarea */}
           <div className="space-y-1">
-            <label className="text-sm font-semibold text-slate-700">Detailed Description</label>
+            <label className="text-sm font-semibold text-slate-700">
+              Detailed Description
+            </label>
             <textarea
               rows="4"
               placeholder="Describe the steps to reproduce the bug..."
               className={`w-full px-4 py-2.5 rounded-lg border bg-slate-50 focus:bg-white transition-all outline-none focus:ring-4 ${
-                errors.description ? "border-rose-300 focus:ring-rose-50" : "border-slate-200 focus:ring-indigo-50 focus:border-indigo-400"
+                errors.description
+                  ? "border-rose-300 focus:ring-rose-50"
+                  : "border-slate-200 focus:ring-indigo-50 focus:border-indigo-400"
               }`}
-              {...register("description", { required: "Description is required" })}
+              {...register("description", {
+                required: "Description is required",
+              })}
             />
-            {errors.description && <p className="text-xs text-rose-500 font-medium">{errors.description.message}</p>}
+            {errors.description && (
+              <p className="text-xs text-rose-500 font-medium">
+                {errors.description.message}
+              </p>
+            )}
           </div>
 
           {/* Dropdown Groups */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-1">
-              <label className="text-sm font-semibold text-slate-700">Priority</label>
-              <select 
+              <label className="text-sm font-semibold text-slate-700">
+                Priority
+              </label>
+              <select
                 className="w-full px-4 py-2.5 rounded-lg border border-slate-200 bg-slate-50 outline-none focus:ring-4 focus:ring-indigo-50 focus:border-indigo-400"
                 {...register("priority", { required: true })}
               >
@@ -137,8 +183,10 @@ export const CreateBug = () => {
             </div>
 
             <div className="space-y-1">
-              <label className="text-sm font-semibold text-slate-700">Issue Type</label>
-              <select 
+              <label className="text-sm font-semibold text-slate-700">
+                Issue Type
+              </label>
+              <select
                 className="w-full px-4 py-2.5 rounded-lg border border-slate-200 bg-slate-50 outline-none focus:ring-4 focus:ring-indigo-50 focus:border-indigo-400"
                 {...register("type", { required: true })}
               >
@@ -154,7 +202,9 @@ export const CreateBug = () => {
           {/* Result & Date */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-1">
-              <label className="text-sm font-semibold text-slate-700">Expected Result</label>
+              <label className="text-sm font-semibold text-slate-700">
+                Expected Result
+              </label>
               <input
                 type="text"
                 placeholder="What should have happened?"
@@ -164,7 +214,9 @@ export const CreateBug = () => {
             </div>
 
             <div className="space-y-1">
-              <label className="text-sm font-semibold text-slate-700">Due Date</label>
+              <label className="text-sm font-semibold text-slate-700">
+                Due Date
+              </label>
               <div className="relative">
                 <input
                   type="date"
@@ -177,15 +229,25 @@ export const CreateBug = () => {
 
           {/* Screenshot Upload */}
           <div className="space-y-1">
-            <label className="text-sm font-semibold text-slate-700">Bug Screenshot (Optional)</label>
+            <label className="text-sm font-semibold text-slate-700">
+              Bug Screenshot (Optional)
+            </label>
             <div className="flex items-center justify-center w-full">
               <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-slate-300 border-dashed rounded-lg cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
                   <FiUploadCloud className="w-8 h-8 mb-3 text-slate-400" />
-                  <p className="mb-2 text-sm text-slate-500"><span className="font-semibold">Click to upload</span> or drag and drop</p>
+                  <p className="mb-2 text-sm text-slate-500">
+                    <span className="font-semibold">Click to upload</span> or
+                    drag and drop
+                  </p>
                   <p className="text-xs text-slate-400">PNG, JPG or GIF</p>
                 </div>
-                <input type="file" accept="image/*" className="hidden" {...register("image")} />
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  {...register("image")}
+                />
               </label>
             </div>
           </div>
@@ -198,22 +260,18 @@ export const CreateBug = () => {
               {...register("assignedId", { required: true })}
             >
               <option value="">Select a user...</option>
-              <optgroup label="Developers" className="font-bold text-indigo-600">
-                {developers.map((u) => (
-                  <option key={u._id} value={u._id} className="text-slate-700 font-normal">
-                    👤 {u.name}
-                  </option>
-                ))}
-              </optgroup>
-              <optgroup label="Project Managers" className="font-bold text-amber-600">
-                {projectManagers.map((u) => (
-                  <option key={u._id} value={u._id} className="text-slate-700 font-normal">
-                    💼 {u.name}
-                  </option>
-                ))}
-              </optgroup>
+            {user.length > 0 && (
+            <optgroup label="Users">
+              {user.map((u) => (
+                <option key={u._id} value={u._id}>
+                  {u.name} ({u.role})
+                </option>
+              ))}
+            </optgroup>
+          )}  
             </select>
           </div>
+          
 
           {/* Action Buttons */}
           <div className="flex items-center justify-end gap-4 pt-4">
@@ -231,7 +289,6 @@ export const CreateBug = () => {
               Create Bug Report
             </button>
           </div>
-
         </form>
       </div>
     </div>

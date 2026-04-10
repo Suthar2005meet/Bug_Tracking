@@ -30,22 +30,7 @@ const AddSprint = async (req, resp) => {
         project: req.body.projectId,
         sprint: sprint._id
         })
-
-        // ✅ 3. Create Notification
-        await NotificationModel.insertMany([{
-        receiver: req.body.userId,
-        sender: req.body.userId,
-        type: "SPRINT_ADDED",
-        project: req.body.projectId,
-        sprint: sprint._id,
-        message: `Sprint "${req.body.name}" has been created`
-    }])
-        resp.status(201).json({
-        message: "Sprint Added Successfully",
-        data: sprint
-        })
-
-    } catch (err) {
+     } catch (err) {
         console.log(err)
         resp.status(500).json({
         message: "Server Error",

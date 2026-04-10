@@ -38,6 +38,8 @@ app.use('/notification',NotificationRoute)
 const DashboardRoute = require('./src/Routes/DashboardRoute')
 app.use('/dashboard',DashboardRoute)
 
+const UserManageRoute = require('./src/Routes/UserManageRoute')
+app.use('/usermanage',UserManageRoute)
 
 const PORT = process.env.PORT
 app.listen(PORT,()=>{

@@ -30,26 +30,95 @@ const allbugs = async (req, resp) => {
 // =====================================================
 // 2️⃣ Add Bug + Activity + Notification
 // =====================================================
+// const addBug = async (req, resp) => {
+//     try {
+
+//         if (!req.file) {
+//             return resp.status(400).json({
+//                 error: "File not uploaded",
+                
+//             });
+//         }
+
+//         const cloudinaryResponse = await uploadToCloudinary(req.file.buffer);
+
+//         const savedbug = await BugSchema.create({
+//             ...req.body,
+//             image: cloudinaryResponse.secure_url
+//         });
+
+//         const reporterId = Array.isArray(req.body.reportedBy)
+//             ? req.body.reportedBy[0]
+//             : req.body.reportedBy;
+
+//         // =====================================================
+//         // 🔥 Activity Log
+//         // =====================================================
+//         await ActivityLogModel.create({
+//             user: reporterId,
+//             action: "BUG_CREATED",
+//             bug: savedbug._id,
+//             task: req.body.taskId || null
+//         });
+
+//         // =====================================================
+//         // 🔔 Notification to Assigned Developers
+//         // =====================================================
+//         const assignedUsers = normalizeToArray(savedbug.assignedId);
+//         if (assignedUsers.length > 0) {
+//             const notifications = assignedUsers.map(dev => ({
+//                 receiver: dev,
+//                 sender: reporterId,
+//                 type: "BUG_ASSIGNED",
+//                 bug: savedbug._id,
+//                 task: req.body.taskId || null,
+//                 message: "You have been assigned a new bug"
+//             }));
+
+//             await NotificationModel.insertMany(notifications);
+//         }
+
+//         resp.status(201).json({
+//             message: "bug detail saved",
+//             data: savedbug
+//         });
+
+//     } catch (err) {
+//         console.error("addBug failed:", err.message);
+//         resp.status(500).json({
+//             error: err.message || err
+//         });
+//     }
+// };
+
 const addBug = async (req, resp) => {
     try {
 
         if (!req.file) {
             return resp.status(400).json({
                 error: "File not uploaded",
-                
             });
         }
 
         const cloudinaryResponse = await uploadToCloudinary(req.file.buffer);
 
-        const savedbug = await BugSchema.create({
-            ...req.body,
-            image: cloudinaryResponse.secure_url
-        });
-
+        // 🔥 Get Reporter ID safely
         const reporterId = Array.isArray(req.body.reportedBy)
             ? req.body.reportedBy[0]
             : req.body.reportedBy;
+
+        // 🔥 Normalize Assigned Developers
+        const assignedUsers = normalizeToArray(req.body.assignedId);
+
+        // =====================================================
+        // ✅ Create Bug
+        // =====================================================
+        const savedbug = await BugSchema.create({
+            ...req.body,
+            reportedBy: reporterId,      // ensure proper reporter saved
+            assignedId: assignedUsers,   // ensure array format
+            image: cloudinaryResponse.secure_url
+        });
 
         // =====================================================
         // 🔥 Activity Log
@@ -64,8 +133,8 @@ const addBug = async (req, resp) => {
         // =====================================================
         // 🔔 Notification to Assigned Developers
         // =====================================================
-        const assignedUsers = normalizeToArray(savedbug.assignedId);
         if (assignedUsers.length > 0) {
+
             const notifications = assignedUsers.map(dev => ({
                 receiver: dev,
                 sender: reporterId,
@@ -78,9 +147,17 @@ const addBug = async (req, resp) => {
             await NotificationModel.insertMany(notifications);
         }
 
+        // =====================================================
+        // ✅ Return Populated Bug (IMPORTANT)
+        // =====================================================
+        const populatedBug = await BugSchema.findById(savedbug._id)
+            .populate("reportedBy", "name email role")
+            .populate("assignedId", "name email role")
+            .populate("taskId", "title");
+
         resp.status(201).json({
             message: "bug detail saved",
-            data: savedbug
+            data: populatedBug
         });
 
     } catch (err) {
@@ -90,7 +167,6 @@ const addBug = async (req, resp) => {
         });
     }
 };
-
 
 // =====================================================
 // 3️⃣ Get Bug By ID

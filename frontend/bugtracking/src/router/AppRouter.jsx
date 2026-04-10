@@ -34,6 +34,7 @@ import { Task } from "../components/developer/Task"
 import { TesterTask } from "../components/Tester/TesterTask";
 import { Setting } from "../pages/Setting";
 import Dashboard from "../pages/Dashboard";
+import AddUserPm from "../components/projetcmanager/AddUserPm";
 
 const router = createBrowserRouter([
     {path:'/' , element:<Login/>},
@@ -82,7 +83,7 @@ const router = createBrowserRouter([
     },
     {
         path:'/tester', element:<ProtectedRoutes userRoles={["Tester"]}>
-            <TesterNavbar/>,
+            <TesterNavbar/>
         </ProtectedRoutes>,
         children:[
             {index: true,element:<Navigate to="dashboard" replace />},
@@ -118,8 +119,11 @@ const router = createBrowserRouter([
             {path:'projects/sprint/:id',element:<SprintProject/>},
             {path:'projects/sprint/:projectId/addtask/:sprintId',element:<AddTask/>},
             {path:'projects/sprint/:id/addsprint',element:<AddSprint/>},
-            {path:'user',element:<ShowUser/>},
-            {path:'user/adduser',element:<AddUser/>},
+            {path:'user/:id',element:<AddUserPm/>},
+            // {path:'user/adduser',element:<AddUserPm/>},
+            // {path:'user/adduserpm/:id',element:<AddUserPm/>},
+            {path:'user/userdetail/:id',element:<UserDetail/>},
+            {path:'user/edituser/:id',element:<EditUser/>},
             {path:'setting/:id',element:<Setting/>}
 
         ]

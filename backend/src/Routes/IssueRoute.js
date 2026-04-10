@@ -13,5 +13,6 @@ router.get('/user/:id',IssueController.getDataByUser)
 router.put('/status/:id',validateToken,IssueController.updateIssueStatus)
 router.put('/adduser/:id',validateToken,IssueController.addUserToIssue)
 router.get('/tester/:id',IssueController.getDataByTester)
+router.get('/pm',validateToken,IssueController.getPmIssues)
 
 module.exports = router

@@ -189,10 +189,8 @@ const getProjectsByUser = async (req, res) => {
     }
 
     const projects = await ProjectSchema.find({
-      assignedDevelopers: id,
+      createdBy: id,
     })
-      .populate("assignedDevelopers", "name email")
-      .populate("assignedTester", "name email");
 
     res.status(200).json({
       success: true,
@@ -200,6 +198,7 @@ const getProjectsByUser = async (req, res) => {
       data: projects,
     });
   } catch (error) {
+    console.log(error)
     res.status(500).json({
       success: false,
       message: error.message,

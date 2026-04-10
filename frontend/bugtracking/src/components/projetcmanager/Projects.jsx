@@ -1,8 +1,10 @@
 import axios from 'axios'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { AuthContext } from '../../AuthProvider'
 
 export const Projects = () => {
+  const {userId, role} = useContext(AuthContext)
   const [projects, setProjects] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
   const [loading, setLoading] = useState(true)
@@ -10,8 +12,15 @@ export const Projects = () => {
   const getProjects = async () => {
     try {
       setLoading(true)
-      const res = await axios.get('/project/all')
-      setProjects(res.data.data)
+      // const res = await axios.get(`/project/user/${userId}`)
+      if(role === "ProjectManager"){
+        const res = await axios.get(`/project/user/${userId}`)
+        setProjects(res.data.data)
+      }else{
+        const res = await axios.get('/project/all')
+        setProjects(res.data.data)
+      }
+      // setProjects(res.data.data)
     } catch (error) {
       console.error('Error fetching projects:', error)
     } finally {

@@ -1,12 +1,23 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import axios from 'axios';
 import { getRoleLabel, hasRole, normalizeRole } from '../../../utils/roles';
+import {AuthContext} from '../../../AuthProvider'
 
 export const ShowUser = () => {
+  const { role, userId} = useContext(AuthContext)
   const [users, setUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeRole, setActiveRole] = useState('All');
+
+  const normalizedRole = normalizeRole(role);
+
+const addUserPath =
+  normalizedRole === "projectmanager"
+    ? `/projectmanager/user/adduserpm/${userId}`
+    : normalizedRole === "admin"
+    ? `adduser`
+    : null;
 
   const roles = [
     { label: 'All', value: 'All' },
@@ -94,12 +105,20 @@ export const ShowUser = () => {
             </div>
 
             {/* Add Button */}
-            <Link
+            {/* <Link
               className="px-5 py-2 rounded-lg bg-green-500 hover:bg-green-600 text-white font-semibold text-sm transition-colors duration-200 shadow-sm"
               to="adduser"
             >
               + Add User
-            </Link>
+            </Link> */}
+            {addUserPath && (
+  <Link
+    className="px-5 py-2 rounded-lg bg-green-500 hover:bg-green-600 text-white font-semibold text-sm transition-colors duration-200 shadow-sm"
+    to={addUserPath}
+  >
+    + Add User
+  </Link>
+)}
           </div>
 
           {/* Role Filter Buttons */}

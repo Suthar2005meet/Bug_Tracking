@@ -366,6 +366,30 @@
     }
     };
 
+const getPmIssues = async (req, res) => {
+  try {
+    const pmId = req.user.id;
+
+    const issues = await IssueSchema.find({
+      reporterId: pmId   // ✅ Only issues created by this PM
+    })
+      .populate("projectId")
+      .populate("sprintId")
+      .populate("reporterId", "name email role")
+      .populate("assigned", "name role");
+
+    res.status(200).json({
+      message: "Issues Found Successfully",
+      data: issues
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      message: error.message
+    });
+  }
+};
+
     module.exports = {
     getData,
     addTask,
@@ -376,4 +400,5 @@
     updateIssueStatus,
     addUserToIssue,
     getDataByTester,
+    getPmIssues
     };

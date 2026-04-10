@@ -6,29 +6,33 @@ export const Task = () => {
   const { userId } = useContext(AuthContext);
 
   const [issues, setIssues] = useState([]);
-  const [testers, setTesters] = useState([]);
+  // const [testers, setTesters] = useState([]);
+  const [user, setuser] = useState([])
   const [selectedTester, setSelectedTester] = useState({});
   const [loading, setLoading] = useState(false);
 
-  // ================= GET USER ISSUES =================
+  // // ================= GET USER ISSUES =================
   const getIssues = async () => {
     try {
       const res = await axios.get(`/issue/user/${userId}`);
       setIssues(res.data.data);
+      console.log(res.data)
     } catch (err) {
       console.log(err);
     }
   };
 
-  // ================= GET TESTERS =================
-  const getTesters = async () => {
-    try {
-      const res = await axios.get("/user/tester");
-      setTesters(res.data.data);
-    } catch (err) {
-      console.log(err);
-    }
-  };
+// ================= GET TESTERS =================
+const getUser = async () => {
+  try {
+    const res = await axios.get("/usermanage/tester");
+    console.log(res.data.team.users)
+    setuser(res.data.team.users || []);
+  } catch (err) {
+    console.log(err);
+    setuser([]);
+  }
+};
 
   // ================= START / RESTART PROGRESS =================
   const startProgress = async (issueId) => {
@@ -69,7 +73,8 @@ export const Task = () => {
 
   useEffect(() => {
     getIssues();
-    getTesters();
+    // getTesters();
+    getUser()
   }, []);
 
   return (
@@ -148,7 +153,7 @@ export const Task = () => {
                       Assigned Team
                     </strong>
                     <ul className="flex flex-wrap gap-2">
-                      {issue.assigend?.map((user) => (
+                      {issue.assigned?.map((user) => (
                         <li
                           key={user._id}
                           className="text-xs bg-white border border-slate-200 px-2 py-1 rounded shadow-sm text-slate-600"
@@ -207,11 +212,18 @@ export const Task = () => {
                           }
                         >
                           <option value="">Choose a member...</option>
-                          {testers.map((tester) => (
+                          {/* {testers.map((tester) => (
                             <option key={tester._id} value={tester._id}>
                               {tester.name}
                             </option>
-                          ))}
+                          ))} */}
+                          {user.length > 0 && (
+                                    <optgroup label="Users">
+                                        {user.map(u => (
+                                            <option key={u._id} value={u._id}>{u.name}   ({u.role})</option>
+                                        ))}
+                                    </optgroup>
+                                )}
                         </select>
                       </div>
                       <button

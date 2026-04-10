@@ -7,9 +7,10 @@ export const AddTask = () => {
     const { sprintId, projectId } = useParams();
     const { userId } = useContext(AuthContext);
     const navigate = useNavigate();
-    const [developer, setDeveloper] = useState([]);
-    const [tester, setTester] = useState([]);
-    const [pm, setPm] = useState([]);
+    // const [developer, setDeveloper] = useState([]);
+    // const [tester, setTester] = useState([]);
+    // const [pm, setPm] = useState([]);
+    const [user , setuser] = useState([])
     const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
 
@@ -22,33 +23,48 @@ export const AddTask = () => {
         dueDate: '',
     });
 
-    const developerData = async () => {
-        try {
-            const res = await axios.get('/user/developer');
-            setDeveloper(res.data.data);
-        } catch (err) {
-            console.log(err);
-        }
-    };
+    // const developerData = async () => {
+    //     try {
+    //         const res = await axios.get('/user/developer');
+    //         setDeveloper(res.data.data);
+    //     } catch (err) {
+    //         console.log(err);
+    //     }
+    // };
 
-    const testerData = async () => {
-        try {
-            const res = await axios.get('/user/tester');
-            setTester(res.data.data);
-        } catch (err) {
-            console.log(err);
-        }
-    };
+    // const testerData = async () => {
+    //     try {
+    //         const res = await axios.get('/user/tester');
+    //         setTester(res.data.data);
+    //     } catch (err) {
+    //         console.log(err);
+    //     }
+    // };
 
-    const projectManagerData = async () => {
-        try {
-            const res = await axios.get('/user/projectmanager');
-            setPm(res.data.data);
-        } catch (err) {
-            console.log(err);
-        }
-    };
+    // const projectManagerData = async () => {
+    //     try {
+    //         const res = await axios.get('/user/projectmanager');
+    //         setPm(res.data.data);
+    //     } catch (err) {
+    //         console.log(err);
+    //     }
+    // };
+    const getUser = async () => {
+    try {
+        const res = await axios.get("/usermanage/my-team");
 
+        if (res.data.team && res.data.team.users) {
+            setuser(res.data.team.users);   // ✅ Correct path
+            console.log(res.data.team.users)
+        } else {
+            setuser([]);
+        }
+
+    } catch (err) {
+        console.log(err);
+        setuser([]);
+    }
+};
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
@@ -86,9 +102,10 @@ export const AddTask = () => {
     };
 
     useEffect(() => {
-        developerData();
-        testerData();
-        projectManagerData();
+        // developerData();
+        // testerData();
+        // projectManagerData();
+        getUser()
     }, []);
 
     const selectClass =
@@ -166,7 +183,15 @@ export const AddTask = () => {
                             >
                                 <option value="" disabled>Select a user...</option>
 
-                                {developer.length > 0 && (
+                                {user.length > 0 && (
+                                    <optgroup label="Users">
+                                        {user.map(u => (
+                                            <option key={u._id} value={u._id}>{u.name}   ({u.role})</option>
+                                        ))}
+                                    </optgroup>
+                                )}
+
+                                {/* {developer.length > 0 && (
                                     <optgroup label="👨‍💻 Developers">
                                         {developer.map(u => (
                                             <option key={u._id} value={u._id}>{u.name}</option>
@@ -188,7 +213,7 @@ export const AddTask = () => {
                                             <option key={u._id} value={u._id}>{u.name}</option>
                                         ))}
                                     </optgroup>
-                                )}
+                                )} */}
                             </select>
                         </div>
 
