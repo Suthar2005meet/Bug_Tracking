@@ -2,11 +2,13 @@ import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../AuthProvider';
+import { useToast } from '../../hooks/useToast';
 
 export const AddTask = () => {
     const { sprintId, projectId } = useParams();
     const { userId } = useContext(AuthContext);
     const navigate = useNavigate();
+    const toast = useToast();
     // const [developer, setDeveloper] = useState([]);
     // const [tester, setTester] = useState([]);
     // const [pm, setPm] = useState([]);
@@ -91,11 +93,11 @@ export const AddTask = () => {
             await axios.post('/issue/add', data, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
-            alert("🚀 Issue created successfully!");
+            toast.success("🚀 Issue created successfully!");
             navigate(-1);
         } catch (err) {
             console.error(err);
-            alert("Failed to create issue.");
+            toast.error("Failed to create issue.");
         } finally {
             setLoading(false);
         }

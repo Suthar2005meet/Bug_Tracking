@@ -2,6 +2,7 @@ import { useContext, useState } from "react";
 import { FaBars, FaBox, FaBug, FaChevronRight, FaCog, FaUsers } from "react-icons/fa";
 import { FaDatabase } from "react-icons/fa6";
 import { Link, NavLink, Outlet } from "react-router-dom";
+import { NotificationDropdown } from "../common/NotificationDropdown";
 import { AuthContext } from "../../AuthProvider";
 
 export const AdminSidebar = () => {
@@ -149,10 +150,7 @@ export const AdminSidebar = () => {
           </p>
           <div className="flex items-center gap-3">
             {/* Notification bell */}
-            <button className="relative flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition-all hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600">
-              🔔
-              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 font-mono text-[8px] font-bold text-white">3</span>
-            </button>
+            <NotificationDropdown role="admin" />
             {/* Avatar */}
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 font-black text-xs text-white shadow-md shadow-indigo-200">
               A

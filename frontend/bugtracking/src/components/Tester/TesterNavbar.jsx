@@ -5,6 +5,7 @@ import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../AuthProvider";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { NotificationDropdown } from "../common/NotificationDropdown";
 
 export const TesterNavbar = () => {
   const { userId, logout } = useContext(AuthContext);
@@ -12,15 +13,11 @@ export const TesterNavbar = () => {
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const [notificationOpen, setNotificationOpen] = useState(false);
 
   const [user, setUser] = useState(null);
-  const [notifications, setNotifications] = useState([]);
-  const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
   const profileRef = useRef(null);
-  const notificationRef = useRef(null);
 
   const navLinks = [
     { name: "Dashboard", path: `dashboard/${userId}` },
@@ -41,61 +38,6 @@ export const TesterNavbar = () => {
     }
   };
 
-  const getNotifications = async () => {
-    if (!userId) return;
-    try {
-      const res = await axios.get(`/notification/all/${userId}`);
-      setNotifications(res.data.data || []);
-    } catch (err) {
-      console.error("Fetch error:", err);
-    }
-  };
-
-  const getUnreadCount = async () => {
-    if (!userId) return;
-    try {
-      const res = await axios.get(`/notification/user/${userId}/unread-count`);
-      setUnreadCount(res.data.count || 0);
-    } catch (err) {
-      console.error("Count error:", err);
-    }
-  };
-
-  // ─── NOTIFICATION ACTIONS ───
-  const handleNotificationClick = async (n) => {
-    if (!n) return;
-    try {
-      if (!n.isRead) {
-        await axios.put(`/notification/${n._id}/read`);
-        getUnreadCount();
-      }
-
-      setNotificationOpen(false);
-
-      // Tester-specific routing logic
-      if (n.type?.includes("BUG") || n.bug) {
-        navigate(`bug/${userId}`);
-      } else if (n.type?.includes("TASK") || n.task) {
-        navigate(`task/${userId}`);
-      } else {
-        navigate(`dashboard/${userId}`);
-      }
-    } catch (err) {
-      console.error("Nav error:", err);
-    }
-  };
-
-  const markAllRead = async () => {
-    try {
-      await axios.put(`/notification/user/${userId}/read-all`);
-      getNotifications();
-      setUnreadCount(0);
-      toast.success("All notifications cleared");
-    } catch (err) {
-      toast.error("Failed to update notifications");
-    }
-  };
-
   const handleLogout = () => {
     logout();
     toast.info("Logged out successfully");
@@ -105,14 +47,12 @@ export const TesterNavbar = () => {
   useEffect(() => {
     if (userId) {
       getUser();
-      getUnreadCount();
     }
   }, [userId]);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (profileRef.current && !profileRef.current.contains(e.target)) setProfileOpen(false);
-      if (notificationRef.current && !notificationRef.current.contains(e.target)) setNotificationOpen(false);
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -136,86 +76,7 @@ export const TesterNavbar = () => {
         <div className="flex items-center gap-2 md:gap-4">
           
           {/* 🔔 IMPROVED NOTIFICATION DROPDOWN */}
-          <div className="relative" ref={notificationRef}>
-            <button 
-              onClick={() => {
-                setNotificationOpen(!notificationOpen);
-                if (!notificationOpen) getNotifications();
-              }}
-              className={`relative p-2.5 rounded-full transition-all ${notificationOpen ? 'bg-green-50 text-[#71dd37]' : 'text-slate-400 hover:bg-slate-50'}`}
-            >
-              <FiBell size={22} />
-              {unreadCount > 0 && (
-                <span className="absolute top-1.5 right-1.5 h-5 w-5 bg-rose-500 text-white text-[10px] font-bold rounded-full border-2 border-white flex items-center justify-center animate-pulse">
-                  {unreadCount}
-                </span>
-              )}
-            </button>
-
-            {notificationOpen && (
-              <div className="absolute right-0 mt-4 w-80 md:w-[420px] bg-white border border-slate-200 rounded-2xl shadow-2xl z-[80] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                <div className="p-4 bg-white border-b border-slate-100 flex justify-between items-center">
-                  <div>
-                    <h3 className="text-base font-extrabold text-slate-800">Alert Center</h3>
-                    <p className="text-[11px] text-slate-400 font-medium">You have {unreadCount} unread tasks/bugs</p>
-                  </div>
-                  {notifications.length > 0 && (
-                    <button onClick={markAllRead} className="text-[10px] font-bold text-indigo-600 hover:bg-indigo-50 px-2 py-1 rounded transition-colors uppercase tracking-widest">
-                      <FaCheckDouble className="inline mr-1" /> Clear All
-                    </button>
-                  )}
-                </div>
-
-                <div className="max-h-[400px] overflow-y-auto">
-                  {notifications.length === 0 ? (
-                    <div className="p-12 text-center">
-                      <FiInbox className="mx-auto mb-3 text-slate-200" size={40} />
-                      <p className="text-sm font-medium text-slate-400 italic">No new activity logged</p>
-                    </div>
-                  ) : (
-                    notifications.map((n) => (
-                      <div 
-                        key={n._id} 
-                        onClick={() => handleNotificationClick(n)}
-                        className={`p-4 border-b border-slate-50 transition-all cursor-pointer hover:bg-slate-50 flex gap-3
-                          ${!n.isRead ? 'bg-indigo-50/30 border-l-4 border-l-[#71dd37]' : 'bg-white opacity-90'}`}
-                      >
-                        {/* Avatar Column */}
-                        <div className="flex-shrink-0 mt-1">
-                          <div className={`h-10 w-10 rounded-full flex items-center justify-center text-xs font-bold shadow-sm 
-                            ${n.type?.includes('BUG') ? 'bg-rose-100 text-rose-600' : 'bg-blue-100 text-blue-600'}`}>
-                            {n.sender?.name?.charAt(0) || "U"}
-                          </div>
-                        </div>
-
-                        {/* Content Column */}
-                        <div className="flex-grow">
-                          <div className="flex justify-between items-start mb-1">
-                            <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded ${n.type?.includes('BUG') ? 'bg-rose-50 text-rose-600' : 'bg-blue-50 text-blue-600'}`}>
-                              {n.type?.replace('_', ' ')}
-                            </span>
-                            <span className="text-[10px] text-slate-400 italic font-medium">
-                              {new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                            </span>
-                          </div>
-                          
-                          <p className={`text-sm leading-snug ${!n.isRead ? 'font-bold text-slate-800' : 'text-slate-600'}`}>
-                            {n.sender?.name} <span className="font-normal text-slate-500">{n.message}</span>
-                          </p>
-
-                          {n.bug && (
-                            <div className="mt-2 text-[10px] bg-white border border-slate-100 p-2 rounded text-slate-500 font-medium">
-                              Ticket: {n.bug.title}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
+          <NotificationDropdown role="tester" />
 
           <div className="h-8 w-px bg-slate-200 mx-1 hidden sm:block"></div>
 

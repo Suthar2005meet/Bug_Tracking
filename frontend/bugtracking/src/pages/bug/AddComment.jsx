@@ -3,11 +3,13 @@
     import { useForm } from "react-hook-form";
     import { useNavigate, useParams } from "react-router-dom";
     import { AuthContext } from "../../AuthProvider";
+    import { useToast } from "../../hooks/useToast";
 
     export const AddComment = () => {
     const { userId } = useContext(AuthContext);
     const { id } = useParams();
     const navigate = useNavigate();
+    const toast = useToast();
 
     const [bug, setBug] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -33,7 +35,7 @@
     // 🔹 Submit Comment
     const submitHandle = async (data) => {
         if (!userId) {
-        alert("User not logged in");
+        toast.error("User not logged in");
         return;
         }
 

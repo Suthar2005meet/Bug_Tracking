@@ -2,11 +2,13 @@ import React, { useContext, useState } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../../AuthProvider";
+import { useToast } from "../../hooks/useToast";
 
 export const AddSprint = () => {
   const { id } = useParams(); // projectId from URL
   const { userId } = useContext(AuthContext);
   const navigate = useNavigate();
+  const toast = useToast();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -24,7 +26,7 @@ export const AddSprint = () => {
 
     // ✅ Date validation
     if (new Date(formData.dueDate) < new Date(formData.startDate)) {
-      alert("Due date cannot be before start date");
+      toast.error("Due date cannot be before start date");
       return;
     }
 
@@ -39,7 +41,7 @@ export const AddSprint = () => {
       navigate(-1);
     } catch (err) {
       console.error("Error adding sprint:", err.response?.data || err);
-      alert("Failed to add sprint.");
+      toast.error("Failed to add sprint.");
     } finally {
       setLoading(false);
     }

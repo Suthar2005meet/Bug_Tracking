@@ -10,11 +10,13 @@ import {
   FiUser,
   FiType,
 } from "react-icons/fi";
+import { useToast } from "../../hooks/useToast";
 
 export const CreateBug = () => {
   const { userId } = useContext(AuthContext);
   const { id } = useParams();
   const navigate = useNavigate();
+  const toast = useToast();
 
   const [taskData, setTaskData] = useState(null);
   const [user, setuser] = useState([]);
@@ -86,12 +88,12 @@ export const CreateBug = () => {
       });
 
       if (res.status === 201) {
-        alert("Bug Created Successfully");
+        toast.success("Bug Created Successfully");
         navigate(-1);
       }
     } catch (err) {
       console.log(err.response?.data || err.message);
-      alert("Error creating bug");
+      toast.error("Error creating bug");
     }
   };
 

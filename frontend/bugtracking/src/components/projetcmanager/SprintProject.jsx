@@ -2,9 +2,11 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ChevronDown, Edit2, Save, X } from "lucide-react";
+import { useToast } from "../../hooks/useToast";
 
 export const SprintProject = () => {
   const { id } = useParams();
+  const toast = useToast();
   const [sprints, setSprints] = useState([]);
   const [sprintTasks, setSprintTasks] = useState({});
   const [search, setSearch] = useState("");
@@ -86,7 +88,7 @@ export const SprintProject = () => {
       setEditValues({});
     } catch (err) {
       console.error("Error updating task:", err);
-      alert("Failed to update task. Please try again.");
+      toast.error("Failed to update task. Please try again.");
     } finally {
       setLoading(false);
     }

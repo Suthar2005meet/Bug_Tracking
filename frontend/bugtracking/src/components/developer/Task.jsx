@@ -1,9 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../AuthProvider";
 import axios from "axios";
+import { useToast } from "../../hooks/useToast";
 
 export const Task = () => {
   const { userId } = useContext(AuthContext);
+  const toast = useToast();
 
   const [issues, setIssues] = useState([]);
   // const [testers, setTesters] = useState([]);
@@ -53,7 +55,7 @@ const getUser = async () => {
   const addTester = async (issueId) => {
     try {
       if (!selectedTester[issueId]) {
-        alert("Please select tester");
+        toast.warning("Please select tester");
         return;
       }
       setLoading(true);

@@ -5,6 +5,7 @@ import { NavLink, Outlet, Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../AuthProvider";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { NotificationDropdown } from "../common/NotificationDropdown";
 
 export const PmNavbar = () => {
     const { userId, logout } = useContext(AuthContext);
@@ -12,14 +13,10 @@ export const PmNavbar = () => {
 
     const [menuOpen, setMenuOpen] = useState(false);
     const [profileOpen, setProfileOpen] = useState(false);
-    const [notificationOpen, setNotificationOpen] = useState(false);
 
     const [user, setUser] = useState(null);
-    const [notifications, setNotifications] = useState([]);
-    const [unreadCount, setUnreadCount] = useState(0);
 
     const profileRef = useRef(null);
-    const notificationRef = useRef(null);
 
     const navLinks = [
         { name: "Dashboard", path: `dashboard/${userId}` },
@@ -37,67 +34,15 @@ export const PmNavbar = () => {
         } catch (err) { console.error(err); }
     };
 
-    const getNotifications = async () => {
-        if (!userId) return;
-        try {
-            const res = await axios.get(`/notification/all/${userId}`);
-            setNotifications(res.data.data || []);
-        } catch (err) { console.error(err); }
-    };
-
-    const getCount = async () => {
-        if (!userId) return;
-        try {
-            const res = await axios.get(`/notification/user/${userId}/unread-count`);
-            setUnreadCount(res.data.count || 0);
-        } catch (err) { console.error(err); }
-    };
-
-    const markAllRead = async () => {
-        try {
-            await axios.put(`/notification/user/${userId}/read-all`);
-            getNotifications();
-            setUnreadCount(0);
-            toast.success("Notifications cleared");
-        } catch (err) { toast.error("Failed to clear notifications"); }
-    };
-
-    // ─── SMART NAVIGATION ───
-    const handleNotificationClick = async (n) => {
-        if (!n) return;
-        try {
-            if (!n.isRead) {
-                await axios.put(`/notification/${n._id}/read`);
-                getCount();
-            }
-
-            setNotificationOpen(false);
-
-            const type = n.type;
-            const title = (n.title || "").toLowerCase();
-
-            // PM Specific Routing
-            if (type?.includes("BUG") || title.includes("bug")) {
-                navigate(`bugs`);
-            } else if (type?.includes("PROJECT") || title.includes("project") || type?.includes("SPRINT")) {
-                navigate(`projects`);
-            } else if (type?.includes("USER")) {
-                navigate(`user/${userId}`);
-            } else {
-                navigate(`dashboard/${userId}`);
-            }
-        } catch (err) { console.error("Nav error:", err); }
-    };
+    // Replaced by NotificationContext
 
     useEffect(() => {
         getUser();
-        getCount();
     }, [userId]);
 
     useEffect(() => {
         const handler = (e) => {
             if (profileRef.current && !profileRef.current.contains(e.target)) setProfileOpen(false);
-            if (notificationRef.current && !notificationRef.current.contains(e.target)) setNotificationOpen(false);
         };
         document.addEventListener("mousedown", handler);
         return () => document.removeEventListener("mousedown", handler);
@@ -126,75 +71,7 @@ export const PmNavbar = () => {
 
                 <div className="flex items-center gap-4">
                     {/* 🔔 Notifications */}
-                    <div className="relative" ref={notificationRef}>
-                        <button
-                            onClick={() => {
-                                setNotificationOpen(!notificationOpen);
-                                if (!notificationOpen) getNotifications();
-                            }}
-                            className={`relative p-2.5 rounded-full transition-all border ${notificationOpen ? 'bg-green-50 text-[#71dd37] border-green-100' : 'text-slate-400 border-transparent hover:bg-slate-50'}`}
-                        >
-                            <FiBell size={20} />
-                            {unreadCount > 0 && (
-                                <span className="absolute top-0 right-0 h-5 w-5 bg-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white animate-bounce">
-                                    {unreadCount}
-                                </span>
-                            )}
-                        </button>
-
-                        {notificationOpen && (
-                            <div className="absolute right-0 mt-4 w-80 md:w-[420px] bg-white border border-slate-200 rounded-2xl shadow-2xl z-[80] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                                <div className="p-4 bg-slate-50/50 border-b border-slate-100 flex justify-between items-center">
-                                    <h3 className="font-extrabold text-slate-700 text-sm tracking-tight">System Notifications</h3>
-                                    <button onClick={markAllRead} className="text-[10px] text-indigo-600 font-bold flex items-center gap-1 hover:bg-indigo-50 px-2 py-1 rounded transition-all">
-                                        <FaCheckDouble size={10} /> Mark all read
-                                    </button>
-                                </div>
-                                <div className="max-h-[400px] overflow-y-auto">
-                                    {notifications.length === 0 ? (
-                                        <div className="p-12 text-center">
-                                            <FiInbox className="mx-auto mb-3 text-slate-200" size={40} />
-                                            <p className="text-xs font-bold text-slate-400 italic">No pending updates</p>
-                                        </div>
-                                    ) : (
-                                        notifications.map((n, i) => (
-                                            <div 
-                                                key={i} 
-                                                onClick={() => handleNotificationClick(n)}
-                                                className={`p-4 border-b border-slate-50 transition-all cursor-pointer hover:bg-slate-50 flex gap-3
-                                                ${!n.isRead ? 'bg-green-50/30 border-l-4 border-l-[#71dd37]' : 'bg-white'}`}
-                                            >
-                                                {/* Sender Initial Avatar */}
-                                                <div className={`h-10 w-10 flex-shrink-0 rounded-full flex items-center justify-center font-bold text-xs shadow-sm
-                                                    ${n.type?.includes('BUG') ? 'bg-rose-100 text-rose-600' : 'bg-blue-100 text-blue-600'}`}>
-                                                    {n.sender?.name?.charAt(0) || "S"}
-                                                </div>
-
-                                                <div className="flex-grow">
-                                                    <div className="flex justify-between items-start mb-1">
-                                                        <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded ${n.type?.includes('BUG') ? 'bg-rose-50 text-rose-600' : 'bg-blue-50 text-blue-600'}`}>
-                                                            {n.type?.replace('_', ' ')}
-                                                        </span>
-                                                        <span className="text-[10px] text-slate-400 italic">
-                                                            {new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                        </span>
-                                                    </div>
-                                                    <p className={`text-sm leading-tight ${!n.isRead ? 'font-bold text-slate-900' : 'text-slate-600'}`}>
-                                                        {n.sender?.name} <span className="font-normal text-slate-500">{n.message}</span>
-                                                    </p>
-                                                    {n.bug && (
-                                                        <div className="mt-2 text-[10px] bg-slate-100/50 p-2 rounded border border-slate-100 text-slate-500 font-medium">
-                                                            Bug Ref: {n.bug.title}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        ))
-                                    )}
-                                </div>
-                            </div>
-                        )}
-                    </div>
+                    <NotificationDropdown role="projectmanager" />
 
                     <div className="h-8 w-px bg-slate-200 mx-1"></div>
 
