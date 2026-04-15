@@ -27,7 +27,7 @@ const BugSchema = new mongoose.Schema(
 
     status: {
         type: String,
-        enum: ["Open", "In Progress", "Resolved", "Closed"],
+        enum: ["Open", "In Progress", "In Testing", "Resolved", "Re-Open", "Closed"],
         default: "Open",
     },
 
@@ -42,8 +42,13 @@ const BugSchema = new mongoose.Schema(
     },
     taskId : {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "tasks",
+        ref: "issue",
         required: true,
+    },
+
+    projectId : {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "projects",
     },
 
     assignedId : [

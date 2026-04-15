@@ -1,0 +1,114 @@
+# Bug Tracking System - Functionality Documentation
+
+## 1. Project Overview
+A comprehensive Bug Tracking System designed to manage software projects, track issues, report bugs, and coordinate work between different roles (Admin, Project Manager, Developer, and Tester).
+
+## 2. User Roles & Access Control
+
+### Admin
+- **Full System Access**: Oversees all users, projects, and issues.
+- **User Management**: Create, view, edit, and manage all users in the system.
+- **Project Oversight**: Create and manage all projects and their sprints.
+- **Bug Tracking**: Report, view, and modify any bug in the system.
+- **Dashboard**: High-level overview with KPIs for total users, projects, issues, bugs, and sprints.
+
+### Project Manager (PM)
+- **Project Management**: Create and manage projects, define sprints, and assign tasks.
+- **Team Management**: Add developers and testers to their team and manage their roles within projects.
+- **Bug Oversight**: Track bugs within their projects and monitor progress.
+- **Dashboard**: View project-specific statistics and recent activity feed.
+
+### Developer
+- **Task Execution**: View and manage tasks assigned to them within sprints.
+- **Bug Resolution**: View bugs assigned to them and update their status.
+- **Collaboration**: Add and view comments on bugs to coordinate with testers.
+- **Dashboard**: View personal task/bug counts and incoming notifications.
+
+### Tester
+- **Bug Reporting**: Identify and report new bugs found during testing.
+- **Task Verification**: View tasks assigned for testing and create bugs directly linked to them.
+- **Bug Management**: Update bug statuses and provide details/images for reproduction.
+- **Dashboard**: View assigned tasks and personal bug reporting statistics.
+
+---
+
+## 3. Frontend Functionality Map
+
+### Common Features (All Roles)
+- **Login/Logout**: Secure access with JWT-based authentication.
+- **Profile Settings**: Update name, email, and profile image.
+- **Notifications**: Real-time alerts for assignments, status changes, and comments.
+- **Dark UI**: Optimized dark-themed dashboard with modern aesthetics.
+
+### Key Pages & Interactions
+
+#### Dashboard Page
+- **KPI Cards**: Interactive cards showing counts (e.g., Total Projects, My Tasks). 
+- **Charts**: Integrated ApexCharts showing Status, Priority, and Role distributions.
+- **Side Panels**: Recent Activity feed (Admin/PM) or Personal Notifications (Dev/Tester).
+
+#### Project Management
+- **Projects List**: View projects in card/list format.
+- **Buttons**:
+  - `Create Project`: (Admin/PM) Open form to add a new project with documentation.
+  - `Edit Project`: Modify project details.
+  - `Details`: View project overview and team.
+  - `Sprint`: (Admin/PM) Navigate to Sprint management for a project.
+
+#### Sprint & Task Management
+- **Buttons**:
+  - `Add Sprint`: (Admin/PM) Create a new sprint for a project.
+  - `Add Task`: (Admin/PM) Assign a task within a specific sprint to a developer or tester.
+  - `View Task`: View task details and documents.
+
+#### Bug Tracking
+- **Bugs List**: Filterable view of bugs.
+- **Buttons**:
+  - `Create Bug`: (Admin/Tester) Report a new bug with image attachment.
+  - `Edit Bug`: Update bug description, priority, or status.
+  - `Details`: View full bug report and status history.
+  - `Add Comment`: Interact with team members on a specific bug report.
+
+#### User Management
+- **Users List**: View all system users.
+- **Buttons**:
+  - `Add User`: (Admin) form to create new team members.
+  - `Edit User`: Update user roles and personal info.
+  - `Details`: View user activity and assigned projects.
+
+---
+
+## 4. Backend API Structure (Endpoints)
+
+### Authentication & Users (`/user`, `/usermanage`)
+- `POST /user/login`: Authenticate and receive JWT.
+- `POST /user/create`: Admin-driven user creation.
+- `PUT /user/update/:id`: Profile updates with image upload.
+- `GET /usermanage/my-team`: PM-driven team retrieval.
+- `POST /usermanage/save-team`: Add/Update team compositions.
+
+### Projects (`/project`)
+- `GET /project/all`: List all projects.
+- `POST /project/create`: Multi-part form for project creation (docs included).
+- `PUT /project/update/:id`: Modify project lifecycle.
+- `GET /project/user/:id`: Fetch projects for a specific user.
+
+### Bugs (`/bug`)
+- `GET /bug/all`: Retrieve all reported bugs.
+- `POST /bug/create`: Report bug with image attachment.
+- `PUT /bug/status/:id`: Lifecycle status updates (Pending -> Resolved).
+- `GET /bug/bug/:id`: Detailed bug report.
+
+### Issues & Tasks (`/issue`)
+- `POST /issue/add`: Create task within a sprint.
+- `PUT /issue/status/:id`: Update task completion status.
+- `PUT /issue/adduser/:id`: Assign task to a user.
+
+### Sprints (`/sprint`)
+- `POST /sprint/add`: Create sprints for project timelines.
+- `GET /sprint/project/:id`: Get sprints belonging to a project.
+
+### Notifications & Dashboard (`/notification`, `/dashboard`)
+- `GET /dashboard/all/:id`: Fetch aggregated data for dashboard KPIs and Charts.
+- `GET /notification/all/:id`: User-specific notifications.
+- `PUT /notification/:id/read`: Mark notification as read.

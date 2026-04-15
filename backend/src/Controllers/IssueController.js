@@ -7,25 +7,25 @@
 
     // ================= HELPER FUNCTIONS =================
 
-    // ✅ Activity Logger
-    const logActivity = async ({ user, action, bug, project, task }) => {
+// ✅ Safe Activity Logger
+const logActivity = async ({ user, action, bug, project, task, sprint }) => {
     try {
         if (!user) {
-        console.warn("Activity skipped: no user provided");
-        return;
+            console.warn(`Activity skipped [${action}]: no user provided`);
+            return;
         }
-
         await ActivityLogModel.create({
-        user,
-        action,
-        bug: bug || null,
-        project: project || null,
-        task: task || null,
+            user,
+            action,
+            bug: bug || null,
+            project: project || null,
+            task: task || null,
+            sprint: sprint || null,
         });
     } catch (err) {
         console.error("Activity Error:", err.message);
     }
-    };
+};
 
     // ✅ Notification Sender
     const sendNotification = async ({
@@ -76,6 +76,7 @@
         ]);
 
         resp.json({
+        success: true,
         message: "Data Found SuccessFully",
         data: res,
         });
@@ -107,11 +108,11 @@
 
         // 🔥 Activity
         await logActivity({
-        user: currentUserId,
-        action: "TASK_CREATED",
-        bug: savedTask._id,
-        project: savedTask.projectId,
-        task: savedTask._id,
+            user: currentUserId,
+            action: "TASK_CREATED",
+            bug: savedTask._id,
+            project: savedTask.projectId,
+            task: savedTask._id,
         });
 
         // 🔥 Notification
@@ -126,6 +127,7 @@
         });
 
         resp.status(201).json({
+        success: true,
         message: "project create Successfully",
         data: savedTask,
         });
@@ -138,9 +140,15 @@
     const sprintByTask = async (req, resp) => {
     const { id } = req.params;
     try {
-        const res = await IssueSchema.find({ sprintId: id });
+        const res = await IssueSchema.find({ sprintId: id }).populate([
+        { path: "projectId" },
+        { path: "reporterId" },
+        { path: "assigned" },
+        { path: "sprintId" },
+        ]);
 
         resp.json({
+        success: true,
         message: "Sprint data found",
         data: res,
         });
@@ -177,6 +185,7 @@
         }
 
         resp.status(200).json({
+        success: true,
         message: "Issue Data Found",
         data: issue,
         });
@@ -193,24 +202,27 @@
     const updateIssue = async (req, resp) => {
     try {
         const res = await IssueSchema.findByIdAndUpdate(req.params.id, req.body, {
-        new: true,
-        });
+            new: true,
+        }).populate("assigned");
 
         // 🔥 Activity
         const currentUserId = req.user?._id || req.body?.updatedBy || req.body?.sender || res.reporterId;
+        // 🔥 Activity
         await logActivity({
-        user: currentUserId,
-        action: "TASK_UPDATED",
-        bug: res._id,
-        project: res.projectId,
-        task: res._id,
+            user: currentUserId,
+            action: "TASK_UPDATED",
+            bug: res._id,
+            project: res.projectId,
+            task: res._id,
         });
 
         resp.json({
+        success: true,
         message: "Update Successfully",
         data: res,
         });
     } catch (err) {
+        console.log(err)
         resp.status(500).json({
         message: "Server Error",
         err: err,
@@ -235,6 +247,7 @@
         ]);
 
         resp.status(200).json({
+        success: true,
         message: "Issues Found Successfully",
         data: issues,
         });
@@ -315,11 +328,11 @@
 
         // 🔥 Activity
         await logActivity({
-        user: currentUserId,
-        action: "TASK_ASSIGNED",
-        bug: updatedIssue._id,
-        project: updatedIssue.projectId,
-        task: updatedIssue._id,
+            user: currentUserId,
+            action: "TASK_ASSIGNED",
+            bug: updatedIssue._id,
+            project: updatedIssue.projectId,
+            task: updatedIssue._id,
         });
 
         // 🔥 Notification
@@ -334,6 +347,7 @@
         });
 
         res.json({
+        success: true,
         message: "User Added Successfully",
         data: updatedIssue,
         });
@@ -350,11 +364,12 @@
     const { id } = req.params;
     try {
         const res = await IssueSchema.find({
-        assigned: id,
-        status: ["In Testing", "Resolved", "Closed", "Re-Open"],
-        });
+            assigned: id,
+            status: ["In Testing", "Resolved", "Closed", "Re-Open"],
+        }).populate("assigned");
 
         resp.json({
+        success: true,
         message: "Tester All Data Find",
         data: res,
         });
@@ -379,6 +394,7 @@ const getPmIssues = async (req, res) => {
       .populate("assigned", "name role");
 
     res.status(200).json({
+      success: true,
       message: "Issues Found Successfully",
       data: issues
     });

@@ -3,16 +3,17 @@ import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../../AuthProvider";
 import { useToast } from "../../hooks/useToast";
+import { motion } from "framer-motion";
 
 export const AddSprint = () => {
-  const { id } = useParams(); // projectId from URL
+  const { id } = useParams();
   const { userId } = useContext(AuthContext);
   const navigate = useNavigate();
   const toast = useToast();
 
   const [formData, setFormData] = useState({
     name: "",
-    userId : "",
+    userId: "",
     projectId: id,
     startDate: "",
     dueDate: "",
@@ -24,7 +25,6 @@ export const AddSprint = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // ✅ Date validation
     if (new Date(formData.dueDate) < new Date(formData.startDate)) {
       toast.error("Due date cannot be before start date");
       return;
@@ -35,9 +35,8 @@ export const AddSprint = () => {
     try {
       await axios.post("/sprint/add", {
         ...formData,
-        userId: userId, // ✅ important for activity & notification
+        userId: userId,
       });
-
       navigate(-1);
     } catch (err) {
       console.error("Error adding sprint:", err.response?.data || err);
@@ -54,75 +53,67 @@ export const AddSprint = () => {
     });
   };
 
-  const inputClass =
-    "w-full px-4 py-2.5 text-sm text-slate-800 bg-white rounded-xl border border-slate-200 outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 hover:border-slate-300 shadow-sm";
-
-  const labelClass =
-    "block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5";
-
-  const statusColors = {
-    Planned: "text-blue-700 bg-blue-50",
-    Active: "text-emerald-700 bg-emerald-50",
-    Completed: "text-slate-600 bg-slate-100",
-  };
-
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-slate-100 via-blue-50 to-slate-100">
-      <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden">
+    <div className="flex items-center justify-center relative w-full py-8">
+      <div className="pointer-events-none fixed inset-0 bg-mesh opacity-60" />
 
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full max-w-lg glass bg-white/[0.02] border border-white/[0.06] rounded-3xl overflow-hidden shadow-2xl relative z-10"
+      >
         {/* Header */}
-        <div className="relative bg-gradient-to-r from-slate-900 to-blue-900 px-8 pt-8 pb-10">
-          <div className="relative flex items-center gap-4">
-            <span className="flex items-center justify-center w-12 h-12 rounded-2xl bg-blue-500/20 text-2xl">
+        <div className="relative bg-gradient-to-r from-blue-900/40 to-cyan-900/40 border-b border-white/[0.06] px-8 pt-8 pb-8">
+          <div className="flex items-center gap-4">
+            <span className="flex items-center justify-center w-12 h-12 rounded-2xl bg-blue-500/20 text-2xl border border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.2)]">
               🚀
             </span>
             <div>
-              <h2 className="text-xl font-extrabold text-white">
+              <h2 className="text-xl font-extrabold text-white tracking-wide">
                 New Sprint
               </h2>
-              <p className="text-blue-300 text-xs">
+              <p className="text-blue-400 text-[11px] font-bold uppercase tracking-widest mt-1">
                 Configure and launch your sprint
               </p>
             </div>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="px-8 pb-8 space-y-5">
-
+        <form onSubmit={handleSubmit} className="px-8 pb-8 pt-6 space-y-5">
           {/* Sprint Name */}
           <div>
-            <label className={labelClass}>Sprint Name</label>
+            <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1.5 pl-1">Sprint Name</label>
             <input
               type="text"
               name="name"
               required
-              placeholder="e.g., Sprint 1 — Auth Module"
-              className={inputClass}
+              placeholder="e.g., Sprint 1 - Auth Module"
+              className="input-dark w-full text-sm"
               value={formData.name}
               onChange={handleChange}
             />
           </div>
 
           {/* Dates */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-5">
             <div>
-              <label className={labelClass}>Start Date</label>
+              <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1.5 pl-1">Start Date</label>
               <input
                 type="date"
                 name="startDate"
                 required
-                className={inputClass}
+                className="input-dark w-full text-sm"
                 value={formData.startDate}
                 onChange={handleChange}
               />
             </div>
             <div>
-              <label className={labelClass}>Due Date</label>
+              <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1.5 pl-1">Due Date</label>
               <input
                 type="date"
                 name="dueDate"
                 required
-                className={inputClass}
+                className="input-dark w-full text-sm"
                 value={formData.dueDate}
                 onChange={handleChange}
               />
@@ -131,12 +122,10 @@ export const AddSprint = () => {
 
           {/* Status */}
           <div>
-            <label className={labelClass}>Initial Status</label>
+            <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1.5 pl-1">Initial Status</label>
             <select
               name="status"
-              className={`${inputClass} font-semibold ${
-                statusColors[formData.status] || ""
-              }`}
+              className="input-dark w-full text-sm font-semibold"
               value={formData.status}
               onChange={handleChange}
             >
@@ -147,11 +136,11 @@ export const AddSprint = () => {
           </div>
 
           {/* Buttons */}
-          <div className="flex items-center gap-3 pt-2">
+          <div className="flex gap-4 pt-6 border-t border-white/[0.04] px-1">
             <button
               type="button"
               onClick={() => navigate(-1)}
-              className="flex-1 px-4 py-3 text-sm font-semibold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50"
+              className="flex-1 py-3 text-[11px] font-bold uppercase tracking-widest text-slate-400 bg-white/[0.03] hover:bg-white/[0.08] hover:text-white transition-all rounded-full border border-white/[0.06]"
             >
               Cancel
             </button>
@@ -159,18 +148,18 @@ export const AddSprint = () => {
             <button
               type="submit"
               disabled={loading}
-              className={`flex-[2] px-4 py-3 text-sm font-bold rounded-xl text-white transition-all
-                ${
-                  loading
-                    ? "bg-blue-300 cursor-not-allowed"
-                    : "bg-blue-600 hover:bg-blue-700"
-                }`}
+              className="flex-[2] py-3 text-[11px] font-bold uppercase tracking-widest text-white rounded-full transition-all shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:-translate-y-0.5 bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-300 hover:to-teal-400 flex justify-center items-center gap-2 border-0 disabled:opacity-60 disabled:hover:translate-y-0"
             >
-              {loading ? "Creating..." : "🚀 Save Sprint"}
+              {loading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Creating...
+                </>
+              ) : "🚀 Save Sprint"}
             </button>
           </div>
         </form>
-      </div>
+      </motion.div>
     </div>
   );
 };

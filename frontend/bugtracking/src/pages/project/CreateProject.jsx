@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { AuthContext } from '../../AuthProvider';
+import { motion } from 'framer-motion';
 
 export const CreateProject = () => {
   const { name, userId } = useContext(AuthContext)
@@ -60,166 +61,142 @@ export const CreateProject = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 px-4 py-10">
-      <div className="max-w-3xl mx-auto">
+    <div className="relative w-full">
+      <div className="pointer-events-none fixed inset-0 bg-mesh opacity-60" />
 
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-3xl mx-auto relative z-10"
+      >
         {/* Header */}
-        <div className="mb-8 bg-white border-l-4 border-amber-400 pl-5 pr-4 py-4 shadow-sm">
-          <p className="text-xs font-mono text-amber-500 uppercase tracking-widest mb-1">Project Tracker</p>
-          <h1 className="text-2xl font-mono font-bold text-slate-800">Create New Project</h1>
+        <div className="glass p-5 mb-6 border-l-[3px] border-l-cyan-500">
+          <p className="text-[10px] font-bold text-cyan-400 uppercase tracking-[0.25em] mb-1">Project Tracker</p>
+          <h1 className="text-xl md:text-2xl font-extrabold text-white">Create New Project</h1>
         </div>
 
-        <form onSubmit={handleSubmit(submitHandle)} className="space-y-4">
-
+        <form onSubmit={handleSubmit(submitHandle)} className="space-y-6">
           {/* Project Name */}
-          <div className="bg-sky-50 border border-sky-200 border-l-4 border-l-sky-500 p-5 hover:bg-sky-100 hover:border-l-sky-600">
-            <label className="block text-xs font-mono text-sky-600 uppercase tracking-widest mb-2">
+          <div className="glass p-5 border-l-[3px] border-l-cyan-500/50">
+            <label className="block text-[10px] font-bold text-cyan-400 uppercase tracking-widest mb-2">
               Project Name <span className="text-red-400">*</span>
             </label>
             <input
               type="text"
               placeholder="Enter project name"
               {...register("title", { required: "Project name is required" })}
-              className="w-full bg-white border border-sky-200 px-3 py-2 font-mono text-sm text-slate-700 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-200"
+              className="input-dark"
             />
-            {errors.projectName && (
-              <p className="mt-2 text-xs font-mono text-red-500">{errors.projectName.message}</p>
-            )}
+            {errors.title && <p className="mt-2 text-xs text-red-400">{errors.title.message}</p>}
           </div>
 
-          {/* Project Document */}
-          <div className="bg-violet-50 border border-violet-200 border-l-4 border-l-violet-500 p-5 hover:bg-violet-100 hover:border-l-violet-600">
-            <label className="block text-xs font-mono text-violet-600 uppercase tracking-widest mb-2">
+          {/* Document */}
+          <div className="glass p-5 border-l-[3px] border-l-violet-500/50">
+            <label className="block text-[10px] font-bold text-violet-400 uppercase tracking-widest mb-2">
               Project Document <span className="text-red-400">*</span>
             </label>
             <input
               type="file"
               {...register("document", { required: "Project document is required" })}
-              className="w-full bg-white border border-violet-200 px-3 py-2 font-mono text-sm text-slate-700 outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-200 file:mr-3 file:py-1 file:px-3 file:border-0 file:bg-violet-100 file:text-violet-700 file:font-mono file:text-xs file:uppercase file:tracking-widest hover:file:bg-violet-200"
+              className="input-dark file:mr-3 file:py-1.5 file:px-4 file:border-0 file:bg-violet-500/20 file:text-violet-400 file:font-bold file:text-[10px] file:uppercase file:tracking-widest file:rounded-lg file:cursor-pointer hover:file:bg-violet-500/30"
             />
-            {errors.document && (
-              <p className="mt-2 text-xs font-mono text-red-500">{errors.document.message}</p>
-            )}
+            {errors.document && <p className="mt-2 text-xs text-red-400">{errors.document.message}</p>}
           </div>
 
-          <div className="bg-white border border-slate-200 shadow-sm px-6 py-5 border-l-4 border-l-red-400">
-          <p className="text-xs uppercase tracking-widest text-slate-400 mb-2">
-            Created By : <br /><br /> <span className="px-3 py-1 text-sm bg-indigo-50 text-indigo-700 rounded-full border border-indigo-200" >{name}</span>
-          </p>
-
-          {/* Hidden field - will not show in UI but will submit */}
-          <input type="hidden" {...register('createdBy')} value={userId} />
+          {/* Created By */}
+          <div className="glass p-5 border-l-[3px] border-l-emerald-500/50">
+            <p className="text-[10px] uppercase tracking-widest text-slate-500 mb-2">
+              Created By
+            </p>
+            <span className="px-3 py-1.5 text-sm bg-cyan-500/10 text-cyan-400 rounded-full border border-cyan-500/20 font-semibold">{name}</span>
+            <input type="hidden" {...register('createdBy')} value={userId} />
           </div>
 
           {/* Description */}
-          <div className="bg-orange-50 border border-orange-200 border-l-4 border-l-orange-500 p-5 hover:bg-orange-100 hover:border-l-orange-600">
-            <label className="block text-xs font-mono text-orange-600 uppercase tracking-widest mb-2">
-              Description
-            </label>
+          <div className="glass p-5 border-l-[3px] border-l-amber-500/50">
+            <label className="block text-[10px] font-bold text-amber-400 uppercase tracking-widest mb-2">Description</label>
             <input
               type="text"
               placeholder="Brief description of the project"
               {...register("description")}
-              className="w-full bg-white border border-orange-200 px-3 py-2 font-mono text-sm text-slate-700 outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-200"
+              className="input-dark"
             />
           </div>
 
-
           {/* Priority & Status */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
-            <div className="bg-amber-50 border border-amber-200 border-l-4 border-l-amber-500 p-5 hover:bg-amber-100 hover:border-l-amber-600">
-              <label className="block text-xs font-mono text-amber-600 uppercase tracking-widest mb-2">
+            <div className="glass p-5">
+              <label className="block text-[10px] font-bold text-amber-400 uppercase tracking-widest mb-2">
                 Priority <span className="text-red-400">*</span>
               </label>
               <select
                 {...register("priority", { required: "Please select priority" })}
-                className="w-full bg-white border border-amber-200 px-3 py-2 font-mono text-sm text-slate-700 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-200"
+                className="input-dark"
               >
                 <option value="">-- Select Priority --</option>
                 <option value="Low">Low</option>
                 <option value="Medium">Medium</option>
                 <option value="High">High</option>
               </select>
-              {errors.priority && (
-                <p className="mt-2 text-xs font-mono text-red-500">{errors.priority.message}</p>
-              )}
+              {errors.priority && <p className="mt-2 text-xs text-red-400">{errors.priority.message}</p>}
             </div>
 
-            <div className="bg-emerald-50 border border-emerald-200 border-l-4 border-l-emerald-500 p-5 hover:bg-emerald-100 hover:border-l-emerald-600">
-              <label className="block text-xs font-mono text-emerald-600 uppercase tracking-widest mb-2">
-                Status
-              </label>
-              <select
-                {...register("status")}
-                className="w-full bg-white border border-emerald-200 px-3 py-2 font-mono text-sm text-slate-700 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-200"
-              >
+            <div className="glass p-5">
+              <label className="block text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-2">Status</label>
+              <select {...register("status")} className="input-dark">
                 <option value="">-- Select Status --</option>
                 <option value="Working">In Progress</option>
                 <option value="Pending">Pending</option>
                 <option value="Completed">Completed</option>
               </select>
             </div>
-
           </div>
 
-          {/* Start Date & Due Date */}
+          {/* Dates */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
-            <div className="bg-cyan-50 border border-cyan-200 border-l-4 border-l-cyan-500 p-5 hover:bg-cyan-100 hover:border-l-cyan-600">
-              <label className="block text-xs font-mono text-cyan-600 uppercase tracking-widest mb-2">
+            <div className="glass p-5">
+              <label className="block text-[10px] font-bold text-cyan-400 uppercase tracking-widest mb-2">
                 Start Date <span className="text-red-400">*</span>
               </label>
               <input
                 type="date"
                 {...register("startDate", { required: "Start date is required" })}
-                className="w-full bg-white border border-cyan-200 px-3 py-2 font-mono text-sm text-slate-700 outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-200"
+                className="input-dark"
               />
-              {errors.startDate && (
-                <p className="mt-2 text-xs font-mono text-red-500">{errors.startDate.message}</p>
-              )}
+              {errors.startDate && <p className="mt-2 text-xs text-red-400">{errors.startDate.message}</p>}
             </div>
 
-            <div className="bg-indigo-50 border border-indigo-200 border-l-4 border-l-indigo-500 p-5 hover:bg-indigo-100 hover:border-l-indigo-600">
-              <label className="block text-xs font-mono text-indigo-600 uppercase tracking-widest mb-2">
-                Due Date
-              </label>
-              <input
-                type="date"
-                {...register("dueDate")}
-                className="w-full bg-white border border-indigo-200 px-3 py-2 font-mono text-sm text-slate-700 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-200"
-              />
+            <div className="glass p-5">
+              <label className="block text-[10px] font-bold text-violet-400 uppercase tracking-widest mb-2">Due Date</label>
+              <input type="date" {...register("dueDate")} className="input-dark" />
             </div>
-
           </div>
 
           {/* Divider */}
           <div className="flex items-center gap-3 py-2">
-            <div className="h-px flex-1 bg-slate-300" />
-            <span className="text-xs font-mono text-slate-400 uppercase tracking-widest">Actions</span>
-            <div className="h-px flex-1 bg-slate-300" />
+            <div className="h-px flex-1 bg-white/[0.06]" />
+            <span className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Actions</span>
+            <div className="h-px flex-1 bg-white/[0.06]" />
           </div>
 
           {/* Buttons */}
           <div className="flex gap-3">
             <button
               type="button"
-              onClick={() => navigate('/admin/project')}
-              className="flex-1 py-3 bg-white text-slate-600 font-mono text-xs uppercase tracking-widest border border-slate-300 border-l-4 border-l-slate-400 hover:bg-slate-50 hover:text-slate-800 hover:border-l-slate-600"
+              onClick={() => navigate(-1)}
+              className="btn-ghost flex-1 py-3 text-xs uppercase tracking-widest"
             >
               Cancel
             </button>
-
             <button
               type="submit"
-              className="flex-1 py-3 bg-amber-400 text-slate-900 font-mono text-xs uppercase tracking-widest font-bold border border-amber-300 border-l-4 border-l-amber-600 hover:bg-amber-500 hover:border-l-amber-700"
+              className="btn-primary flex-1 py-3 text-xs uppercase tracking-widest font-bold"
             >
               Create Project
             </button>
           </div>
-
         </form>
-      </div>
+      </motion.div>
     </div>
   );
 };

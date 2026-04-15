@@ -11,6 +11,7 @@ const getUserNotifications = async (req, resp) => {
             .sort({ createdAt: -1 });
 
         resp.json({
+            success: true,
             message: "User Notifications Retrieved",
             data: notifications
         });
@@ -39,6 +40,7 @@ const markAsRead = async (req, resp) => {
         }
 
         resp.json({
+            success: true,
             message: "Notification marked as read",
             data: notification
         });
@@ -60,6 +62,7 @@ const markAllAsRead = async (req, resp) => {
         );
 
         resp.json({
+            success: true,
             message: "All notifications marked as read"
         });
     } catch (err) {
@@ -80,6 +83,7 @@ const getUnreadCount = async (req, resp) => {
         });
 
         resp.json({
+            success: true,
             message: "Unread notification count retrieved",
             data: { unreadCount: count }
         });

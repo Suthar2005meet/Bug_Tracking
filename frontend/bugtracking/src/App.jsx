@@ -22,6 +22,20 @@ function App() {
       (error) => Promise.reject(error)
     );
 
+    // ✅ Handle token expiration globally
+    axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response && error.response.status === 401) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("userId");
+          localStorage.removeItem("role");
+          window.location.href = "/";
+        }
+        return Promise.reject(error);
+      }
+    );
+
   }, []);
 
   return (

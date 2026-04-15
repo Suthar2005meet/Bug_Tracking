@@ -40,24 +40,13 @@ const UsersRoleChart = ({ data = [] }) => {
   const total = formattedData.reduce((s, d) => s + d.value, 0)
 
   return (
-    <div style={{
-      background: "linear-gradient(145deg, #001a0e 0%, #002a1a 60%, #001a0e 100%)",
-      borderRadius: "20px",
-      padding: "24px",
-      border: "1px solid rgba(16,185,129,0.18)",
-      boxShadow: "0 20px 60px rgba(16,185,129,0.1), inset 0 1px 0 rgba(255,255,255,0.04)",
-      width: "100%",
-      height: "320px",
-      position: "relative",
-      overflow: "hidden",
-      boxSizing: "border-box"
-    }}>
+    <div className="glass p-5 flex flex-col items-stretch bg-gradient-to-br from-[#001a0e] via-[#002a1a] to-[#001a0e] border border-emerald-500/20 rounded-2xl min-h-[360px] lg:min-h-[320px] relative overflow-hidden">
       {/* Center glow */}
       <div style={{
-        position: "absolute", top: "50%", left: "38%",
+        position: "absolute", top: "50%", left: "50%",
         transform: "translate(-50%,-50%)",
         width: 160, height: 160, borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(16,185,129,0.12) 0%, transparent 70%)",
+        background: "radial-gradient(circle, rgba(16,185,129,0.1) 0%, transparent 70%)",
         pointerEvents: "none"
       }} />
 
@@ -74,21 +63,22 @@ const UsersRoleChart = ({ data = [] }) => {
         }}>Users By Role</h3>
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", height: "calc(100% - 52px)" }}>
-        {/* Donut */}
-        <div style={{ width: "55%", height: "100%", position: "relative" }}>
-          <ResponsiveContainer width="100%" height="100%">
+      <div className="flex flex-col lg:flex-row items-center justify-center gap-6 flex-1">
+        {/* Donut Container */}
+        <div className="relative w-full aspect-square max-w-[200px] lg:max-w-none lg:w-[50%] lg:h-full">
+          <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
             <PieChart>
               <Pie
                 data={formattedData}
                 cx="50%"
                 cy="50%"
-                innerRadius={52}
-                outerRadius={84}
+                innerRadius="65%"
+                outerRadius="95%"
                 dataKey="value"
                 stroke="none"
                 startAngle={90}
                 endAngle={-270}
+                paddingAngle={2}
               >
                 {formattedData.map((entry, index) => (
                   <Cell key={index} fill={entry.color} />
@@ -112,21 +102,15 @@ const UsersRoleChart = ({ data = [] }) => {
           </div>
         </div>
 
-        {/* Legend + stats */}
-        <div style={{ width: "45%", paddingLeft: 12, display: "flex", flexDirection: "column", gap: 7 }}>
+        {/* Legend */}
+        <div className="flex-1 w-full flex flex-col gap-2 min-w-0">
           {formattedData.map((item, i) => (
-            <div key={i} style={{
-              display: "flex", alignItems: "center", justifyContent: "space-between",
-              background: "rgba(255,255,255,0.03)",
-              borderRadius: 8,
-              padding: "5px 10px",
-              border: `1px solid ${item.color}22`
-            }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+            <div key={i} className="flex items-center justify-between bg-white/[0.03] border border-white/[0.04] p-2.5 rounded-xl hover:bg-white/[0.05] transition-colors gap-3">
+              <div className="flex items-center gap-2.5 min-w-0">
                 <div style={{ width: 8, height: 8, borderRadius: "50%", background: item.color, flexShrink: 0 }} />
-                <span style={{ color: "#cbd5e1", fontSize: 11, fontFamily: "DM Mono, monospace" }}>{item.name}</span>
+                <span className="text-slate-300 text-[11px] font-bold tracking-wide truncate">{item.name}</span>
               </div>
-              <span style={{ color: item.color, fontSize: 12, fontWeight: 700, fontFamily: "DM Mono, monospace" }}>
+              <span style={{ color: item.color, fontSize: 13, fontWeight: 800, fontFamily: "DM Mono, monospace" }}>
                 {item.value}
               </span>
             </div>

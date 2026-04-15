@@ -51,14 +51,18 @@ const sendNotification = async ({
 
 const getAllProject = async (req, resp) => {
   try {
-    const allProject = await ProjectSchema.find();
+    const allProject = await ProjectSchema.find()
+      .populate("createdBy members")
+      .sort({ createdAt: -1 });
 
     resp.json({
+      success: true,
       message: "All Project Details",
       data: allProject,
     });
   } catch (err) {
     resp.status(500).json({
+      success: false,
       message: "Error while fetching the Details",
     });
   }
@@ -99,6 +103,7 @@ const createProject = async (req, resp) => {
     });
 
     resp.status(201).json({
+      success: true,
       message: "project create Successfully",
       data: savedProject,
     });
@@ -114,15 +119,18 @@ const getProjectById = async (req, resp) => {
   try {
     const res = await ProjectSchema.findById(req.params.id).populate([
       { path: "createdBy" },
+      { path: "members" },
     ]);
 
     resp.json({
+      success: true,
       message: "Project Details Fetched",
       data: res,
     });
   } catch (err) {
     console.log(err)
     resp.status(500).json({
+      success: false,
       message: "Error while fetched the details",
     });
   }
@@ -132,22 +140,24 @@ const updateById = async (req, resp) => {
   try {
     const res = await ProjectSchema.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
-    });
+    }).populate("createdBy members");
 
     // 🔥 Activity
     await logActivity({
-      user: req.body._id,
+      user: req.body._id || req.user?.id,
       action: "PROJECT_UPDATED",
       project: res._id,
     });
 
     resp.json({
+      success: true,
       message: "Update Succesfully",
       data: res,
     });
   } catch (err) {
     console.log(err)
     resp.status(500).json({
+      success: false,
       message: "error while fetching the data",
       err: err,
     });
@@ -190,7 +200,7 @@ const getProjectsByUser = async (req, res) => {
 
     const projects = await ProjectSchema.find({
       createdBy: id,
-    })
+    }).populate("members");
 
     res.status(200).json({
       success: true,
@@ -275,11 +285,11 @@ const getProjectByTester = async (req, resp) => {
       inTesting: true,
     }).populate([
       { path: "createdBy" },
-      { path: "assignedDevelopers" },
-      { path: "assignedTester" },
+      { path: "members" },
     ]);
 
     resp.json({
+      success: true,
       message: "Tester Project Find Successfully",
       data: res,
     });

@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { FaUsers, FaFolder, FaTasks, FaBug, FaStream } from "react-icons/fa";
 import { useParams } from "react-router-dom";
+import { motion } from "framer-motion";
 
 // Charts
 import UsersRoleChart from "../components/charts/UsersRoleChart";
@@ -12,80 +13,14 @@ import BugsPriorityChart from "../components/charts/BugsPriorityChart";
 import SprintStatusChart from "../components/charts/SprintStatusChart";
 import { AuthContext } from "../AuthProvider";
 import { findChartSeries, getChartCount } from "../utils/chartData";
+import { NotificationDropdown } from "../components/common/NotificationDropdown";
 
-const ISSUE_STATUS_CHART_KEYS = [
-  ["issue", "status"],
-  ["issues", "status"],
-  ["issue", "state"],
-  ["issues", "state"],
-  ["task", "status"],
-  ["tasks", "status"],
-  ["task", "state"],
-  ["tasks", "state"],
-  ["assigned", "issue", "status"],
-  ["assigned", "issues", "status"],
-  ["assigned", "task", "status"],
-  ["assigned", "tasks", "status"],
-  ["my", "issue", "status"],
-  ["my", "issues", "status"],
-  ["my", "task", "status"],
-  ["my", "tasks", "status"],
-];
-
-const ISSUE_PRIORITY_CHART_KEYS = [
-  ["issue", "priority"],
-  ["issues", "priority"],
-  ["task", "priority"],
-  ["tasks", "priority"],
-  ["assigned", "issue", "priority"],
-  ["assigned", "issues", "priority"],
-  ["assigned", "task", "priority"],
-  ["assigned", "tasks", "priority"],
-  ["my", "issue", "priority"],
-  ["my", "issues", "priority"],
-  ["my", "task", "priority"],
-  ["my", "tasks", "priority"],
-];
-
-const BUG_STATUS_CHART_KEYS = [
-  ["bug", "status"],
-  ["bugs", "status"],
-  ["bug", "state"],
-  ["bugs", "state"],
-  ["my", "bug", "status"],
-  ["my", "bugs", "status"],
-  ["assigned", "bug", "status"],
-  ["assigned", "bugs", "status"],
-  ["tester", "bug", "status"],
-  ["tester", "bugs", "status"],
-  ["reported", "bug", "status"],
-  ["reported", "bugs", "status"],
-];
-
-const BUG_PRIORITY_CHART_KEYS = [
-  ["bug", "priority"],
-  ["bugs", "priority"],
-  ["my", "bug", "priority"],
-  ["my", "bugs", "priority"],
-  ["assigned", "bug", "priority"],
-  ["assigned", "bugs", "priority"],
-  ["tester", "bug", "priority"],
-  ["tester", "bugs", "priority"],
-  ["reported", "bug", "priority"],
-  ["reported", "bugs", "priority"],
-];
-
-const SPRINT_STATUS_CHART_KEYS = [
-  ["sprint", "status"],
-  ["sprints", "status"],
-  ["sprint", "state"],
-];
-
-const USERS_ROLE_CHART_KEYS = [
-  ["user", "role"],
-  ["users", "role"],
-  ["role"],
-];
+const ISSUE_STATUS_CHART_KEYS = [ ["issue", "status"], ["issues", "status"], ["issue", "state"], ["issues", "state"], ["task", "status"], ["tasks", "status"], ["task", "state"], ["tasks", "state"], ["assigned", "issue", "status"], ["assigned", "issues", "status"], ["assigned", "task", "status"], ["assigned", "tasks", "status"], ["my", "issue", "status"], ["my", "issues", "status"], ["my", "task", "status"], ["my", "tasks", "status"], ];
+const ISSUE_PRIORITY_CHART_KEYS = [ ["issue", "priority"], ["issues", "priority"], ["task", "priority"], ["tasks", "priority"], ["assigned", "issue", "priority"], ["assigned", "issues", "priority"], ["assigned", "task", "priority"], ["assigned", "tasks", "priority"], ["my", "issue", "priority"], ["my", "issues", "priority"], ["my", "task", "priority"], ["my", "tasks", "priority"], ];
+const BUG_STATUS_CHART_KEYS = [ ["bug", "status"], ["bugs", "status"], ["bug", "state"], ["bugs", "state"], ["my", "bug", "status"], ["my", "bugs", "status"], ["assigned", "bug", "status"], ["assigned", "bugs", "status"], ["tester", "bug", "status"], ["tester", "bugs", "status"], ["reported", "bug", "status"], ["reported", "bugs", "status"], ];
+const BUG_PRIORITY_CHART_KEYS = [ ["bug", "priority"], ["bugs", "priority"], ["my", "bug", "priority"], ["my", "bugs", "priority"], ["assigned", "bug", "priority"], ["assigned", "bugs", "priority"], ["tester", "bug", "priority"], ["tester", "bugs", "priority"], ["reported", "bug", "priority"], ["reported", "bugs", "priority"], ];
+const SPRINT_STATUS_CHART_KEYS = [ ["sprint", "status"], ["sprints", "status"], ["sprint", "state"], ];
+const USERS_ROLE_CHART_KEYS = [ ["user", "role"], ["users", "role"], ["role"], ];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -111,7 +46,6 @@ const pickChartData = (source = {}, keyGroups = []) => {
     const series = findChartSeries(source, tokens);
     if (series.length > 0) return series;
   }
-
   return [];
 };
 
@@ -123,28 +57,21 @@ const preferDashboardValue = (primary, fallback) => {
     if (primary.length > 0) return primary;
     return Array.isArray(fallback) ? fallback : primary;
   }
-
   return primary ?? fallback;
 };
 
 const mergeDashboardSection = (primary = {}, fallback = {}) => {
   const merged = {};
-  const keys = new Set([
-    ...Object.keys(fallback || {}),
-    ...Object.keys(primary || {}),
-  ]);
-
+  const keys = new Set([...Object.keys(fallback || {}), ...Object.keys(primary || {})]);
   for (const key of keys) {
     merged[key] = preferDashboardValue(primary?.[key], fallback?.[key]);
   }
-
   return merged;
 };
 
 const mergeDashboardData = (primary, fallback) => {
   if (!primary) return fallback || null;
   if (!fallback) return primary;
-
   return {
     ...fallback,
     ...primary,
@@ -158,13 +85,8 @@ const mergeDashboardData = (primary, fallback) => {
 
 const shouldHydrateTesterCharts = (data, normalizedRole) => {
   if (normalizedRole !== "tester") return false;
-
   const source = data?.charts || {};
-
-  return (
-    !hasChartData(source, BUG_STATUS_CHART_KEYS) ||
-    !hasChartData(source, BUG_PRIORITY_CHART_KEYS)
-  );
+  return !hasChartData(source, BUG_STATUS_CHART_KEYS) || !hasChartData(source, BUG_PRIORITY_CHART_KEYS);
 };
 
 // ─── Dashboard ────────────────────────────────────────────────────────────────
@@ -241,6 +163,7 @@ const Dashboard = () => {
   const isTester = normalizedRole === "tester";
 
   const issuesStatusData = pickChartData(charts, ISSUE_STATUS_CHART_KEYS);
+  const generatedAt = meta.generatedAt ? new Date(meta.generatedAt).toLocaleTimeString() : new Date().toLocaleTimeString();
   const issuesPriorityData = pickChartData(charts, ISSUE_PRIORITY_CHART_KEYS);
   const bugsStatusData = pickChartData(charts, BUG_STATUS_CHART_KEYS);
   const bugsPriorityData = pickChartData(charts, BUG_PRIORITY_CHART_KEYS);
@@ -254,408 +177,288 @@ const Dashboard = () => {
     totalCount(issuesStatusData)
   );
   const myBugsCount = firstDefined(
-    summary.myBugs, summary.assignedBugs, summary.totalAssignedBugs,
-    isAdmin || isProjectManager || isTester ? summary.totalBugs : undefined,
+    summary.myBugs, summary.assignedBugs, summary.reportedBugs,
+    isAdmin || isProjectManager ? summary.totalBugs : undefined,
     totalCount(bugsStatusData)
   );
 
-  const generatedAt = meta?.generatedAt
-    ? new Date(meta.generatedAt).toLocaleString() : "";
-
   return (
-    <div style={S.page}>
-      <Blob style={{ top: -100, left: -80, width: 480, height: 480, background: "radial-gradient(circle, rgba(16,185,129,0.07) 0%, transparent 70%)" }} />
-      <Blob style={{ bottom: -80, right: -60, width: 380, height: 380, background: "radial-gradient(circle, rgba(99,102,241,0.08) 0%, transparent 70%)" }} />
-      <Blob style={{ top: "40%", left: "50%", width: 300, height: 300, background: "radial-gradient(circle, rgba(244,114,182,0.05) 0%, transparent 70%)" }} />
+    <div className="relative w-full">
+      <div className="pointer-events-none fixed inset-0 bg-mesh opacity-60" />
 
-      {/* Header */}
-      <div style={S.header}>
-        <div>
-          <p style={S.headerSub}>{normalizedRole.toUpperCase()} PANEL</p>
-          <h1 style={S.headerTitle}>{roleTitle} Dashboard</h1>
-        </div>
-        <div style={S.headerRight}>
-          <div style={S.liveDot} />
-          <span style={S.headerTime}>{generatedAt}</span>
-        </div>
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 mb-12">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8 md:mb-10 pb-6 border-b border-white/[0.06]"
+        >
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div className="space-y-1">
+              <h1 className="text-2xl md:text-3xl font-black text-slate-100 m-0">
+                {roleTitle} <span className="text-cyan-400">Dashboard</span>
+              </h1>
+              <p className="text-xs md:text-sm text-slate-500 font-medium">
+                Overview of your workspace metrics and activity
+              </p>
+            </div>
+            <div className="flex items-center gap-4 flex-wrap">
+              <div className="flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-emerald-500/5 border border-emerald-500/10 backdrop-blur-md">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)] animate-pulse" />
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">
+                  LIVE • {generatedAt}
+                </span>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* ─── ADMIN ─── */}
+        {isAdmin && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6 mb-8 lg:mb-10">
+              <KpiCard icon={<FaUsers />}  label="Users"    value={summary.totalUsers}    color="cyan" />
+              <KpiCard icon={<FaFolder />} label="Projects" value={summary.totalProjects} color="violet" />
+              <KpiCard icon={<FaTasks />}  label="Issues"   value={summary.totalIssues}   color="emerald" />
+              <KpiCard icon={<FaBug />}    label="Bugs"     value={summary.totalBugs}     color="rose" />
+              <KpiCard icon={<FaStream />} label="Sprints"  value={summary.totalSprints}  color="amber" />
+            </div>
+            <TwoColLayout
+              charts={
+                <>
+                  <ChartCard><UsersRoleChart data={usersRoleData} /></ChartCard>
+                  <ChartCard><IssuesStatusChart data={issuesStatusData} /></ChartCard>
+                  <ChartCard><BugsStatusChart data={bugsStatusData} /></ChartCard>
+                  <ChartCard><SprintStatusChart data={sprintStatusData} /></ChartCard>
+                </>
+              }
+              side={<ActivityPanel activity={recentActivity} />}
+            />
+          </motion.div>
+        )}
+
+        {/* ─── PROJECT MANAGER ─── */}
+        {isProjectManager && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8 lg:mb-10">
+              <KpiCard icon={<FaFolder />} label="Projects" value={summary.totalProjects} color="violet" />
+              <KpiCard icon={<FaTasks />}  label="Issues"   value={summary.totalIssues}   color="emerald" />
+              <KpiCard icon={<FaBug />}    label="Bugs"     value={summary.totalBugs}     color="rose" />
+              <KpiCard icon={<FaStream />} label="Sprints"  value={summary.totalSprints}  color="amber" />
+            </div>
+            <TwoColLayout
+              charts={
+                <>
+                  <ChartCard><IssuesStatusChart data={issuesStatusData} /></ChartCard>
+                  <ChartCard><IssuesPriorityChart data={issuesPriorityData} /></ChartCard>
+                  <ChartCard><BugsStatusChart data={bugsStatusData} /></ChartCard>
+                  <ChartCard><BugsPriorityChart data={bugsPriorityData} /></ChartCard>
+                  <ChartCard><SprintStatusChart data={sprintStatusData} /></ChartCard>
+                </>
+              }
+              side={<ActivityPanel activity={recentActivity} />}
+            />
+          </motion.div>
+        )}
+
+        {/* ─── DEVELOPER ─── */}
+        {isDeveloper && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 mb-8 lg:mb-10">
+              <KpiCard icon={<FaTasks />} label="My Tasks" value={myTasksCount} color="emerald" />
+              <KpiCard icon={<FaBug />}   label="My Bugs"  value={myBugsCount}  color="rose" />
+            </div>
+            <TwoColLayout
+              charts={
+                <>
+                  <ChartCard><IssuesStatusChart data={issuesStatusData} /></ChartCard>
+                  <ChartCard><IssuesPriorityChart data={issuesPriorityData} /></ChartCard>
+                  <ChartCard><BugsStatusChart data={bugsStatusData} /></ChartCard>
+                </>
+              }
+              side={<NotificationPanel notifications={notifications} />}
+            />
+          </motion.div>
+        )}
+
+        {/* ─── TESTER ─── */}
+        {isTester && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 mb-8 lg:mb-10">
+              <KpiCard icon={<FaBug />}   label="My Bugs"         value={myBugsCount}  color="rose" />
+              <KpiCard icon={<FaTasks />} label="Assigned Tasks"  value={myTasksCount} color="amber" />
+            </div>
+            <TwoColLayout
+              charts={
+                <>
+                  <ChartCard><BugsStatusChart data={bugsStatusData} /></ChartCard>
+                  <ChartCard><BugsPriorityChart data={bugsPriorityData} /></ChartCard>
+                </>
+              }
+              side={<NotificationPanel notifications={notifications} />}
+            />
+          </motion.div>
+        )}
+
+        {!isAdmin && !isProjectManager && !isDeveloper && !isTester && (
+          <div className="flex flex-col items-center justify-center py-24 text-center">
+            <div className="text-4xl opacity-50 mb-4 tracking-widest animate-pulse">⚠️</div>
+            <p className="text-[10px] font-black tracking-[0.3em] uppercase text-slate-500">
+              No dashboard configured for role: <span className="text-white">{role || "Unknown"}</span>
+            </p>
+          </div>
+        )}
       </div>
-
-      {/* ─── ADMIN ─────────────────────────────────── */}
-      {isAdmin && (
-        <>
-          <KpiRow>
-            <KpiCard icon={<FaUsers />}  label="Total Users"    value={summary.totalUsers}    accent="#6EE7F7" />
-            <KpiCard icon={<FaFolder />} label="Total Projects" value={summary.totalProjects} accent="#A78BFA" />
-            <KpiCard icon={<FaTasks />}  label="Total Issues"   value={summary.totalIssues}   accent="#34D399" />
-            <KpiCard icon={<FaBug />}    label="Total Bugs"     value={summary.totalBugs}     accent="#F472B6" />
-            <KpiCard icon={<FaStream />} label="Total Sprints"  value={summary.totalSprints}  accent="#FBBF24" />
-          </KpiRow>
-          <TwoColLayout
-            charts={<>
-              <UsersRoleChart    data={usersRoleData} />
-              <IssuesStatusChart data={issuesStatusData} />
-              <BugsStatusChart   data={bugsStatusData} />
-              <SprintStatusChart data={sprintStatusData} />
-            </>}
-            side={<ActivityPanel activity={recentActivity} />}
-          />
-        </>
-      )}
-
-      {/* ─── PROJECT MANAGER ──────────────────────── */}
-      {isProjectManager && (
-        <>
-          <KpiRow>
-            <KpiCard icon={<FaFolder />} label="Projects" value={summary.totalProjects} accent="#A78BFA" />
-            <KpiCard icon={<FaTasks />}  label="Issues"   value={summary.totalIssues}   accent="#34D399" />
-            <KpiCard icon={<FaBug />}    label="Bugs"     value={summary.totalBugs}     accent="#F472B6" />
-            <KpiCard icon={<FaStream />} label="Sprints"  value={summary.totalSprints}  accent="#FBBF24" />
-          </KpiRow>
-          <TwoColLayout
-            charts={<>
-              <IssuesStatusChart   data={issuesStatusData} />
-              <IssuesPriorityChart data={issuesPriorityData} />
-              <BugsStatusChart     data={bugsStatusData} />
-              <BugsPriorityChart   data={bugsPriorityData} />
-              <SprintStatusChart   data={sprintStatusData} />
-            </>}
-            side={<ActivityPanel activity={recentActivity} />}
-          />
-        </>
-      )}
-
-      {/* ─── DEVELOPER ────────────────────────────── */}
-      {isDeveloper && (
-        <>
-          <KpiRow>
-            <KpiCard icon={<FaTasks />} label="My Tasks" value={myTasksCount} accent="#34D399" />
-            <KpiCard icon={<FaBug />}   label="My Bugs"  value={myBugsCount}  accent="#F472B6" />
-          </KpiRow>
-          <TwoColLayout
-            charts={<>
-              <IssuesStatusChart   data={issuesStatusData} />
-              <IssuesPriorityChart data={issuesPriorityData} />
-              <BugsStatusChart     data={bugsStatusData} />
-            </>}
-            side={<NotificationPanel notifications={notifications} />}
-          />
-        </>
-      )}
-
-      {/* ─── TESTER ───────────────────────────────── */}
-      {isTester && (
-        <>
-          <KpiRow>
-            <KpiCard icon={<FaBug />}   label="My Bugs"         value={myBugsCount}  accent="#FF453A" />
-            <KpiCard icon={<FaTasks />} label="Assigned Tasks"  value={myTasksCount} accent="#FBBF24" />
-          </KpiRow>
-          <TwoColLayout
-            charts={<>
-              <BugsStatusChart data={bugsStatusData} />
-              <BugsPriorityChart data={bugsPriorityData} />
-            </>}
-            side={<NotificationPanel notifications={notifications} />}
-          />
-        </>
-      )}
-
-      {!isAdmin && !isProjectManager && !isDeveloper && !isTester && (
-        <div style={S.noRole}>
-          No dashboard configured for role:{" "}
-          <strong style={{ color: "#e2e8f0" }}>{role || "Unknown"}</strong>
-        </div>
-      )}
     </div>
   );
 };
+
 
 export default Dashboard;
 
 // ─── Layout Primitives ────────────────────────────────────────────────────────
 
-const Blob = ({ style }) => <div style={{ ...S.blob, ...style }} />;
-
-/** Charts on left (2-col grid), sidebar panel on right */
 const TwoColLayout = ({ charts, side }) => (
-  <div style={S.twoCol}>
-    <div style={S.chartsGrid}>{charts}</div>
-    <div style={S.sideStack}>{side}</div>
-  </div>
-);
-
-const KpiRow = ({ children }) => <div style={S.kpiRow}>{children}</div>;
-
-const KpiCard = ({ icon, label, value, accent = "#6EE7F7" }) => (
-  <div
-    style={{ ...S.kpiCard, borderColor: `${accent}20` }}
-    onMouseEnter={e => {
-      e.currentTarget.style.transform = "translateY(-5px)";
-      e.currentTarget.style.boxShadow = `0 20px 48px ${accent}18`;
-      e.currentTarget.style.borderColor = `${accent}44`;
-    }}
-    onMouseLeave={e => {
-      e.currentTarget.style.transform = "translateY(0)";
-      e.currentTarget.style.boxShadow = "none";
-      e.currentTarget.style.borderColor = `${accent}20`;
-    }}
-  >
-    <div style={{ ...S.kpiIcon, background: `${accent}12`, color: accent }}>{icon}</div>
-    <div>
-      <p style={S.kpiLabel}>{label}</p>
-      <h2 style={{ ...S.kpiValue, color: accent }}>{value ?? 0}</h2>
+  <div className="flex flex-col lg:flex-row gap-6 md:gap-8 items-start">
+    <div className="flex-[3] w-full grid grid-cols-1 md:grid-cols-2 gap-6">
+      {charts}
     </div>
-    <div style={{ ...S.kpiAccentBar, background: `linear-gradient(90deg, ${accent}, transparent)` }} />
+    <div className="flex-1 w-full lg:sticky lg:top-24 flex flex-col gap-6">
+      {side}
+    </div>
   </div>
 );
+
+const ChartCard = ({ children }) => (
+  <motion.div
+    whileHover={{ y: -4 }}
+    className="bg-[#0f172a]/95 border border-white/[0.06] rounded-[24px] p-6 shadow-2xl transition-all duration-300"
+  >
+    {children}
+  </motion.div>
+);
+
+const KpiCard = ({ icon, label, value, color }) => {
+  const colorMap = {
+    cyan:    { iconBg: 'bg-cyan-500/10',    iconColor: 'text-cyan-400',    border: 'border-cyan-500/20',     bgGlow: 'from-cyan-500/5' },
+    violet:  { iconBg: 'bg-violet-500/10',  iconColor: 'text-violet-400',  border: 'border-violet-500/20',   bgGlow: 'from-violet-500/5' },
+    emerald: { iconBg: 'bg-emerald-500/10', iconColor: 'text-emerald-400', border: 'border-emerald-500/20',  bgGlow: 'from-emerald-500/5' },
+    rose:    { iconBg: 'bg-rose-500/10',    iconColor: 'text-rose-400',    border: 'border-rose-500/20',     bgGlow: 'from-rose-500/5' },
+    amber:   { iconBg: 'bg-amber-500/10',   iconColor: 'text-amber-400',   border: 'border-amber-500/20',    bgGlow: 'from-amber-500/5' },
+  };
+  const theme = colorMap[color] || colorMap.cyan;
+
+  return (
+    <motion.div
+      whileHover={{ y: -5, scale: 1.02 }}
+      className={`relative overflow-hidden p-6 rounded-[28px] border ${theme.border} bg-[#0f172a]/95 group transition-all duration-500`}
+    >
+      <div className={`absolute -right-6 -top-6 w-24 h-24 bg-gradient-to-br ${theme.bgGlow} to-transparent blur-2xl rounded-full transition-all duration-700 group-hover:scale-150 group-hover:opacity-60`} />
+      
+      <div className="flex items-center gap-5 relative z-10">
+        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-xl border ${theme.border} ${theme.iconBg} ${theme.iconColor} shadow-inner transition-transform duration-500 group-hover:rotate-12`}>
+          {icon}
+        </div>
+        <div className="flex flex-col gap-0.5">
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 m-0">
+            {label}
+          </p>
+          <p className="text-3xl font-black text-slate-100 m-0 leading-none">
+            {value ?? 0}
+          </p>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
 
 // ─── Side Panels ──────────────────────────────────────────────────────────────
 
 const ActivityPanel = ({ activity = [] }) => (
-  <SidePanel title="Recent Activity" dotColor="#10B981">
-    {activity.length === 0 ? <EmptyState label="No recent activity" /> : (
-      activity.map((item, i) => (
-        <div key={item._id || i} style={S.feedItem}
-          onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.03)"}
-          onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-        >
-          <div style={S.avatar}>{(item?.user?.name || "?")[0].toUpperCase()}</div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <p style={S.feedName}>
-              {item?.user?.name || "Unknown"}
-              {item?.user?.role && <span style={S.feedRole}> · {item.user.role}</span>}
-            </p>
-            <p style={S.feedAction}>{item.action}</p>
-          </div>
-        </div>
-      ))
-    )}
-  </SidePanel>
+  <div className="bg-[#0f172a]/95 border border-white/[0.06] rounded-[24px] overflow-hidden flex flex-col group transition-all duration-500 hover:border-emerald-500/20 shadow-2xl">
+    <div className="flex items-center gap-3 px-6 py-5 border-b border-white/[0.06] bg-white/[0.02]">
+      <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)]" />
+      <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-200 m-0 flex-1">
+        Recent Activity
+      </h3>
+    </div>
+    <div className="overflow-y-auto max-h-[500px] p-2 no-scrollbar">
+      {activity.length === 0 ? <EmptyState label="No activity" /> : (
+        activity.slice(0, 15).map((item, i) => (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: i * 0.05 }}
+            key={item._id || i} 
+            className="flex items-start gap-4 p-4 rounded-xl hover:bg-white/[0.03] transition-all duration-300"
+          >
+            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center text-xs font-black text-white shadow-xl flex-shrink-0 border border-white/10 uppercase">
+              {(item?.user?.name || "?")[0]}
+            </div>
+            <div className="flex flex-col gap-1 min-w-0">
+              <p className="text-xs font-black text-slate-200 m-0 truncate leading-none">
+                {item?.user?.name || "Unknown"}
+                {item?.user?.role && (
+                  <span className="ml-2 text-[8px] font-bold uppercase tracking-widest text-cyan-400 bg-cyan-400/10 px-1.5 py-0.5 rounded-sm">
+                    {item.user.role}
+                  </span>
+                )}
+              </p>
+              <p className="text-[11px] text-slate-500 font-medium m-0 leading-relaxed italic">
+                {item.action}
+              </p>
+            </div>
+          </motion.div>
+        ))
+      )}
+    </div>
+  </div>
 );
 
 const NotificationPanel = ({ notifications = [] }) => (
-  <SidePanel
-    title="Notifications"
-    dotColor="#FBBF24"
-    badge={notifications.length > 0 ? notifications.length : null}
-  >
-    {notifications.length === 0 ? <EmptyState label="All caught up!" /> : (
-      notifications.map((note, i) => (
-        <div key={note._id || i} style={S.notifItem}
-          onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.03)"}
-          onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-        >
-          <div style={S.notifBell}>🔔</div>
-          <p style={S.notifMsg}>{note.message}</p>
-        </div>
-      ))
-    )}
-  </SidePanel>
-);
-
-const SidePanel = ({ title, dotColor = "#10B981", badge, children }) => (
-  <div style={S.sidePanel}>
-    <div style={S.panelHeader}>
-      <span style={{ ...S.panelDot, background: dotColor, boxShadow: `0 0 8px ${dotColor}88` }} />
-      <h3 style={S.panelTitle}>{title}</h3>
-      {badge && <span style={S.badge}>{badge}</span>}
+  <div className="bg-[#0f172a]/95 border border-white/[0.06] rounded-[24px] overflow-hidden flex flex-col hover:border-amber-500/20 transition-all duration-500 shadow-2xl">
+    <div className="flex items-center gap-3 px-6 py-5 border-b border-white/[0.06] bg-white/[0.02]">
+      <span className="w-2 h-2 rounded-full bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.8)]" />
+      <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-200 m-0 flex-1">
+        Notifications
+      </h3>
+      {notifications.length > 0 && (
+        <span className="text-[9px] font-black text-white bg-red-500/20 border border-red-500/20 px-2 py-0.5 rounded-full">
+          {notifications.length}
+        </span>
+      )}
     </div>
-    <div style={S.feedScroll}>{children}</div>
+    <div className="overflow-y-auto max-h-[500px] p-2 no-scrollbar">
+      {notifications.length === 0 ? <EmptyState label="All clear" /> : (
+        notifications.map((note, i) => (
+          <div key={note._id || i} className="flex gap-4 p-4 rounded-xl hover:bg-white/[0.03] transition-all">
+            <span className="text-base flex-shrink-0">🔔</span>
+            <p className="text-xs text-slate-400 leading-relaxed m-0 font-medium">{note.message}</p>
+          </div>
+        ))
+      )}
+    </div>
   </div>
 );
 
 const EmptyState = ({ label }) => (
-  <div style={S.emptyState}>
-    <span style={S.emptyDash}>—</span>
-    <p style={S.emptyLabel}>{label}</p>
+  <div className="flex flex-col items-center justify-center py-12 opacity-40">
+    <span className="text-2xl mb-2">—</span>
+    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 m-0">{label}</p>
   </div>
 );
 
 const LoadingScreen = () => (
-  <div style={{ ...S.centeredScreen, background: "#080d14" }}>
-    <div style={S.spinner} />
-    <p style={{ color: "#64748b", fontSize: 12, fontFamily: "DM Mono, monospace", marginTop: 14 }}>
-      Loading dashboard…
-    </p>
-    <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+  <div className="flex flex-col items-center justify-center min-h-[60vh]">
+    <div className="w-10 h-10 border-2 border-white/5 border-t-cyan-500 rounded-full animate-spin shadow-[0_0_15px_rgba(34,211,238,0.3)]" />
+    <p className="text-[9px] font-black uppercase tracking-[0.4em] text-cyan-500 mt-6 animate-pulse">Initializing Dashboard Data</p>
   </div>
 );
 
 const ErrorScreen = () => (
-  <div style={{ ...S.centeredScreen, background: "#080d14" }}>
-    <FaBug size={32} color="#FF453A" />
-    <p style={{ color: "#FF453A", marginTop: 12, fontFamily: "DM Mono, monospace", fontSize: 13 }}>
-      Failed to load dashboard data.
-    </p>
+  <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+    <div className="w-16 h-16 rounded-full bg-red-500/5 flex items-center justify-center text-2xl border border-red-500/10 mb-6 shadow-2xl text-red-500">⚠️</div>
+    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-red-500">Initialization Failed</p>
+    <p className="text-xs text-slate-600 mt-2">Could not retrieve workspace metrics at this time.</p>
   </div>
 );
-
-// ─── Style Object ─────────────────────────────────────────────────────────────
-
-const S = {
-  page: {
-    padding: "30px 28px 48px",
-    minHeight: "100vh",
-    background: "#080d14",
-    fontFamily: "'DM Mono', monospace",
-    position: "relative",
-    overflow: "hidden",
-  },
-  blob: {
-    position: "absolute",
-    borderRadius: "50%",
-    pointerEvents: "none",
-    zIndex: 0,
-  },
-  centeredScreen: {
-    display: "flex", flexDirection: "column",
-    alignItems: "center", justifyContent: "center", height: "100vh",
-  },
-  spinner: {
-    width: 36, height: 36, borderRadius: "50%",
-    border: "3px solid rgba(16,185,129,0.12)",
-    borderTop: "3px solid #10B981",
-    animation: "spin 0.8s linear infinite",
-  },
-
-  /* Header */
-  header: {
-    display: "flex", justifyContent: "space-between", alignItems: "flex-end",
-    marginBottom: 28, position: "relative", zIndex: 1,
-    paddingBottom: 20,
-    borderBottom: "1px solid rgba(255,255,255,0.05)",
-  },
-  headerSub: {
-    margin: "0 0 4px", fontSize: 10, fontWeight: 700,
-    letterSpacing: "0.2em", color: "#10B981",
-  },
-  headerTitle: {
-    margin: 0, fontSize: 24, fontWeight: 800,
-    color: "#f1f5f9", letterSpacing: "-0.02em",
-  },
-  headerRight: { display: "flex", alignItems: "center", gap: 8 },
-  liveDot: {
-    width: 7, height: 7, borderRadius: "50%",
-    background: "#10B981", boxShadow: "0 0 8px #10B98199",
-  },
-  headerTime: { fontSize: 11, color: "#475569" },
-
-  /* KPI */
-  kpiRow: {
-    display: "flex", flexWrap: "wrap", gap: 12,
-    marginBottom: 24, position: "relative", zIndex: 1,
-  },
-  kpiCard: {
-    flex: "1 1 150px", minWidth: 140,
-    background: "linear-gradient(140deg, #0f172a 0%, #1a2235 100%)",
-    borderRadius: 16, padding: "16px 18px",
-    border: "1px solid",
-    display: "flex", alignItems: "center", gap: 14,
-    position: "relative", overflow: "hidden",
-    transition: "transform 0.2s, box-shadow 0.2s, border-color 0.2s",
-    cursor: "default",
-  },
-  kpiIcon: {
-    width: 40, height: 40, borderRadius: 12,
-    display: "flex", alignItems: "center", justifyContent: "center",
-    fontSize: 16, flexShrink: 0,
-  },
-  kpiLabel: {
-    margin: "0 0 3px", fontSize: 9,
-    color: "#64748b", letterSpacing: "0.1em", textTransform: "uppercase",
-  },
-  kpiValue: { margin: 0, fontSize: 24, fontWeight: 800, lineHeight: 1 },
-  kpiAccentBar: {
-    position: "absolute", bottom: 0, left: 0, right: 0,
-    height: 2, opacity: 0.5,
-  },
-
-  /* Two-column layout */
-  twoCol: {
-    display: "grid",
-    gridTemplateColumns: "1fr 320px",
-    gap: 18,
-    alignItems: "start",
-    position: "relative", zIndex: 1,
-  },
-  chartsGrid: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: 14,
-  },
-  sideStack: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 14,
-    /* Sticky so it doesn't scroll away while charts are long */
-    position: "sticky",
-    top: 20,
-  },
-
-  /* Side panel */
-  sidePanel: {
-    background: "linear-gradient(145deg, #0d1525, #111827)",
-    borderRadius: 20,
-    border: "1px solid rgba(255,255,255,0.06)",
-    overflow: "hidden",
-  },
-  panelHeader: {
-    display: "flex", alignItems: "center", gap: 9,
-    padding: "14px 18px",
-    borderBottom: "1px solid rgba(255,255,255,0.05)",
-  },
-  panelDot: { width: 8, height: 8, borderRadius: "50%", flexShrink: 0 },
-  panelTitle: {
-    margin: 0, flex: 1,
-    fontSize: 10, fontWeight: 700,
-    letterSpacing: "0.15em", textTransform: "uppercase", color: "#94a3b8",
-  },
-  badge: {
-    background: "rgba(251,191,36,0.12)", color: "#FBBF24",
-    fontSize: 10, fontWeight: 700,
-    padding: "2px 8px", borderRadius: 20,
-    border: "1px solid rgba(251,191,36,0.22)",
-  },
-  feedScroll: { maxHeight: 520, overflowY: "auto", padding: "6px 0" },
-
-  /* Activity feed items */
-  feedItem: {
-    display: "flex", alignItems: "flex-start", gap: 12,
-    padding: "11px 18px",
-    borderBottom: "1px solid rgba(255,255,255,0.03)",
-    transition: "background 0.15s",
-    cursor: "default",
-  },
-  avatar: {
-    width: 30, height: 30, borderRadius: "50%",
-    background: "linear-gradient(135deg, #10B981, #059669)",
-    display: "flex", alignItems: "center", justifyContent: "center",
-    fontSize: 12, fontWeight: 700, color: "#fff", flexShrink: 0,
-  },
-  feedName: { margin: "0 0 2px", fontSize: 12, fontWeight: 600, color: "#e2e8f0" },
-  feedRole: { fontSize: 10, color: "#64748b", fontWeight: 400 },
-  feedAction: { margin: 0, fontSize: 11, color: "#64748b", lineHeight: 1.55 },
-
-  /* Notification items */
-  notifItem: {
-    display: "flex", alignItems: "flex-start", gap: 12,
-    padding: "11px 18px",
-    borderBottom: "1px solid rgba(255,255,255,0.03)",
-    transition: "background 0.15s",
-    cursor: "default",
-  },
-  notifBell: { fontSize: 13, flexShrink: 0, marginTop: 1 },
-  notifMsg: { margin: 0, fontSize: 11, color: "#94a3b8", lineHeight: 1.6 },
-
-  /* Empty state */
-  emptyState: {
-    display: "flex", flexDirection: "column", alignItems: "center",
-    padding: "36px 20px", gap: 6,
-  },
-  emptyDash: { fontSize: 20, color: "#1e293b" },
-  emptyLabel: { margin: 0, fontSize: 10, color: "#475569", letterSpacing: "0.1em" },
-
-  noRole: {
-    textAlign: "center", color: "#64748b",
-    padding: "80px 0", fontSize: 13,
-  },
-};

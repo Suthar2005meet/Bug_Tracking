@@ -1,20 +1,19 @@
 import axios from 'axios'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { motion } from 'framer-motion'
 
 export const Bugs = () => {
   const [bugs, setbugs]       = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch]   = useState('')
   const [filter, setFilter]   = useState('all')
-  const [visible, setVisible] = useState(false)
 
   const getBugs = async () => {
     try {
       setLoading(true)
       const res = await axios.get('/bug/all')
       setbugs(res.data.data)
-      setTimeout(() => setVisible(true), 60)
     } catch (err) {
       console.error(err)
     } finally {
@@ -33,237 +32,278 @@ export const Bugs = () => {
     return matchSearch && matchFilter
   })
 
+  const avatarGradients = [
+    { from: '#f59e0b', to: '#8b5cf6' },
+    { from: '#06b6d4', to: '#3b82f6' },
+    { from: '#10b981', to: '#14b8a6' },
+    { from: '#ec4899', to: '#f43f5e' },
+    { from: '#8b5cf6', to: '#6366f1' },
+    { from: '#f97316', to: '#ef4444' },
+  ]
+
+  const getInitial = (title) => (title || 'B').charAt(0).toUpperCase()
+
+  const cardStyle = {
+    background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(12, 18, 36, 0.92) 100%)',
+    border: '1px solid rgba(255, 255, 255, 0.06)',
+    borderRadius: '20px',
+    transition: 'all 0.3s cubic-bezier(0.22, 1, 0.36, 1)',
+  }
+
+  const cardHoverHandlers = {
+    onMouseEnter: (e) => {
+      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'
+      e.currentTarget.style.boxShadow = '0 8px 40px rgba(0,0,0,0.4)'
+      e.currentTarget.style.transform = 'translateY(-2px)'
+    },
+    onMouseLeave: (e) => {
+      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'
+      e.currentTarget.style.boxShadow = 'none'
+      e.currentTarget.style.transform = 'translateY(0)'
+    },
+  }
+
+  const btnDetailsStyle = {
+    background: 'linear-gradient(135deg, #1d4ed8, #3b82f6)',
+    color: '#fff',
+    boxShadow: '0 4px 16px rgba(59, 130, 246, 0.25)',
+    border: '1px solid rgba(59, 130, 246, 0.3)',
+  }
+
+  const btnEditStyle = {
+    background: 'linear-gradient(135deg, #4338ca, #7c3aed)',
+    color: '#fff',
+    boxShadow: '0 4px 16px rgba(124, 58, 237, 0.25)',
+    border: '1px solid rgba(124, 58, 237, 0.3)',
+  }
+
+  const btnSprintStyle = {
+    background: 'linear-gradient(90deg, rgba(20, 83, 78, 0.8), rgba(20, 184, 166, 0.5))',
+    color: '#fff',
+    border: '1px solid rgba(20, 184, 166, 0.3)',
+    boxShadow: '0 0 20px rgba(20, 184, 166, 0.12)',
+  }
+
+  const btnBaseStyle = {
+    flex: 1,
+    textAlign: 'center',
+    padding: '8px 0',
+    borderRadius: '10px',
+    fontWeight: 700,
+    fontSize: '11px',
+    textTransform: 'uppercase',
+    letterSpacing: '0.1em',
+    textDecoration: 'none',
+    transition: 'all 0.2s',
+    cursor: 'pointer',
+  }
+
+  const getStatusStyle = (status) => {
+    const key = status?.toLowerCase?.().replace(/\s/g, '') || ''
+    const map = {
+      'open': { bg: 'rgba(245, 158, 11, 0.1)', color: '#fbbf24', border: 'rgba(245, 158, 11, 0.2)', dot: '#f59e0b' },
+      'inprogress': { bg: 'rgba(6, 182, 212, 0.1)', color: '#22d3ee', border: 'rgba(6, 182, 212, 0.2)', dot: '#06b6d4' },
+      'resolved': { bg: 'rgba(16, 185, 129, 0.1)', color: '#34d399', border: 'rgba(16, 185, 129, 0.2)', dot: '#10b981' },
+      'closed': { bg: 'rgba(255, 255, 255, 0.04)', color: '#94a3b8', border: 'rgba(255, 255, 255, 0.08)', dot: '#64748b' },
+    }
+    return map[key] || map['open']
+  }
+
+  const getPriorityColor = (priority) => {
+    const map = { High: '#f87171', Medium: '#fbbf24', Low: '#34d399' }
+    return map[priority] || '#94a3b8'
+  }
+
   /* ── loading ── */
   if (loading)
     return (
-      <div className="flex h-screen flex-col items-center justify-center bg-gradient-to-br from-blue-50 via-white to-indigo-50 gap-4">
-        <div className="relative h-14 w-14">
-          <div className="absolute inset-0 rounded-full border-4 border-blue-100" />
-          <div className="absolute inset-0 animate-spin rounded-full border-4 border-transparent border-t-blue-500" />
+      <div className="flex h-[60vh] flex-col items-center justify-center gap-4">
+        <div className="relative h-12 w-12">
+          <div className="absolute inset-0 rounded-full border-3 border-white/10" />
+          <div className="absolute inset-0 animate-spin rounded-full border-3 border-transparent border-t-cyan-500" />
         </div>
-        <p className="font-mono text-xs tracking-[0.2em] text-blue-400 uppercase animate-pulse">
+        <p className="text-xs tracking-[0.2em] text-slate-500 uppercase animate-pulse">
           Loading bugs...
         </p>
       </div>
     )
 
+  const filters = ['all', 'open', 'inprogress', 'resolved', 'closed']
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50/40 to-indigo-50/60 px-4 py-8 sm:px-6 lg:px-8">
+    <div className="relative w-full">
+      <div className="pointer-events-none fixed inset-0 bg-mesh opacity-60" />
 
-      {/* Decorative blobs */}
-      <div className="pointer-events-none fixed top-0 right-0 h-96 w-96 -translate-y-1/2 translate-x-1/2 rounded-full bg-blue-400/10 blur-3xl" />
-      <div className="pointer-events-none fixed bottom-0 left-0 h-96 w-96 translate-y-1/2 -translate-x-1/2 rounded-full bg-violet-400/10 blur-3xl" />
+      <div className="relative mx-auto max-w-6xl z-10 px-4 md:px-8 py-8 md:py-12">
 
-      <div className="relative mx-auto max-w-5xl">
-
-        {/* ── PAGE HEADER ── */}
-        <div className={`mb-8 transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
-          <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.25em] text-blue-400 mb-1">
-            Bug Tracker
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          style={{ marginBottom: '32px' }}
+        >
+          <h1 className="text-3xl md:text-4xl font-extrabold text-white" style={{ marginBottom: '4px' }}>
+            All Bugs
+          </h1>
+          <p className="text-slate-500 text-sm">
+            Track and manage all reported bugs · <span style={{ color: '#22d3ee', fontWeight: 700 }}>{filteredBugs.length} found</span>
           </p>
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <h1 className="text-2xl font-bold text-slate-800 sm:text-3xl">All Bugs</h1>
-            <div className="flex items-center gap-2">
-              <span className="rounded-full bg-blue-100 px-3 py-1 font-mono text-xs font-bold text-blue-600">
-                {filteredBugs.length} found
-              </span>
-              {/* <Link
-                to="createbug"
-                className="rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2.5 font-mono text-xs font-bold uppercase tracking-widest text-white shadow-lg shadow-blue-200 transition-all hover:scale-105 hover:shadow-xl hover:shadow-blue-300 active:scale-95"
-              >
-                + Report Bug
-              </Link> */}
-            </div>
-          </div>
-        </div>
+        </motion.div>
 
-        {/* ── SEARCH + FILTER BAR ── */}
-        <div className={`mb-6 flex flex-wrap gap-3 transition-all duration-700 delay-100 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
-          {/* Search */}
-          <div className="relative flex-1 min-w-[200px]">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">🔍</span>
+        {/* Search + Filter */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="flex flex-col sm:flex-row items-stretch sm:items-center"
+          style={{ gap: '12px', marginBottom: '32px' }}
+        >
+          <div className="relative flex-1 min-w-[200px] group">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-cyan-400 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </span>
             <input
               type="search"
               placeholder="Search bugs..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-4 text-sm text-slate-700 shadow-sm placeholder:text-slate-400 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all"
+              className="input-dark w-full"
+              style={{ paddingLeft: '44px' }}
             />
           </div>
 
-          {/* Filter pills */}
           <div className="flex flex-wrap gap-2">
-            {['all', 'open', 'inprogress', 'resolved', 'closed'].map((f) => (
+            {filters.map((f) => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
-                className={`rounded-xl px-3 py-2 font-mono text-[11px] font-bold uppercase tracking-widest transition-all duration-200 ${
-                  filter === f
-                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-200 scale-105'
-                    : 'border border-slate-200 bg-white text-slate-500 hover:border-blue-300 hover:text-blue-600'
-                }`}
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: '10px',
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.1em',
+                  transition: 'all 0.2s',
+                  cursor: 'pointer',
+                  ...(filter === f
+                    ? { background: 'linear-gradient(135deg, #06b6d4, #8b5cf6)', color: '#fff', border: 'none', boxShadow: '0 4px 16px rgba(6, 182, 212, 0.3)' }
+                    : { background: 'rgba(255,255,255,0.04)', color: '#64748b', border: '1px solid rgba(255,255,255,0.06)' }),
+                }}
               >
                 {f === 'inprogress' ? 'In Progress' : f.charAt(0).toUpperCase() + f.slice(1)}
               </button>
             ))}
           </div>
-        </div>
+        </motion.div>
 
-        {/* ── BUG LIST ── */}
+        {/* Bug List */}
         {filteredBugs.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-300 bg-white/60 py-20 text-center">
-            <p className="text-4xl mb-3">🐛</p>
-            <p className="font-mono text-sm font-semibold text-slate-400">No bugs found</p>
-            <p className="mt-1 text-xs text-slate-400">Try adjusting your search or filter</p>
-          </div>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex flex-col items-center justify-center glass rounded-2xl text-center"
+            style={{ padding: '80px 20px' }}
+          >
+            <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.4 }}>🐛</div>
+            <h3 className="text-lg font-bold text-white" style={{ marginBottom: '8px' }}>No bugs found</h3>
+            <p className="text-slate-500 text-sm">Try adjusting your search or filter</p>
+          </motion.div>
         ) : (
-          <div className="space-y-4">
-            {filteredBugs.map((bug, index) => (
-              <BugCard key={bug._id} bug={bug} index={index} visible={visible} />
-            ))}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {filteredBugs.map((bug, index) => {
+              const gradient = avatarGradients[index % avatarGradients.length]
+              const initial = getInitial(bug.title)
+              const ss = getStatusStyle(bug.status)
+
+              return (
+                <motion.div
+                  key={bug._id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: Math.min(index * 0.06, 0.5) }}
+                >
+                  <div
+                    className="group flex flex-col sm:flex-row items-stretch overflow-hidden"
+                    style={cardStyle}
+                    {...cardHoverHandlers}
+                  >
+                    {/* LEFT: Avatar + Info */}
+                    <div className="flex-1 min-w-0 flex flex-col sm:flex-row items-start sm:items-center p-6 gap-5">
+                      <div
+                        style={{
+                          flexShrink: 0, width: '56px', height: '56px', borderRadius: '16px',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          color: '#fff', fontSize: '24px', fontWeight: 800,
+                          background: `linear-gradient(135deg, ${gradient.from}, ${gradient.to})`,
+                          boxShadow: `0 8px 24px ${gradient.from}33`, transition: 'transform 0.3s',
+                        }}
+                        className="group-hover:scale-105"
+                      >
+                        {initial}
+                      </div>
+
+                      <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <h2 className="group-hover:text-cyan-400 transition-colors" style={{ fontSize: '18px', fontWeight: 800, color: '#f1f5f9', margin: 0, lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {bug.title}
+                        </h2>
+
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                          {/* Status */}
+                          <span style={{
+                            display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '2px 10px', borderRadius: '6px',
+                            fontSize: '10px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', flexShrink: 0,
+                            background: ss.bg, color: ss.color, border: `1px solid ${ss.border}`,
+                          }}>
+                            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: ss.dot, boxShadow: `0 0 8px ${ss.dot}cc` }} />
+                            {bug.status}
+                          </span>
+                          {/* Priority */}
+                          <span style={{ display: 'inline-flex', padding: '2px 10px', borderRadius: '6px', fontSize: '10px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', background: 'rgba(255,255,255,0.04)', color: getPriorityColor(bug.priority), border: '1px solid rgba(255,255,255,0.08)' }}>
+                            {bug.priority}
+                          </span>
+                          {/* Description */}
+                          <span style={{ fontSize: '12px', fontWeight: 500, color: '#94a3b8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '350px' }}>
+                            {bug.description}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* RIGHT: Actions */}
+                    <div className="w-full sm:w-[220px] flex-shrink-0 flex flex-col justify-center gap-2.5 p-5 border-t sm:border-t-0 sm:border-l border-white/[0.04]">
+                      <div className="flex gap-2">
+                        <Link to={`bugdetail/${bug._id}`} style={{ ...btnDetailsStyle, ...btnBaseStyle }}>
+                          Details
+                        </Link>
+                        <Link to={`editbug/${bug._id}`} style={{ ...btnEditStyle, ...btnBaseStyle }}>
+                          Edit
+                        </Link>
+                      </div>
+                      <Link
+                        to={`allcomment/${bug._id}`}
+                        style={{
+                          ...btnSprintStyle,
+                          ...btnBaseStyle,
+                          width: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px',
+                        }}
+                      >
+                        💬 Comment
+                      </Link>
+                    </div>
+                  </div>
+                </motion.div>
+              )
+            })}
           </div>
         )}
-
       </div>
     </div>
   )
 }
-
-/* ── BUG CARD ──────────────────────────────────────────────────── */
-const BugCard = ({ bug, index, visible }) => {
-  const delay = Math.min(index * 80, 600)
-
-  return (
-    <div
-      className="group overflow-hidden rounded-2xl border border-white bg-white shadow-sm shadow-slate-200/80 transition-all duration-500 hover:shadow-lg hover:shadow-blue-100 hover:-translate-y-0.5"
-      style={{
-        opacity: visible ? 1 : 0,
-        transform: visible ? 'translateY(0)' : 'translateY(20px)',
-        transition: `opacity 0.5s ease ${delay}ms, transform 0.5s ease ${delay}ms, box-shadow 0.2s ease, translate 0.2s ease`,
-      }}
-    >
-      {/* Colored left accent bar by priority */}
-      <div className={`absolute left-0 top-0 h-full w-1 rounded-l-2xl ${priorityAccent(bug.priority)}`} />
-
-      <div className="flex flex-col gap-4 p-5 pl-6 sm:flex-row sm:items-start sm:justify-between">
-
-        {/* Left — content */}
-        <div className="flex-1 min-w-0">
-          {/* ID + badges row */}
-          <div className="mb-2 flex flex-wrap items-center gap-2">
-            <span className="font-mono text-[10px] font-semibold uppercase tracking-widest text-slate-400">
-              #{bug._id?.slice(-6)?.toUpperCase()}
-            </span>
-            <StatusBadge value={bug.status} />
-            <PriorityBadge value={bug.priority} />
-            {bug.type && <TypeBadge value={bug.type} />}
-          </div>
-
-          {/* Title */}
-          <h2 className="mb-1.5 text-base font-bold text-slate-800 group-hover:text-blue-700 transition-colors duration-200 leading-snug">
-            {bug.title}
-          </h2>
-
-          {/* Description — truncated */}
-          <p className="text-sm text-slate-500 leading-relaxed line-clamp-2">
-            {bug.description}
-          </p>
-
-          {/* Meta row */}
-          <div className="mt-3 flex flex-wrap items-center gap-4 text-xs text-slate-400">
-            {bug.assignedTo && (
-              <span className="flex items-center gap-1">
-                <span>👤</span>
-                <span className="font-medium text-slate-600">{bug.assignedTo}</span>
-              </span>
-            )}
-            {bug.project && (
-              <span className="flex items-center gap-1">
-                <span>📁</span>
-                <span className="font-medium text-slate-600">{bugs.projectName}</span>
-              </span>
-            )}
-            {bug.duedate && (
-              <span className="flex items-center gap-1">
-                <span>📅</span>
-                <span className="font-medium text-slate-600">{bug.duedate}</span>
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* Right — actions */}
-        <div className="flex shrink-0 flex-row gap-2 sm:flex-col sm:items-end">
-          <Link
-            to={`bugdetail/${bug._id}`}
-            className="rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2 text-center font-mono text-[11px] font-bold uppercase tracking-widest text-white shadow-md shadow-blue-200 transition-all hover:scale-105 hover:shadow-lg active:scale-95"
-          >
-            Details
-          </Link>
-          <Link
-            to={`editbug/${bug._id}`}
-            className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-center font-mono text-[11px] font-bold uppercase tracking-widest text-slate-500 transition-all hover:border-orange-300 hover:bg-orange-50 hover:text-orange-600"
-          >
-            Edit
-          </Link>
-          <Link
-            to={`comment/${bug._id}`}
-            className="rounded-xl border border-slate-200 bg-orange-200 px-4 py-2 text-center font-mono text-[11px] font-bold uppercase tracking-widest text-slate-500 transition-all hover:border-orange-300 hover:bg-orange-50 hover:text-orange-600"
-          >
-            Add Comment
-          </Link>
-          <Link
-            to={`allcomment/${bug._id}`}
-            className="rounded-xl border border-green-200 bg-slate-50 px-4 py-2 text-center font-mono text-[11px] font-bold uppercase tracking-widest text-slate-500 transition-all hover:border-orange-300 hover:bg-orange-50 hover:text-orange-600"
-          >
-            All Comment
-          </Link>
-        </div>
-
-      </div>
-    </div>
-  )
-}
-
-/* ── HELPERS ───────────────────────────────────────────────────── */
-const priorityAccent = (value) => {
-  if (!value) return 'bg-slate-200'
-  const map = { High: 'bg-red-500', Medium: 'bg-amber-400', Low: 'bg-emerald-500' }
-  return map[value] || 'bg-slate-300'
-}
-
-const StatusBadge = ({ value }) => {
-  const map = {
-    open:       'bg-yellow-100 text-yellow-700 border border-yellow-200',
-    inprogress: 'bg-blue-100   text-blue-700   border border-blue-200',
-    resolved:   'bg-emerald-100 text-emerald-700 border border-emerald-200',
-    closed:     'bg-slate-100  text-slate-500  border border-slate-200',
-  }
-  const key = value?.toLowerCase?.().replace(/\s/g, '') || ''
-  const cls = map[key] || 'bg-slate-100 text-slate-500 border border-slate-200'
-  return (
-    <span className={`rounded-lg px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-widest ${cls}`}>
-      {value}
-    </span>
-  )
-}
-
-const PriorityBadge = ({ value }) => {
-  const map = {
-    High:   'bg-red-100    text-red-600    border border-red-200',
-    Medium: 'bg-amber-100  text-amber-600  border border-amber-200',
-    Low:    'bg-emerald-100 text-emerald-600 border border-emerald-200',
-  }
-  const cls = map[value] || 'bg-slate-100 text-slate-500 border border-slate-200'
-  return (
-    <span className={`rounded-lg px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-widest ${cls}`}>
-      {value}
-    </span>
-  )
-}
-
-const TypeBadge = ({ value }) => (
-  <span className="rounded-lg border border-violet-200 bg-violet-100 px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-widest text-violet-600">
-    {value}
-  </span>
-)

@@ -72,7 +72,7 @@ const SprintStatusChart = ({ data = [] }) => {
         }}>Sprint Status Overview</h3>
       </div>
 
-      <ResponsiveContainer width="100%" height="82%">
+      <ResponsiveContainer width="100%" height="82%" minWidth={0} minHeight={0}>
         <ComposedChart data={formattedData} layout="vertical" margin={{ left: 0, right: 32 }}>
           <XAxis
             type="number"

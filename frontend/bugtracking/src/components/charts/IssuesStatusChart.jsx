@@ -77,7 +77,7 @@ const IssuesStatusChart = ({ data = [] }) => {
         </div>
 
         {hasData ? (
-            <ResponsiveContainer width="100%" height="82%">
+            <ResponsiveContainer width="100%" height="82%" minWidth={0} minHeight={0}>
                 <AreaChart data={formattedData}>
                 <defs>
                     <linearGradient id="tealGrad" x1="0" y1="0" x2="0" y2="1">

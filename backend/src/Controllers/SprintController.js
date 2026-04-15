@@ -18,18 +18,39 @@ const getData = async (req, resp) => {
     }
 }
 
+const logActivity = async ({ user, action, bug, project, sprint }) => {
+    try {
+        if (!user) return;
+        await ActivityLogModel.create({
+            user,
+            action,
+            bug: bug || null,
+            project: project || null,
+            sprint: sprint || null
+        });
+    } catch (err) {
+        console.error("Activity Error:", err.message);
+    }
+};
+
 const AddSprint = async (req, resp) => {
     try {
         // ✅ 1. Create Sprint
         const sprint = await SprintSchema.create(req.body)
 
         // ✅ 2. Create Activity Log
-        await ActivityLogModel.create({
-        user: req.body.userId,
-        action: "SPRINT_CREATED",
-        project: req.body.projectId,
-        sprint: sprint._id
-        })
+        await logActivity({
+            user: req.body.userId,
+            action: "SPRINT_CREATED",
+            project: req.body.projectId,
+            sprint: sprint._id
+        });
+
+        resp.status(201).json({
+            success: true,
+            message: "Sprint Created Successfully",
+            data: sprint
+        });
      } catch (err) {
         console.log(err)
         resp.status(500).json({

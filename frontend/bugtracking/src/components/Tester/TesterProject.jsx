@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { AuthContext } from '../../AuthProvider'
 import axios from 'axios'
 import { Link } from 'react-router-dom'
+import { motion } from 'framer-motion'
 
 export const TesterProject = () => {
     const { userId } = useContext(AuthContext)
@@ -20,103 +21,177 @@ export const TesterProject = () => {
     }
 
     useEffect(() => {
-        if (userId) {
-            getProject()
-        }
+        if (userId) getProject()
     }, [userId])
+
+    const avatarGradients = [
+        { from: '#f59e0b', to: '#8b5cf6' },
+        { from: '#06b6d4', to: '#3b82f6' },
+        { from: '#10b981', to: '#14b8a6' },
+        { from: '#ec4899', to: '#f43f5e' },
+        { from: '#8b5cf6', to: '#6366f1' },
+        { from: '#f97316', to: '#ef4444' },
+    ]
+
+    const getInitial = (title) => (title || 'P').charAt(0).toUpperCase()
+
+    const cardStyle = {
+        background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(12, 18, 36, 0.92) 100%)',
+        border: '1px solid rgba(255, 255, 255, 0.06)',
+        borderRadius: '20px',
+        transition: 'all 0.3s cubic-bezier(0.22, 1, 0.36, 1)',
+    }
+
+    const cardHoverHandlers = {
+        onMouseEnter: (e) => {
+            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'
+            e.currentTarget.style.boxShadow = '0 8px 40px rgba(0,0,0,0.4)'
+            e.currentTarget.style.transform = 'translateY(-2px)'
+        },
+        onMouseLeave: (e) => {
+            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'
+            e.currentTarget.style.boxShadow = 'none'
+            e.currentTarget.style.transform = 'translateY(0)'
+        },
+    }
+
+    const btnDetailsStyle = {
+        background: 'linear-gradient(135deg, #1d4ed8, #3b82f6)',
+        color: '#fff',
+        boxShadow: '0 4px 16px rgba(59, 130, 246, 0.25)',
+        border: '1px solid rgba(59, 130, 246, 0.3)',
+    }
+
+    const btnEditStyle = {
+        background: 'linear-gradient(135deg, #4338ca, #7c3aed)',
+        color: '#fff',
+        boxShadow: '0 4px 16px rgba(124, 58, 237, 0.25)',
+        border: '1px solid rgba(124, 58, 237, 0.3)',
+    }
+
+    const btnSprintStyle = {
+        background: 'linear-gradient(90deg, rgba(20, 83, 78, 0.8), rgba(20, 184, 166, 0.5))',
+        color: '#fff',
+        border: '1px solid rgba(20, 184, 166, 0.3)',
+        boxShadow: '0 0 20px rgba(20, 184, 166, 0.12)',
+    }
+
+    const btnBaseStyle = {
+        flex: 1,
+        textAlign: 'center',
+        padding: '8px 0',
+        borderRadius: '10px',
+        fontWeight: 700,
+        fontSize: '11px',
+        textTransform: 'uppercase',
+        letterSpacing: '0.1em',
+        textDecoration: 'none',
+        transition: 'all 0.2s',
+        cursor: 'pointer',
+    }
 
     if (loading) {
         return (
             <div className="flex h-64 items-center justify-center">
-                <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-emerald-600"></div>
+                <div className="w-10 h-10 border-3 border-white/10 border-t-amber-500 rounded-full animate-spin"></div>
             </div>
         )
     }
 
     return (
-        <div className="max-w-7xl mx-auto p-6 bg-gray-50 min-h-screen">
-            {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-                <div>
-                    <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+        <div className="relative w-full">
+            <div className="pointer-events-none fixed inset-0 bg-mesh opacity-60" />
+
+            <div className="max-w-6xl mx-auto relative z-10 px-4 md:px-8 py-8 md:py-12">
+                {/* Header */}
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: '32px' }}>
+                    <h1 className="text-3xl md:text-4xl font-extrabold text-white" style={{ marginBottom: '4px' }}>
                         Tester Projects
                     </h1>
-                    <p className="text-slate-500 mt-1 font-medium">
-                        Monitor assigned projects and manage quality assurance.
-                    </p>
-                </div>
-            </div>
+                    <p className="text-slate-500 text-sm">Monitor assigned projects and manage quality assurance</p>
+                </motion.div>
 
-            {/* Content Section */}
-            {projects.length === 0 ? (
-                <div className="text-center bg-white rounded-2xl p-16 shadow-sm border border-slate-200">
-                    <div className="bg-slate-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 text-slate-400">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
+                {projects.length === 0 ? (
+                    <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center justify-center glass rounded-2xl text-center" style={{ padding: '80px 20px' }}>
+                        <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.4 }}>📁</div>
+                        <h3 className="text-lg font-bold text-white" style={{ marginBottom: '8px' }}>No projects found</h3>
+                        <p className="text-slate-500 text-sm">No Assigned Projects found.</p>
+                    </motion.div>
+                ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        {projects.map((project, index) => {
+                            const gradient = avatarGradients[index % avatarGradients.length]
+                            const initial = getInitial(project.title)
+
+                            return (
+                                <motion.div
+                                    key={project._id}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.4, delay: index * 0.06 }}
+                                >
+                                    <div
+                                        className="group"
+                                        style={{ ...cardStyle, display: 'flex', flexWrap: 'wrap', alignItems: 'stretch' }}
+                                        {...cardHoverHandlers}
+                                    >
+                                        {/* LEFT: Avatar + Info */}
+                                        <div style={{ flex: '1 1 0', minWidth: '0', display: 'flex', alignItems: 'center', gap: '20px', padding: '24px 28px' }}>
+                                            <div
+                                                style={{
+                                                    flexShrink: 0, width: '56px', height: '56px', borderRadius: '16px',
+                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                    color: '#fff', fontSize: '24px', fontWeight: 800,
+                                                    background: `linear-gradient(135deg, ${gradient.from}, ${gradient.to})`,
+                                                    boxShadow: `0 8px 24px ${gradient.from}33`, transition: 'transform 0.3s',
+                                                }}
+                                                className="group-hover:scale-105"
+                                            >
+                                                {initial}
+                                            </div>
+
+                                            <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                                <h2 className="group-hover:text-cyan-400 transition-colors" style={{ fontSize: '18px', fontWeight: 800, color: '#f1f5f9', margin: 0, lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                    {project.title}
+                                                </h2>
+
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                                                    <span style={{
+                                                        display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '2px 10px', borderRadius: '6px',
+                                                        fontSize: '10px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', flexShrink: 0,
+                                                        background: 'rgba(245, 158, 11, 0.1)', color: '#fbbf24', border: '1px solid rgba(245, 158, 11, 0.2)',
+                                                    }}>
+                                                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#f59e0b', boxShadow: '0 0 8px rgba(245,158,11,0.8)' }} />
+                                                        QA Mode
+                                                    </span>
+                                                    <span style={{ fontSize: '12px', fontWeight: 500, color: '#94a3b8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '400px' }}>
+                                                        {project.description}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* RIGHT: Actions */}
+                                        <div style={{ width: '220px', flexShrink: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '10px', padding: '20px 24px', borderLeft: '1px solid rgba(255, 255, 255, 0.04)' }}>
+                                            <div style={{ display: 'flex', gap: '8px' }}>
+                                                <Link to={`/project/details/${project._id}`} style={{ ...btnDetailsStyle, ...btnBaseStyle }}>
+                                                    Details
+                                                </Link>
+                                                <Link to="createbug" style={{ ...btnEditStyle, ...btnBaseStyle }}>
+                                                    Bug
+                                                </Link>
+                                            </div>
+                                            <button style={{ ...btnSprintStyle, ...btnBaseStyle, width: '100%' }}>
+                                                ⚡ Active
+                                            </button>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            )
+                        })}
                     </div>
-                    <p className="text-slate-500 text-lg font-medium">No Assigned Projects found.</p>
-                </div>
-            ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {projects.map((project) => (
-                        <div key={project._id} className="group bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col overflow-hidden">
-                            <div className="p-6 flex-grow">
-                                <div className="flex justify-between items-start mb-4">
-                                    <span className="px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 text-[10px] font-bold uppercase tracking-widest border border-emerald-100">
-                                        QA Mode
-                                    </span>
-                                    <span className="text-xs font-semibold text-slate-400">
-                                        ID: {project._id.slice(-6)}
-                                    </span>
-                                </div>
-
-                                <h3 className="text-xl font-bold text-slate-800 group-hover:text-emerald-600 transition-colors">
-                                    {project.title}
-                                </h3>
-                                
-                                <p className="text-sm text-slate-500 mt-3 line-clamp-3 leading-relaxed">
-                                    {project.description}
-                                </p>
-
-                                <div className="mt-6 pt-4 border-t border-slate-50 space-y-2">
-                                    <div className="flex items-center text-xs text-slate-500 font-medium">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 mr-2 text-slate-400">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
-                                        </svg>
-                                        Start: <span className="text-slate-700 ml-1">{project.startDate}</span>
-                                    </div>
-                                    <div className="flex items-center text-xs text-slate-500 font-medium">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 mr-2 text-red-400">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        Deadline: <span className="text-slate-700 ml-1">{project.dueDate}</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Actions Footer */}
-                            <div className="bg-slate-50 p-4 flex gap-3 border-t border-slate-100">
-                                <Link 
-                                    to={`/project/details/${project._id}`} 
-                                    className="flex-1 bg-white border border-slate-200 text-slate-700 text-center py-2.5 rounded-xl text-sm font-bold hover:bg-slate-100 transition-all shadow-sm"
-                                >
-                                    View Details
-                                </Link>
-                                <Link 
-                                    to="createbug" 
-                                    className="flex-1 bg-rose-600 text-white text-center py-2.5 rounded-xl text-sm font-bold hover:bg-rose-700 transition-all shadow-sm active:scale-95 flex items-center justify-center gap-2"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    Report Bug
-                                </Link>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            )}
+                )}
+            </div>
         </div>
     )
 }

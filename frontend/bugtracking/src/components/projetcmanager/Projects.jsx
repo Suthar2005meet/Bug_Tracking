@@ -2,9 +2,10 @@ import axios from 'axios'
 import { useContext, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AuthContext } from '../../AuthProvider'
+import { motion } from 'framer-motion'
 
 export const Projects = () => {
-  const {userId, role} = useContext(AuthContext)
+  const { userId, role } = useContext(AuthContext)
   const [projects, setProjects] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
   const [loading, setLoading] = useState(true)
@@ -12,15 +13,13 @@ export const Projects = () => {
   const getProjects = async () => {
     try {
       setLoading(true)
-      // const res = await axios.get(`/project/user/${userId}`)
-      if(role === "ProjectManager"){
+      if (role === "ProjectManager") {
         const res = await axios.get(`/project/user/${userId}`)
         setProjects(res.data.data)
-      }else{
+      } else {
         const res = await axios.get('/project/all')
         setProjects(res.data.data)
       }
-      // setProjects(res.data.data)
     } catch (error) {
       console.error('Error fetching projects:', error)
     } finally {
@@ -32,221 +31,393 @@ export const Projects = () => {
     getProjects()
   }, [])
 
-  // Fixed filter with null checks
   const filteredProjects = projects.filter(project => {
-    const name = project?.projectName || ''
+    const name = project?.projectName || project?.title || ''
     const description = project?.description || ''
     const search = searchTerm.toLowerCase()
-    
     return (
       name.toLowerCase().includes(search) ||
       description.toLowerCase().includes(search)
     )
   })
 
-  const getGradientColor = (index) => {
-    const colors = [
-      'from-blue-400 to-blue-500',
-      'from-purple-400 to-purple-500',
-      'from-pink-400 to-pink-500',
-      'from-green-400 to-green-500',
-      'from-indigo-400 to-indigo-500',
-      'from-cyan-400 to-cyan-500',
-    ]
-    return colors[index % colors.length]
+  // Gradient palettes for letter avatars
+  const avatarGradients = [
+    { from: '#f59e0b', to: '#8b5cf6' },
+    { from: '#06b6d4', to: '#3b82f6' },
+    { from: '#10b981', to: '#14b8a6' },
+    { from: '#ec4899', to: '#f43f5e' },
+    { from: '#8b5cf6', to: '#6366f1' },
+    { from: '#f97316', to: '#ef4444' },
+  ]
+
+  const getInitial = (title) => {
+    return (title || 'P').charAt(0).toUpperCase()
+  }
+
+
+
+  /* ── Inline Styles ── */
+  const cardStyle = {
+    background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(12, 18, 36, 0.92) 100%)',
+    border: '1px solid rgba(255, 255, 255, 0.06)',
+    borderRadius: '20px',
+    transition: 'all 0.3s cubic-bezier(0.22, 1, 0.36, 1)',
+  }
+
+  const cardHoverHandlers = {
+    onMouseEnter: (e) => {
+      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'
+      e.currentTarget.style.boxShadow = '0 8px 40px rgba(0,0,0,0.4)'
+      e.currentTarget.style.transform = 'translateY(-2px)'
+    },
+    onMouseLeave: (e) => {
+      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'
+      e.currentTarget.style.boxShadow = 'none'
+      e.currentTarget.style.transform = 'translateY(0)'
+    },
+  }
+
+  const btnDetailsStyle = {
+    background: 'linear-gradient(135deg, #1d4ed8, #3b82f6)',
+    color: '#fff',
+    boxShadow: '0 4px 16px rgba(59, 130, 246, 0.25)',
+    border: '1px solid rgba(59, 130, 246, 0.3)',
+  }
+
+  const btnEditStyle = {
+    background: 'linear-gradient(135deg, #4338ca, #7c3aed)',
+    color: '#fff',
+    boxShadow: '0 4px 16px rgba(124, 58, 237, 0.25)',
+    border: '1px solid rgba(124, 58, 237, 0.3)',
+  }
+
+  const btnSprintStyle = {
+    background: 'linear-gradient(90deg, rgba(20, 83, 78, 0.8), rgba(20, 184, 166, 0.5))',
+    color: '#fff',
+    border: '1px solid rgba(20, 184, 166, 0.3)',
+    boxShadow: '0 0 20px rgba(20, 184, 166, 0.12)',
   }
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 py-12 px-4 sm:px-6 lg:px-8'>
-      <div className='max-w-6xl mx-auto'>
-        {/* Header */}
-        <div className='mb-12 animate-fadeIn'>
-          <h1 className='text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2'>
+    <div className="relative w-full">
+      {/* Decorative mesh */}
+      <div className="pointer-events-none fixed inset-0 bg-mesh opacity-60" />
+
+      <div className="max-w-6xl mx-auto relative z-10 px-4 md:px-8 py-8 md:py-12">
+
+        {/* ═══ Header ═══ */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          style={{ marginBottom: '32px' }}
+        >
+          <h1 className="text-3xl md:text-4xl font-extrabold text-white" style={{ marginBottom: '4px' }}>
             My Projects
           </h1>
-          <p className='text-gray-600 text-lg'>Create, manage and organize your projects</p>
-        </div>
+          <p className="text-slate-500 text-sm">Create, manage and organize your projects</p>
+        </motion.div>
 
-        {/* Search & Add */}
-        <div className='flex flex-col sm:flex-row gap-4 mb-12 animate-slideUp'>
-          <div className='flex-1 relative group'>
+        {/* ═══ Search & Add ═══ */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="flex flex-col sm:flex-row items-stretch sm:items-center"
+          style={{ gap: '12px', marginBottom: '32px' }}
+        >
+          <div className="flex-1 relative group">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-cyan-400 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </span>
             <input
-              type='search'
-              placeholder='Search projects by name or description...'
+              type="search"
+              placeholder="Search projects..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className='w-full px-4 py-3 pl-11 bg-white border-2 border-gray-300 text-gray-800 placeholder-gray-500 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300 shadow-sm group-hover:border-gray-400 group-hover:shadow-md'
+              className="input-dark w-full"
+              style={{ paddingLeft: '44px' }}
             />
-            <svg className='absolute left-3 top-3.5 w-5 h-5 text-gray-500 group-hover:text-blue-500 transition-colors' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' />
-            </svg>
           </div>
 
           <Link
-            to='createproject'
-            className='px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-blue-300 hover:scale-105 active:scale-95 transition-all duration-300 inline-flex items-center justify-center gap-2 whitespace-nowrap'
+            to="createproject"
+            className="btn-primary flex items-center justify-center whitespace-nowrap text-sm"
+            style={{ gap: '8px', padding: '10px 24px', borderRadius: '12px' }}
           >
-            <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 4v16m8-8H4' />
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
             New Project
           </Link>
-        </div>
+        </motion.div>
 
-        {/* Loading */}
+        {/* ═══ Loading ═══ */}
         {loading && (
-          <div className='flex justify-center items-center py-32'>
-            <div className='animate-spin'>
-              <div className='w-16 h-16 border-4 border-gray-200 border-t-blue-600 rounded-full'></div>
-            </div>
+          <div className="flex justify-center items-center" style={{ padding: '120px 0' }}>
+            <div className="w-12 h-12 border-3 border-white/10 border-t-cyan-500 rounded-full animate-spin" />
           </div>
         )}
 
-        {/* Empty State */}
+        {/* ═══ Empty ═══ */}
         {!loading && filteredProjects.length === 0 && (
-          <div className='text-center py-32 animate-fadeIn'>
-            <div className='bg-gradient-to-b from-blue-50 to-purple-50 rounded-2xl p-12 border border-gray-200'>
-              <svg className='w-20 h-20 text-gray-400 mx-auto mb-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={1.5} d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' />
-              </svg>
-              <h3 className='text-2xl font-semibold text-gray-900 mb-2'>No projects found</h3>
-              <p className='text-gray-600 mb-8'>
-                {searchTerm ? 'Try adjusting your search terms' : 'Get started by creating your first project'}
-              </p>
-              {!searchTerm && (
-                <Link
-                  to='createproject'
-                  className='inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold'
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex flex-col items-center justify-center glass rounded-2xl text-center"
+            style={{ padding: '80px 20px' }}
+          >
+            <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.4 }}>📁</div>
+            <h3 className="text-lg font-bold text-white" style={{ marginBottom: '8px' }}>No projects found</h3>
+            <p className="text-slate-500 text-sm" style={{ marginBottom: '24px' }}>
+              {searchTerm ? 'Try adjusting your search' : 'Get started by creating your first project'}
+            </p>
+            {!searchTerm && (
+              <Link to="createproject" className="btn-primary text-sm">
+                Create Project
+              </Link>
+            )}
+          </motion.div>
+        )}
+
+        {/* ═══ Project Cards ═══ */}
+        {!loading && filteredProjects.length > 0 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {filteredProjects.map((project, index) => {
+              const gradient = avatarGradients[index % avatarGradients.length]
+              const initial = getInitial(project.title)
+
+              const sprintProgress = project.sprintProgress || null
+
+              return (
+                <motion.div
+                  key={project._id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: index * 0.06 }}
                 >
-                  Create Project
-                </Link>
-              )}
-            </div>
+                  <div
+                    className="group flex flex-col sm:flex-row items-stretch overflow-hidden"
+                    style={cardStyle}
+                    {...cardHoverHandlers}
+                  >
+
+                    {/* ── LEFT: Avatar + Project Info ── */}
+                    <div className="flex-1 min-w-0 flex flex-col sm:flex-row items-start sm:items-center p-6 gap-5">
+                      {/* Letter Avatar */}
+                      <div
+                        style={{
+                          flexShrink: 0,
+                          width: '56px',
+                          height: '56px',
+                          borderRadius: '16px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: '#fff',
+                          fontSize: '24px',
+                          fontWeight: 800,
+                          background: `linear-gradient(135deg, ${gradient.from}, ${gradient.to})`,
+                          boxShadow: `0 8px 24px ${gradient.from}33`,
+                          transition: 'transform 0.3s',
+                        }}
+                        className="group-hover:scale-105"
+                      >
+                        {initial}
+                      </div>
+
+                      {/* Text Content */}
+                      <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+
+                        {/* Project Title */}
+                        <h2
+                          className="group-hover:text-cyan-400 transition-colors"
+                          style={{
+                            fontSize: '18px',
+                            fontWeight: 800,
+                            color: '#f1f5f9',
+                            margin: 0,
+                            lineHeight: 1.3,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {project.title || 'Untitled Project'}
+                        </h2>
+
+                        {/* Status Badge + Description */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                          <span
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                              padding: '2px 10px',
+                              borderRadius: '6px',
+                              fontSize: '10px',
+                              fontWeight: 700,
+                              letterSpacing: '0.08em',
+                              textTransform: 'uppercase',
+                              background: project.status === 'Completed'
+                                ? 'rgba(6, 182, 212, 0.12)' : 'rgba(16, 185, 129, 0.1)',
+                              color: project.status === 'Completed'
+                                ? '#22d3ee' : '#34d399',
+                              border: `1px solid ${project.status === 'Completed'
+                                ? 'rgba(6, 182, 212, 0.25)' : 'rgba(16, 185, 129, 0.2)'}`,
+                              flexShrink: 0,
+                            }}
+                          >
+                            <span
+                              style={{
+                                width: '6px',
+                                height: '6px',
+                                borderRadius: '50%',
+                                background: project.status === 'Completed' ? '#06b6d4' : '#10b981',
+                                boxShadow: `0 0 8px ${project.status === 'Completed'
+                                  ? 'rgba(6,182,212,0.8)' : 'rgba(16,185,129,0.8)'}`,
+                              }}
+                            />
+                            {project.status || 'Active'}
+                          </span>
+
+                          <span
+                            style={{
+                              fontSize: '12px',
+                              fontWeight: 500,
+                              color: '#94a3b8',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                              maxWidth: '400px',
+                            }}
+                          >
+                            {project.description || 'No description provided'}
+                          </span>
+                        </div>
+
+
+                      </div>
+                    </div>
+
+                    {/* ── RIGHT: Action Buttons ── */}
+                    <div className="w-full sm:w-[220px] flex-shrink-0 flex flex-col justify-center gap-2.5 p-5 border-t sm:border-t-0 sm:border-l border-white/[0.04]">
+                      {/* Details + Edit */}
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <Link
+                          to={`details/${project._id}`}
+                          style={{
+                            ...btnDetailsStyle,
+                            flex: 1,
+                            textAlign: 'center',
+                            padding: '8px 0',
+                            borderRadius: '10px',
+                            fontWeight: 700,
+                            fontSize: '11px',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.1em',
+                            textDecoration: 'none',
+                            transition: 'all 0.2s',
+                          }}
+                        >
+                          Details
+                        </Link>
+                        <Link
+                          to={`edit/${project._id}`}
+                          style={{
+                            ...btnEditStyle,
+                            flex: 1,
+                            textAlign: 'center',
+                            padding: '8px 0',
+                            borderRadius: '10px',
+                            fontWeight: 700,
+                            fontSize: '11px',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.1em',
+                            textDecoration: 'none',
+                            transition: 'all 0.2s',
+                          }}
+                        >
+                          Edit
+                        </Link>
+                      </div>
+
+                      {/* Sprint */}
+                      {sprintProgress ? (
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '10px',
+                            padding: '8px 14px',
+                            borderRadius: '10px',
+                            background: 'rgba(6, 182, 212, 0.06)',
+                            border: '1px solid rgba(6, 182, 212, 0.15)',
+                          }}
+                        >
+                          <div style={{ flex: 1, height: '5px', borderRadius: '99px', background: 'rgba(255,255,255,0.06)' }}>
+                            <div
+                              style={{
+                                width: `${sprintProgress}%`,
+                                height: '100%',
+                                borderRadius: '99px',
+                                background: 'linear-gradient(90deg, #06b6d4, #22d3ee)',
+                                boxShadow: '0 0 8px rgba(6, 182, 212, 0.5)',
+                                transition: 'width 0.5s ease',
+                              }}
+                            />
+                          </div>
+                          <span style={{ fontSize: '11px', fontWeight: 700, color: '#22d3ee', whiteSpace: 'nowrap' }}>
+                            {sprintProgress}%
+                          </span>
+                        </div>
+                      ) : (
+                        <Link
+                          to={`sprint/${project._id}`}
+                          style={{
+                            ...btnSprintStyle,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '6px',
+                            padding: '8px 0',
+                            borderRadius: '10px',
+                            fontWeight: 700,
+                            fontSize: '11px',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.12em',
+                            textDecoration: 'none',
+                            transition: 'all 0.2s',
+                          }}
+                        >
+                          <span style={{ fontSize: '12px' }}>⚡</span>
+                          Sprint
+                        </Link>
+                      )}
+                    </div>
+
+                  </div>
+                </motion.div>
+              )
+            })}
           </div>
         )}
 
-        {/* Horizontal Cards */}
+        {/* ═══ Counter ═══ */}
         {!loading && filteredProjects.length > 0 && (
-          <div className='space-y-4'>
-            {filteredProjects.map((project, index) => (
-              <div
-                key={project._id}
-                className='animate-scaleIn'
-                style={{ animationDelay: `${index * 50}ms` }}
-              >
-                <div className='group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border-2 border-gray-200 hover:border-blue-300 hover:-translate-y-1 flex flex-col md:flex-row items-stretch relative'>
-                  
-                  {/* Left Icon Section */}
-                  <div className={`bg-gradient-to-br ${getGradientColor(index)} p-6 md:p-8 flex items-center justify-center min-w-fit md:min-w-[180px] group-hover:scale-105 transition-transform`}>
-                    <div className='text-center'>
-                      <div className='w-16 h-16 md:w-20 md:h-20 bg-white/30 rounded-2xl flex items-center justify-center mb-3 group-hover:bg-white/40 transition-all'>
-                        <svg className='w-8 h-8 md:w-10 md:h-10 text-white' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                          <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' />
-                        </svg>
-                      </div>
-                      <p className='text-white text-xs font-semibold opacity-95'>Project</p>
-                    </div>
-                  </div>
-
-                  {/* Middle Content */}
-                  <div className='flex-grow p-6 md:p-8 flex flex-col justify-between bg-gradient-to-br from-white to-gray-50'>
-                    <div>
-                      <h2 className='text-xl md:text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-2 group-hover:from-blue-600 group-hover:to-purple-600 transition-all truncate'>
-                        {project.title || 'Untitled Project'}
-                      </h2>
-                      <p className='text-gray-600 text-sm md:text-base line-clamp-2 group-hover:text-gray-700 transition-colors'>
-                        {project.description || 'No description provided'}
-                      </p>
-                    </div>
-                    <div className='flex gap-4 mt-4 text-xs md:text-sm text-gray-500'>
-                      <div className='flex items-center gap-2'>
-                        <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                          <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' />
-                        </svg>
-                        <span>Active</span>
-                      </div>
-                      <div className='flex items-center gap-2'>
-                        <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                          <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M13 10V3L4 14h7v7l9-11h-7z' />
-                        </svg>
-                        <span>Ready</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Right Actions */}
-                  <div className='px-6 md:px-8 py-4 md:py-8 flex md:flex-col gap-2 border-t md:border-t-0 md:border-l border-gray-200 group-hover:border-blue-200 bg-gradient-to-b md:bg-gradient-to-l from-gray-50 to-white transition-all'>
-                    <Link
-                      to={`details/${project._id}`}
-                      className='px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg font-semibold text-center text-sm transition-all active:scale-95 shadow-sm hover:shadow-md'
-                    >
-                      Details
-                    </Link>
-                    <Link
-                      to={`edit/${project._id}`}
-                      className='px-3 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg font-semibold text-center text-sm transition-all active:scale-95 shadow-sm hover:shadow-md'
-                    >
-                      Edit
-                    </Link>
-                    <Link
-                      to={`sprint/${project._id}`}
-                      className='px-3 py-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg font-semibold text-center text-sm transition-all active:scale-95 shadow-sm hover:shadow-md'
-                    >
-                      Sprint
-                    </Link>
-                  </div>
-
-                  {/* Top Border Animation */}
-                  <div className='absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Counter */}
-        {!loading && filteredProjects.length > 0 && (
-          <div className='mt-8 text-center text-gray-600 text-sm animate-fadeIn'>
-            Showing <span className='font-semibold text-gray-900'>{filteredProjects.length}</span> of <span className='font-semibold text-gray-900'>{projects.length}</span> projects
-          </div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            style={{ marginTop: '32px', textAlign: 'center', fontSize: '12px', color: '#475569' }}
+          >
+            Showing <span style={{ fontWeight: 700, color: '#94a3b8' }}>{filteredProjects.length}</span> of <span style={{ fontWeight: 700, color: '#94a3b8' }}>{projects.length}</span> projects
+          </motion.div>
         )}
       </div>
-
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        @keyframes slideUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        @keyframes scaleIn {
-          from {
-            opacity: 0;
-            transform: scale(0.95);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-        .animate-fadeIn { animation: fadeIn 0.6s ease-out; }
-        .animate-slideUp { animation: slideUp 0.6s ease-out; }
-        .animate-scaleIn { animation: scaleIn 0.4s ease-out forwards; opacity: 0; }
-        .line-clamp-2 {
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-        }
-      `}</style>
     </div>
   )
 }

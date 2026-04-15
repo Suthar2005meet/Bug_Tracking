@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { motion } from 'framer-motion';
 
 export const AddUser = () => {
     const navigate = useNavigate();
@@ -42,70 +43,73 @@ export const AddUser = () => {
     };
 
     return (
-        <div className='min-h-screen flex items-center justify-center bg-slate-50 p-6'>
-            <div className='bg-white p-10 rounded-3xl shadow-2xl w-full max-w-lg border border-gray-100'>
+        <div className="flex items-center justify-center py-8 px-4 relative">
+            <div className="pointer-events-none fixed inset-0 bg-mesh opacity-60" />
+
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="glass p-8 md:p-10 w-full max-w-lg relative z-10"
+            >
                 <div className="text-center mb-8">
-                    <h1 className='text-3xl font-black text-gray-800 tracking-tight'>New User Account</h1>
-                    <p className='text-gray-400 mt-2'>Set up credentials and assign a role.</p>
+                    <h1 className="text-2xl font-extrabold text-white tracking-tight">New User Account</h1>
+                    <p className="text-slate-500 mt-2 text-sm">Set up credentials and assign a role.</p>
                 </div>
                 
                 <form onSubmit={handleSubmit(submitHandle)} className="space-y-5">
                     
-                    {/* Name & Email Group */}
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                         <div className="relative">
-                            <User className="absolute left-3 top-9 text-gray-400" size={18} />
-                            <label className='block text-xs font-bold uppercase text-gray-500 mb-1 ml-1'>Full Name</label>
-                            <input type="text" className='w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all' placeholder='Jane Doe' {...register('name', { required: "Name is required" })} />
+                            <User className="absolute left-3 top-9 text-slate-600" size={18} />
+                            <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1 ml-1 tracking-widest">Full Name</label>
+                            <input type="text" className="input-dark pl-10" placeholder="Jane Doe" {...register('name', { required: "Name is required" })} />
                         </div>
 
                         <div className="relative">
-                            <Mail className="absolute left-3 top-9 text-gray-400" size={18} />
-                            <label className='block text-xs font-bold uppercase text-gray-500 mb-1 ml-1'>Email</label>
-                            <input type="email" className='w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none' placeholder='jane@company.com' {...register('email', { required: "Email is required" })} />
+                            <Mail className="absolute left-3 top-9 text-slate-600" size={18} />
+                            <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1 ml-1 tracking-widest">Email</label>
+                            <input type="email" className="input-dark pl-10" placeholder="jane@company.com" {...register('email', { required: "Email is required" })} />
                         </div>
                     </div>
 
-                    {/* Password Field */}
                     <div className="relative">
-                        <Lock className="absolute left-3 top-9 text-gray-400" size={18} />
-                        <label className='block text-xs font-bold uppercase text-gray-500 mb-1 ml-1'>Password</label>
+                        <Lock className="absolute left-3 top-9 text-slate-600" size={18} />
+                        <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1 ml-1 tracking-widest">Password</label>
                         <input 
                             type={showPassword ? "text" : "password"} 
-                            className={`w-full pl-10 pr-12 py-3 bg-gray-50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none ${errors.password ? 'border-red-400' : 'border-gray-200'}`}
-                            placeholder='••••••••' 
+                            className={`input-dark pl-10 pr-12 ${errors.password ? 'border-red-500/40' : ''}`}
+                            placeholder="••••••••" 
                             {...register('password', passwordValidation)} 
                         />
-                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-9 text-gray-400 hover:text-blue-600">
+                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-9 text-slate-600 hover:text-cyan-400 transition-colors">
                             {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                         </button>
-                        {errors.password && <p className="text-red-500 text-[10px] mt-1 font-medium">{errors.password.message}</p>}
+                        {errors.password && <p className="text-red-400 text-[10px] mt-1 font-medium">{errors.password.message}</p>}
                     </div>
 
-                    {/* Confirm Password Field */}
                     <div className="relative">
-                        <ShieldCheck className="absolute left-3 top-9 text-gray-400" size={18} />
-                        <label className='block text-xs font-bold uppercase text-gray-500 mb-1 ml-1'>Confirm Password</label>
+                        <ShieldCheck className="absolute left-3 top-9 text-slate-600" size={18} />
+                        <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1 ml-1 tracking-widest">Confirm Password</label>
                         <input 
                             type="password" 
-                            className={`w-full pl-10 pr-4 py-3 bg-gray-50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none ${errors.confirmpassword ? 'border-red-400' : 'border-gray-200'}`}
-                            placeholder='Repeat password' 
+                            className={`input-dark pl-10 ${errors.confirmpassword ? 'border-red-500/40' : ''}`}
+                            placeholder="Repeat password" 
                             {...register('confirmpassword', { 
                                 required: "Please confirm your password",
                                 validate: (value) => value === password || "Passwords do not match"
                             })} 
                         />
-                        {errors.confirmpassword && <p className="text-red-500 text-[10px] mt-1 font-medium">{errors.confirmpassword.message}</p>}
+                        {errors.confirmpassword && <p className="text-red-400 text-[10px] mt-1 font-medium">{errors.confirmpassword.message}</p>}
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className='block text-xs font-bold uppercase text-gray-500 mb-1 ml-1'>Mobile</label>
-                            <input type="text" className='w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500' {...register('mobileno')} />
+                            <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1 ml-1 tracking-widest">Mobile</label>
+                            <input type="text" className="input-dark" {...register('mobileno')} />
                         </div>
                         <div>
-                            <label className='block text-xs font-bold uppercase text-gray-500 mb-1 ml-1'>Role</label>
-                            <select className='w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500' {...register('role', { required: "Select a role" })}>
+                            <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1 ml-1 tracking-widest">Role</label>
+                            <select className="input-dark" {...register('role', { required: "Select a role" })}>
                                 <option value="">Select...</option>
                                 <option value="ProjectManager">PM</option>
                                 <option value="Developer">Developer</option>
@@ -114,11 +118,11 @@ export const AddUser = () => {
                         </div>
                     </div>
 
-                    <button type="submit" className='w-full bg-slate-900 hover:bg-black text-white font-bold py-4 rounded-xl shadow-xl transition-all active:scale-[0.98] mt-4'>
+                    <button type="submit" className="btn-primary w-full py-3.5 text-sm font-bold mt-4">
                         Create Account
                     </button>
                 </form>
-            </div>
+            </motion.div>
         </div>
     );
 };
