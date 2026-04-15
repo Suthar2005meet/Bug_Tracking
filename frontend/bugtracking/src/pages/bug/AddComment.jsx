@@ -20,7 +20,7 @@ export const AddComment = () => {
 
   const getData = async () => {
     try {
-      const res = await axios.get(`/bug/${id}`);
+      const res = await axios.get(`/bug/bug/${id}`);
       setBug(res.data.data);
     } catch (err) {
       console.log("Bug Fetch Error:", err);

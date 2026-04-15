@@ -276,7 +276,7 @@ const Dashboard = () => {
                   <ChartCard><BugsStatusChart data={bugsStatusData} /></ChartCard>
                 </>
               }
-              side={<NotificationPanel notifications={notifications} />}
+              side={<ActivityPanel activity={recentActivity} />}
             />
           </motion.div>
         )}
@@ -295,7 +295,7 @@ const Dashboard = () => {
                   <ChartCard><BugsPriorityChart data={bugsPriorityData} /></ChartCard>
                 </>
               }
-              side={<NotificationPanel notifications={notifications} />}
+              side={<ActivityPanel activity={recentActivity} />}
             />
           </motion.div>
         )}
