@@ -95,6 +95,7 @@ const Dashboard = () => {
   const { id } = useParams();
   const { userId, role: authRole } = useContext(AuthContext);
   const [dashboard, setDashboard] = useState(null);
+  const [personalActivity, setPersonalActivity] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const dashboardUserId = id || userId;
@@ -135,6 +136,19 @@ const Dashboard = () => {
 
         if (!data) throw new Error("No dashboard data received");
         setDashboard(data);
+
+        // Fetch personal activity specifically for Developer and Tester
+        const normRole = normalizeRole(data?.meta?.role || authRole);
+        if ((normRole === "developer" || normRole === "tester") && userId) {
+          try {
+            const personalRes = await axios.get(`/dashboard/user-activity/${userId}`);
+            if (personalRes.data.success) {
+              setPersonalActivity(personalRes.data.activities);
+            }
+          } catch (err) {
+            console.error("Personal activity fetch error:", err);
+          }
+        }
       } catch (err) {
         console.error("Dashboard fetch error:", err);
         setDashboard(null);
@@ -276,7 +290,7 @@ const Dashboard = () => {
                   <ChartCard><BugsStatusChart data={bugsStatusData} /></ChartCard>
                 </>
               }
-              side={<ActivityPanel activity={recentActivity} />}
+              side={<ActivityPanel title="My Personal Activity" activity={personalActivity} />}
             />
           </motion.div>
         )}
@@ -295,7 +309,7 @@ const Dashboard = () => {
                   <ChartCard><BugsPriorityChart data={bugsPriorityData} /></ChartCard>
                 </>
               }
-              side={<ActivityPanel activity={recentActivity} />}
+              side={<ActivityPanel title="My Personal Activity" activity={personalActivity} />}
             />
           </motion.div>
         )}
@@ -374,12 +388,12 @@ const KpiCard = ({ icon, label, value, color }) => {
 
 // ─── Side Panels ──────────────────────────────────────────────────────────────
 
-const ActivityPanel = ({ activity = [] }) => (
+const ActivityPanel = ({ title = "Recent Activity", activity = [] }) => (
   <div className="bg-[#0f172a]/95 border border-white/[0.06] rounded-[24px] overflow-hidden flex flex-col group transition-all duration-500 hover:border-emerald-500/20 shadow-2xl">
     <div className="flex items-center gap-3 px-6 py-5 border-b border-white/[0.06] bg-white/[0.02]">
       <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)]" />
       <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-200 m-0 flex-1">
-        Recent Activity
+        {title}
       </h3>
     </div>
     <div className="overflow-y-auto max-h-[500px] p-2 no-scrollbar">

@@ -4,10 +4,20 @@ const NotificationModel = require('../Models/NotificationModel');
 const getUserNotifications = async (req, resp) => {
     try {
         const { id } = req.params;
+        const mongoose = require('mongoose');
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return resp.status(400).json({
+                success: false,
+                message: "Invalid User ID format"
+            });
+        }
+
         const notifications = await NotificationModel.find({ receiver: id })
             .populate('sender', 'name email')
             .populate('bug', 'title')
-            .populate('project', 'name')
+            .populate('task', 'title status')
+            .populate('project', 'title')
             .sort({ createdAt: -1 });
 
         resp.json({

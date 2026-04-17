@@ -131,7 +131,7 @@ export const BugDetails = () => {
               <div className="border-t border-white/[0.04] pt-4">
                 <h4 className="text-[10px] text-slate-600 uppercase mb-2 font-bold tracking-widest">Assigned Developers</h4>
                 <div className="space-y-2">
-                  {bug.projectId?.assignedDevelopers?.map((dev) => (
+                  {bug.assignedId?.map((dev) => (
                     <div key={dev._id} className="flex items-center gap-3 bg-white/[0.03] p-2 rounded-lg border border-white/[0.04]">
                       <img src={dev.image} alt={dev.name} className="w-6 h-6 rounded-full border border-cyan-500/30" />
                       <div>
@@ -146,7 +146,7 @@ export const BugDetails = () => {
 
             <div className="glass p-5">
               <h3 className="text-[10px] font-bold text-slate-500 uppercase mb-3 tracking-widest">Assigned Tester</h3>
-              {bug.projectId?.assignedTester?.map((tester) => (
+              {bug.reportedBy.map((tester) => (
                 <div key={tester._id} className="flex items-center gap-2">
                   <span className="w-2 h-2 bg-emerald-500 rounded-full"></span>
                   <span className="text-sm text-slate-400">{tester.name}</span>
@@ -157,7 +157,7 @@ export const BugDetails = () => {
         </motion.div>
 
         {/* Full Screenshot */}
-        {bug.image && (
+        {/* {bug.image && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -167,7 +167,7 @@ export const BugDetails = () => {
             <h3 className="text-[10px] font-bold text-slate-500 uppercase mb-4 tracking-widest text-center">Visual Evidence</h3>
             <img src={bug.image} alt="Full evidence" className="w-full rounded-lg border border-white/[0.06]" />
           </motion.div>
-        )}
+        )} */}
       </div>
     </div>
   );

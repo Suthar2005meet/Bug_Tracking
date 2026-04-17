@@ -9,6 +9,7 @@ import { motion } from 'framer-motion';
 export const AddUser = () => {
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
     
     const { register, handleSubmit, watch, formState: { errors } } = useForm();
     
@@ -19,6 +20,7 @@ export const AddUser = () => {
         // DELETE confirmpassword so it is NOT sent to the backend
         const { confirmpassword, ...backendData } = data;
 
+        setLoading(true);
         try {
             console.log(backendData)
             const res = await axios.post("/user/create", backendData)
@@ -30,6 +32,8 @@ export const AddUser = () => {
             }
         } catch (err) {
             toast.error(err.response?.data?.message || "Registration failed");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -118,8 +122,8 @@ export const AddUser = () => {
                         </div>
                     </div>
 
-                    <button type="submit" className="btn-primary w-full py-3.5 text-sm font-bold mt-4">
-                        Create Account
+                    <button type="submit" disabled={loading} className={`btn-primary w-full py-3.5 text-sm font-bold mt-4 flex items-center justify-center gap-2 ${loading ? 'opacity-60 cursor-not-allowed' : ''}`}>
+                        {loading ? (<><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Processing...</>) : 'Create Account'}
                     </button>
                 </form>
             </motion.div>

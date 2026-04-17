@@ -209,11 +209,7 @@ const getBugById = async(req,resp) => {
             { path: "assignedId" },
             {
                 path: "taskId",
-                populate: { path: "projectId", populate: { path: "members" } }
-            },
-            {
-                path: "projectId",
-                populate: { path: "members" }
+                populate: { path: "projectId" }
             }
         ]);
 
@@ -394,7 +390,7 @@ const updateBugStatus = async (req, resp) => {
             user: updatedBy,
             action: "BUG_STATUS_CHANGED",
             bug: bug._id,
-            task: bug.projectId
+            project: bug.projectId
         });
 
         // 🔔 Notify Reporter
@@ -404,7 +400,7 @@ const updateBugStatus = async (req, resp) => {
                 sender: updatedBy,
                 type: "BUG_STATUS_CHANGED",
                 bug: bug._id,
-                task: bug.projectId,
+                project: bug.projectId,
                 message: `Bug status changed to ${status}`
             }));
 

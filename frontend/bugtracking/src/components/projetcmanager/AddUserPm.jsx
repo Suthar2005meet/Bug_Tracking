@@ -67,6 +67,7 @@ const AddUserPm = () => {
   const [search, setSearch] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   const fetchUsers = async () => {
     try {
@@ -103,14 +104,16 @@ const AddUserPm = () => {
   };
 
   const handleUpdate = async () => {
+    setSaving(true);
     try {
-      await axios.post("/usermanage/save-team", { users: selectedUsers });
-      const newTeam = users.filter((user) => selectedUsers.includes(user._id));
-      setTeamDetails(newTeam);
+      const res = await axios.post("/usermanage/save-team", { users: selectedUsers });
+      setTeamDetails(res.data.team.users);
       setShowModal(false);
       toast.success("Team updated successfully!");
     } catch (err) {
       toast.error("Could not save team changes.");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -205,7 +208,9 @@ const AddUserPm = () => {
 
                <div className="p-6 bg-white/[0.02] border-t border-white/5 flex justify-end gap-3">
                   <button onClick={() => setShowModal(false)} className="text-slate-500 font-bold uppercase text-[10px] px-4">Cancel</button>
-                  <button onClick={handleUpdate} className="bg-cyan-500 text-[#060912] px-6 py-2.5 rounded-lg font-black uppercase text-[10px]">Deploy Team</button>
+                  <button type="button" onClick={handleUpdate} disabled={saving} className={`px-6 py-2.5 rounded-lg font-black uppercase text-[10px] flex items-center justify-center gap-2 transition-all ${saving ? 'bg-cyan-500/60 cursor-not-allowed' : 'bg-cyan-500 hover:bg-cyan-400'} text-[#060912]`}>
+                    {saving ? (<><div className="w-3.5 h-3.5 border-2 border-[#060912]/30 border-t-[#060912] rounded-full animate-spin" />Processing...</>) : 'Deploy Team'}
+                  </button>
                </div>
             </motion.div>
           </div>

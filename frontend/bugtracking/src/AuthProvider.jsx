@@ -63,12 +63,14 @@ import { getCanonicalRole } from "./utils/roles";
             
             localStorage.setItem("userId", userId);
             localStorage.setItem("role", role);
+            localStorage.setItem("name", decoded.name);
             console.log('💾 Saved to localStorage:', { userId, role });
             console.log('🔍 Verify localStorage userId:', localStorage.getItem('userId'));
             
             setToken(newToken);
             setUserId(userId);
             setRole(role);
+            setname(decoded.name);
         } catch (err) {
             console.error('❌ JWT decode failed:', err);
             localStorage.removeItem('token');
@@ -80,10 +82,12 @@ import { getCanonicalRole } from "./utils/roles";
         localStorage.removeItem("token");
         localStorage.removeItem("userId");
         localStorage.removeItem("role");
+        localStorage.removeItem("name");
 
         setToken(null);
         setUserId(null);
         setRole(null);
+        setname(null);
     };
 
     return (

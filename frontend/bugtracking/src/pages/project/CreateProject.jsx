@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -10,41 +10,20 @@ export const CreateProject = () => {
   const { name, userId } = useContext(AuthContext)
   const navigate = useNavigate();
   const { register, handleSubmit, formState: { errors } } = useForm();
-  const [developer, setdeveloper] = useState([]);
-
-  const getDeveloper = async () => {
-    try {
-      const res = await axios.get('/user/developer');
-      console.log(res.data.data);
-      setdeveloper(res.data.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    getDeveloper();
-  }, []);
+  const [loading, setLoading] = useState(false)
 
   const submitHandle = async (data) => {
+    setLoading(true);
     try {
       const formData = new FormData();
       formData.append("title", data.title);
       formData.append("description", data.description);
-      formData.append("createdBy", data.createdBy);
+      formData.append("createdBy", userId);
       formData.append("priority", data.priority);
-      formData.append("status", data.status);
+      formData.append("status", data.status || "Pending");
       formData.append("startDate", data.startDate);
       formData.append("dueDate", data.dueDate);
-
-      if (data.assignedMembers) {
-        data.assignedMembers.forEach((member) => {
-          formData.append("assignedMembers", member);
-        });
-      }
-
       formData.append("document", data.document[0]);
-      console.log(data);
 
       const res = await axios.post("/project/create", formData, {
         headers: { "Content-Type": "multipart/form-data" }
@@ -52,11 +31,12 @@ export const CreateProject = () => {
       if (res.status === 201) {
         toast.success("Project created successfully!");
         navigate(-1);
-        console.log(formData)
       }
     } catch (error) {
       console.log(error);
       toast.error("Failed to create project.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -109,7 +89,6 @@ export const CreateProject = () => {
               Created By
             </p>
             <span className="px-3 py-1.5 text-sm bg-cyan-500/10 text-cyan-400 rounded-full border border-cyan-500/20 font-semibold">{name}</span>
-            <input type="hidden" {...register('createdBy')} value={userId} />
           </div>
 
           {/* Description */}
@@ -144,9 +123,8 @@ export const CreateProject = () => {
             <div className="glass p-5">
               <label className="block text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-2">Status</label>
               <select {...register("status")} className="input-dark">
-                <option value="">-- Select Status --</option>
-                <option value="Working">In Progress</option>
                 <option value="Pending">Pending</option>
+                <option value="In Progress">In Progress</option>
                 <option value="Completed">Completed</option>
               </select>
             </div>
@@ -190,9 +168,10 @@ export const CreateProject = () => {
             </button>
             <button
               type="submit"
-              className="btn-primary flex-1 py-3 text-xs uppercase tracking-widest font-bold"
+              disabled={loading}
+              className={`btn-primary flex-1 py-3 text-xs uppercase tracking-widest font-bold flex items-center justify-center gap-2 ${loading ? 'opacity-60 cursor-not-allowed' : ''}`}
             >
-              Create Project
+              {loading ? (<><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Processing...</>) : 'Create Project'}
             </button>
           </div>
         </form>

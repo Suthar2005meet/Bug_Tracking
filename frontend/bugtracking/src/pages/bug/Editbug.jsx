@@ -16,6 +16,7 @@ export const Editbug = () => {
   const [reported, setReported] = useState([]);
   const [developer, setDeveloper] = useState([]);
   const [bug, setBug] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const { register, handleSubmit, reset, setValue } = useForm();
 
@@ -30,6 +31,7 @@ export const Editbug = () => {
   };
 
   const submitHandle = async (data) => {
+    setLoading(true);
     try {
       const res = await axios.put(`/bug/update/${id}`, data);
       if (res.status == 200) {
@@ -39,6 +41,8 @@ export const Editbug = () => {
     } catch (error) {
       console.log(error);
       toast.error(error.response?.data?.message || "Update failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -191,7 +195,9 @@ export const Editbug = () => {
 
           <div className="flex gap-3">
             <button type="button" onClick={() => navigate(-1)} className="btn-ghost flex-1 py-3 text-xs uppercase tracking-widest">Cancel</button>
-            <button type="submit" className="btn-primary flex-1 py-3 text-xs uppercase tracking-widest font-bold">Update Bug</button>
+            <button type="submit" disabled={loading} className={`btn-primary flex-1 py-3 text-xs uppercase tracking-widest font-bold flex items-center justify-center gap-2 ${loading ? 'opacity-60 cursor-not-allowed' : ''}`}>
+              {loading ? (<><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Processing...</>) : 'Update Bug'}
+            </button>
           </div>
         </form>
       </motion.div>

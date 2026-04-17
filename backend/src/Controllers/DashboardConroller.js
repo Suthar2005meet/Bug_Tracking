@@ -258,4 +258,31 @@ const getDashboardData = async (req, res) => {
     }
 };
 
-module.exports = { getDashboardData };
+const getUserActivity = async (req, res) => {
+    try {
+        const userId = req.params.id;
+        const objectId = toObjectId(userId);
+        if (!objectId) {
+            return res.status(400).json({ success: false, message: "Invalid user ID" });
+        }
+        
+        const activities = await Activity.find({ user: objectId })
+            .populate("user", "name role")
+            .sort({ createdAt: -1 })
+            .limit(50);
+            
+        return res.json({
+            success: true,
+            activities
+        });
+    } catch (error) {
+        console.error("getUserActivity Error:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+            error: error.message
+        });
+    }
+};
+
+module.exports = { getDashboardData, getUserActivity };

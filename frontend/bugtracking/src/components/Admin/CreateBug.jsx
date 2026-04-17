@@ -18,6 +18,7 @@ export const CreateBug = () => {
 
   const [taskData, setTaskData] = useState(null);
   const [user, setuser] = useState([]);
+  const [submitting, setSubmitting] = useState(false);
 
   const {
     register,
@@ -50,6 +51,7 @@ export const CreateBug = () => {
   };
 
   const onSubmit = async (data) => {
+    setSubmitting(true);
     try {
       const formData = new FormData();
       formData.append("title", data.title);
@@ -77,6 +79,8 @@ export const CreateBug = () => {
     } catch (err) {
       console.log(err.response?.data || err.message);
       toast.error("Error creating bug");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -196,7 +200,9 @@ export const CreateBug = () => {
             {/* Buttons */}
             <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/[0.04]">
               <button type="button" onClick={() => navigate(-1)} className="btn-ghost text-sm">Cancel</button>
-              <button type="submit" className="btn-primary text-sm">Create Bug Report</button>
+              <button type="submit" disabled={submitting} className={`btn-primary text-sm flex items-center justify-center gap-2 ${submitting ? 'opacity-60 cursor-not-allowed' : ''}`}>
+                {submitting ? (<><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Processing...</>) : 'Create Bug Report'}
+              </button>
             </div>
           </form>
         </div>

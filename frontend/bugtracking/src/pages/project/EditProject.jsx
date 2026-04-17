@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 export const EditProject = () => {
   const { register, handleSubmit, reset } = useForm();
   const [developer, setdeveloper] = useState([]);
+  const [loading, setLoading] = useState(false);
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -32,12 +33,15 @@ export const EditProject = () => {
   };
 
   const submitHandle = async (data) => {
+    setLoading(true);
     try {
       const res = await axios.put(`/project/update/${id}`, data);
       navigate(-1);
       toast.success("Update Data Successfully");
     } catch (err) {
       console.log(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -129,7 +133,9 @@ export const EditProject = () => {
 
           <div className="flex gap-3">
             <button type="button" onClick={() => navigate(-1)} className="btn-ghost flex-1 py-3 text-xs uppercase tracking-widest">Cancel</button>
-            <button type="submit" className="btn-primary flex-1 py-3 text-xs uppercase tracking-widest font-bold">Update Project</button>
+            <button type="submit" disabled={loading} className={`btn-primary flex-1 py-3 text-xs uppercase tracking-widest font-bold flex items-center justify-center gap-2 ${loading ? 'opacity-60 cursor-not-allowed' : ''}`}>
+              {loading ? (<><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Processing...</>) : 'Update Project'}
+            </button>
           </div>
         </form>
       </motion.div>

@@ -185,7 +185,7 @@ export const ProjectDetails = () => {
             </span>
           </div>
 
-          <div className="space-y-4">
+          {/* <div className="space-y-4">
             {project.members && project.members.length > 0 ? (
               project.members.map((member, i) => (
                 <div key={member._id} className="group flex items-center gap-3 p-3 bg-white/[0.02] hover:bg-white/[0.05] border border-white/[0.04] rounded-2xl transition-all">
@@ -203,7 +203,7 @@ export const ProjectDetails = () => {
                 <p className="text-[10px] font-black uppercase tracking-widest">No active members</p>
               </div>
             )}
-          </div>
+          </div> */}
 
           <div className="mt-8 pt-8 border-t border-white/[0.04]">
             <div className="flex items-center gap-3 text-emerald-400 mb-2">

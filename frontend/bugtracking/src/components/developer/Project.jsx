@@ -8,6 +8,7 @@ export const Project = () => {
   const { userId } = useContext(AuthContext);
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(null);
 
   const getProjectsByUser = async () => {
     try {
@@ -22,6 +23,7 @@ export const Project = () => {
   };
 
   const handleStartTesting = async (projectId) => {
+    setActionLoading(projectId);
     try {
       await axios.put(`/project/testing/${projectId}`);
       setProjects((prevProjects) =>
@@ -31,6 +33,8 @@ export const Project = () => {
       );
     } catch (error) {
       console.log("Error updating project:", error);
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -194,15 +198,18 @@ export const Project = () => {
 
                       <button
                         onClick={() => handleStartTesting(project._id)}
-                        disabled={project.inTesting}
+                        disabled={project.inTesting || actionLoading === project._id}
                         style={{
                           ...btnBaseStyle,
                           ...(project.inTesting
                             ? { background: 'rgba(255,255,255,0.03)', color: '#64748b', border: '1px solid rgba(255,255,255,0.1)', cursor: 'not-allowed', opacity: 0.5 }
-                            : btnSprintStyle),
+                            : actionLoading === project._id
+                              ? { ...btnSprintStyle, opacity: 0.6, cursor: 'not-allowed' }
+                              : btnSprintStyle),
+                          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
                         }}
                       >
-                        {project.inTesting ? '✓ In Testing' : '🚀 Go To Testing'}
+                        {project.inTesting ? '✓ In Testing' : actionLoading === project._id ? (<><div style={{width:'14px',height:'14px',border:'2px solid rgba(255,255,255,0.3)',borderTop:'2px solid #fff',borderRadius:'50%',animation:'spin 1s linear infinite'}} />Processing...</>) : '🚀 Go To Testing'}
                       </button>
                     </div>
                   </div>

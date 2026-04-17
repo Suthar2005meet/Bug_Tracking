@@ -99,8 +99,8 @@ export const SprintProject = () => {
   const getStatusColor = (status) => {
     const map = {
       "Open": "bg-amber-500/15 text-amber-400 border-amber-500/20",
-      "In Progress": "bg-cyan-500/15 text-cyan-400 border-cyan-500/20",
-      "In Testing": "bg-violet-500/15 text-violet-400 border-violet-500/20",
+      "In-Progress": "bg-cyan-500/15 text-cyan-400 border-cyan-500/20",
+      "In-Testing": "bg-violet-500/15 text-violet-400 border-violet-500/20",
       "Resolved": "bg-emerald-500/15 text-emerald-400 border-emerald-500/20",
       "Closed": "bg-white/[0.06] text-slate-400 border-white/[0.08]",
       "Re-Open": "bg-orange-500/15 text-orange-400 border-orange-500/20",
@@ -116,7 +116,7 @@ export const SprintProject = () => {
     "In-Testing": tasks.filter((t) => t.status === "In Testing").length,
     "Resolved": tasks.filter((t) => t.status === "Resolved").length,
     "Closed": tasks.filter((t) => t.status === "Closed").length,
-    "Re-Open": tasks.filter((t) => t.status === "Re-Open").length,
+    "Re-Open": tasks.filter((t) => t.status === "Re Open").length,
   });
 
   const getPriorityColor = (priority) => {
@@ -202,7 +202,7 @@ export const SprintProject = () => {
                             const count = getStatusStats(tasks)[status];
                             return (
                               <div key={status} className={`flex flex-col items-center py-1.5 px-1 rounded-lg border text-xs ${statusStatColors[status]}`}>
-                                <span className="font-medium opacity-80">{status.split("-")[0]}</span>
+                                <span className="font-medium opacity-80 text-[10px] text-center px-1">{status.replace("-", " ")}</span>
                                 <span className="text-sm font-bold">{count}</span>
                               </div>
                             );
@@ -302,7 +302,9 @@ export const SprintProject = () => {
                                   <div className="mt-2 lg:mt-0 pt-4 border-t border-white/[0.04] lg:pt-0 lg:border-t-0 flex items-center justify-end lg:justify-start gap-2 min-w-0">
                                     {editingTask === task._id ? (
                                         <>
-                                          <button onClick={() => updateTask(task._id)} disabled={loading} className="inline-flex hover:scale-105 shrink-0 items-center justify-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-300 hover:to-teal-400 text-white rounded-full font-bold text-[10px] uppercase tracking-widest transition-all shadow-lg shadow-emerald-500/30 border-0"><Save size={12} /> Save</button>
+                                          <button onClick={() => updateTask(task._id)} disabled={loading} className={`inline-flex hover:scale-105 shrink-0 items-center justify-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-300 hover:to-teal-400 text-white rounded-full font-bold text-[10px] uppercase tracking-widest transition-all shadow-lg shadow-emerald-500/30 border-0 ${loading ? 'opacity-60 cursor-not-allowed hover:scale-100' : ''}`}>
+                                            {loading ? (<><div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />Processing...</>) : (<><Save size={12} /> Save</>)}
+                                          </button>
                                           <button onClick={() => { setEditingTask(null); setEditValues({}); }} className="inline-flex hover:scale-110 shrink-0 items-center justify-center p-1.5 bg-white/[0.04] hover:bg-white/[0.08] text-slate-400 hover:text-white transition-all rounded-full border border-white/[0.06]"><X size={12} /></button>
                                         </>
                                       ) : (

@@ -12,6 +12,7 @@ export const Task = () => {
   const [user, setuser] = useState([])
   const [selectedTester, setSelectedTester] = useState({});
   const [loading, setLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState(null);
 
   const getIssues = async () => {
     try {
@@ -34,13 +35,13 @@ export const Task = () => {
 
   const startProgress = async (issueId) => {
     try {
-      setLoading(true);
+      setActionLoading(`${issueId}-start`);
       await axios.put(`/issue/update/${issueId}`, { status: "In Progress" });
       getIssues();
     } catch (err) {
       console.log(err);
     } finally {
-      setLoading(false);
+      setActionLoading(null);
     }
   };
 
@@ -50,14 +51,14 @@ export const Task = () => {
         toast.warning("Please select tester");
         return;
       }
-      setLoading(true);
+      setActionLoading(`${issueId}-test`);
       await axios.put(`/issue/adduser/${issueId}`, { assigned: selectedTester[issueId] });
       await axios.put(`/issue/update/${issueId}`, { status: "In Testing" });
       getIssues();
     } catch (err) {
       console.log(err);
     } finally {
-      setLoading(false);
+      setActionLoading(null);
     }
   };
 
@@ -213,11 +214,13 @@ export const Task = () => {
                             background: 'linear-gradient(90deg, rgba(20, 83, 78, 0.8), rgba(20, 184, 166, 0.5))',
                             color: '#fff', border: '1px solid rgba(20, 184, 166, 0.3)',
                             boxShadow: '0 0 20px rgba(20, 184, 166, 0.12)',
+                            opacity: actionLoading === `${issue._id}-start` ? 0.6 : 1,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
                           }}
                           onClick={() => startProgress(issue._id)}
-                          disabled={loading}
+                          disabled={!!actionLoading}
                         >
-                          {issue.status === "Open" ? "▶ Start" : "🔄 Restart"}
+                          {actionLoading === `${issue._id}-start` ? (<><div style={{width:'14px',height:'14px',border:'2px solid rgba(255,255,255,0.3)',borderTop:'2px solid #fff',borderRadius:'50%',animation:'spin 1s linear infinite'}} />Processing...</>) : (issue.status === "Open" ? "▶ Start" : "🔄 Restart")}
                         </button>
                       )}
 
@@ -244,12 +247,13 @@ export const Task = () => {
                               background: 'linear-gradient(135deg, #4338ca, #7c3aed)',
                               color: '#fff', border: '1px solid rgba(124, 58, 237, 0.3)',
                               boxShadow: '0 4px 16px rgba(124, 58, 237, 0.25)',
-                              opacity: (!selectedTester[issue._id] || loading) ? 0.5 : 1,
+                              opacity: (!selectedTester[issue._id] || actionLoading === `${issue._id}-test`) ? 0.5 : 1,
+                              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
                             }}
                             onClick={() => addTester(issue._id)}
-                            disabled={!selectedTester[issue._id] || loading}
+                            disabled={!selectedTester[issue._id] || !!actionLoading}
                           >
-                            🧪 To Test
+                            {actionLoading === `${issue._id}-test` ? (<><div style={{width:'14px',height:'14px',border:'2px solid rgba(255,255,255,0.3)',borderTop:'2px solid #fff',borderRadius:'50%',animation:'spin 1s linear infinite'}} />Processing...</>) : '🧪 To Test'}
                           </button>
                         </>
                       )}

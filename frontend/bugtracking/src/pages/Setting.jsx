@@ -204,9 +204,9 @@ export const Setting = () => {
                     <button
                         type="submit"
                         disabled={loading}
-                        className={`btn-primary w-full py-3.5 text-sm font-bold ${loading ? "opacity-60 cursor-not-allowed" : ""}`}
+                        className={`btn-primary w-full py-3.5 text-sm font-bold flex items-center justify-center gap-2 ${loading ? "opacity-60 cursor-not-allowed" : ""}`}
                     >
-                        {loading ? "Updating..." : "Update Profile"}
+                        {loading ? (<><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Processing...</>) : "Update Profile"}
                     </button>
                 </form>
             </motion.div>

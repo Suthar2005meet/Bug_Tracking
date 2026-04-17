@@ -9,6 +9,7 @@ export const Bug = () => {
   const { userId, role } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
   const [bugList, setBugList] = useState([]);
+  const [actionLoading, setActionLoading] = useState(null);
   const isDeveloper = hasRole(role, "Developer");
   const isTester = hasRole(role, "Tester");
 
@@ -25,11 +26,14 @@ export const Bug = () => {
   };
 
   const updateBugStatus = async (bugId, newStatus) => {
+    setActionLoading(`${bugId}-${newStatus}`);
     try {
       await axios.put(`/bug/status/${bugId}`, { status: newStatus, updatedBy: userId });
       fetchUserBugs();
     } catch (error) {
       console.error("Status update failed:", error);
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -217,14 +221,17 @@ export const Bug = () => {
                       {isDeveloper && (bug.status === "Open" || bug.status === "Re-Open") && (
                         <button
                           onClick={() => updateBugStatus(bug._id, "In Progress")}
+                          disabled={actionLoading === `${bug._id}-In Progress`}
                           style={{
                             ...btnBaseStyle, width: '100%',
                             background: 'linear-gradient(135deg, #1d4ed8, #3b82f6)',
                             color: '#fff', border: '1px solid rgba(59, 130, 246, 0.3)',
                             boxShadow: '0 4px 16px rgba(59, 130, 246, 0.25)',
+                            opacity: actionLoading === `${bug._id}-In Progress` ? 0.6 : 1,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
                           }}
                         >
-                          {bug.status === "Open" ? "▶ Start Working" : "🔄 Restart Working"}
+                          {actionLoading === `${bug._id}-In Progress` ? (<><div style={{width:'14px',height:'14px',border:'2px solid rgba(255,255,255,0.3)',borderTop:'2px solid #fff',borderRadius:'50%',animation:'spin 1s linear infinite'}} />Processing...</>) : (bug.status === "Open" ? "▶ Start Working" : "🔄 Restart Working")}
                         </button>
                       )}
 
@@ -232,14 +239,17 @@ export const Bug = () => {
                       {isDeveloper && bug.status === "In Progress" && (
                         <button
                           onClick={() => updateBugStatus(bug._id, "In Testing")}
+                          disabled={actionLoading === `${bug._id}-In Testing`}
                           style={{
                             ...btnBaseStyle, width: '100%',
                             background: 'linear-gradient(135deg, #4338ca, #7c3aed)',
                             color: '#fff', border: '1px solid rgba(124, 58, 237, 0.3)',
                             boxShadow: '0 4px 16px rgba(124, 58, 237, 0.25)',
+                            opacity: actionLoading === `${bug._id}-In Testing` ? 0.6 : 1,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
                           }}
                         >
-                          🧪 Ready for Testing
+                          {actionLoading === `${bug._id}-In Testing` ? (<><div style={{width:'14px',height:'14px',border:'2px solid rgba(255,255,255,0.3)',borderTop:'2px solid #fff',borderRadius:'50%',animation:'spin 1s linear infinite'}} />Processing...</>) : '🧪 Ready for Testing'}
                         </button>
                       )}
 
@@ -260,24 +270,30 @@ export const Bug = () => {
                         <div style={{ display: 'flex', gap: '8px' }}>
                           <button
                             onClick={() => updateBugStatus(bug._id, "Resolved")}
+                            disabled={!!actionLoading}
                             style={{
                               ...btnBaseStyle,
                               background: 'linear-gradient(135deg, #047857, #10b981)',
                               color: '#fff', border: '1px solid rgba(16, 185, 129, 0.3)',
                               boxShadow: '0 4px 16px rgba(16, 185, 129, 0.25)',
+                              opacity: actionLoading === `${bug._id}-Resolved` ? 0.6 : 1,
+                              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px',
                             }}
                           >
-                            ✅ Resolve
+                            {actionLoading === `${bug._id}-Resolved` ? (<><div style={{width:'12px',height:'12px',border:'2px solid rgba(255,255,255,0.3)',borderTop:'2px solid #fff',borderRadius:'50%',animation:'spin 1s linear infinite'}} />...</>) : '✅ Resolve'}
                           </button>
                           <button
                             onClick={() => updateBugStatus(bug._id, "Re-Open")}
+                            disabled={!!actionLoading}
                             style={{
                               ...btnBaseStyle,
                               background: 'rgba(255,255,255,0.04)',
                               color: '#fb923c', border: '1px solid rgba(255,255,255,0.08)',
+                              opacity: actionLoading === `${bug._id}-Re-Open` ? 0.6 : 1,
+                              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px',
                             }}
                           >
-                            🔄 Re-Open
+                            {actionLoading === `${bug._id}-Re-Open` ? (<><div style={{width:'12px',height:'12px',border:'2px solid rgba(249,115,22,0.3)',borderTop:'2px solid #fb923c',borderRadius:'50%',animation:'spin 1s linear infinite'}} />...</>) : '🔄 Re-Open'}
                           </button>
                         </div>
                       )}
@@ -287,24 +303,30 @@ export const Bug = () => {
                         <div style={{ display: 'flex', gap: '8px' }}>
                           <button
                             onClick={() => updateBugStatus(bug._id, "Closed")}
+                            disabled={!!actionLoading}
                             style={{
                               ...btnBaseStyle,
                               background: 'linear-gradient(135deg, #be123c, #ef4444)',
                               color: '#fff', border: '1px solid rgba(239, 68, 68, 0.3)',
                               boxShadow: '0 4px 16px rgba(239, 68, 68, 0.25)',
+                              opacity: actionLoading === `${bug._id}-Closed` ? 0.6 : 1,
+                              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px',
                             }}
                           >
-                            🔒 Close Bug
+                            {actionLoading === `${bug._id}-Closed` ? (<><div style={{width:'12px',height:'12px',border:'2px solid rgba(255,255,255,0.3)',borderTop:'2px solid #fff',borderRadius:'50%',animation:'spin 1s linear infinite'}} />...</>) : '🔒 Close Bug'}
                           </button>
                           <button
                             onClick={() => updateBugStatus(bug._id, "Re-Open")}
+                            disabled={!!actionLoading}
                             style={{
                               ...btnBaseStyle,
                               background: 'rgba(255,255,255,0.04)',
                               color: '#fb923c', border: '1px solid rgba(255,255,255,0.08)',
+                              opacity: actionLoading === `${bug._id}-Re-Open` ? 0.6 : 1,
+                              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px',
                             }}
                           >
-                            🔄 Re-Open
+                            {actionLoading === `${bug._id}-Re-Open` ? (<><div style={{width:'12px',height:'12px',border:'2px solid rgba(249,115,22,0.3)',borderTop:'2px solid #fb923c',borderRadius:'50%',animation:'spin 1s linear infinite'}} />...</>) : '🔄 Re-Open'}
                           </button>
                         </div>
                       )}

@@ -10,6 +10,7 @@ export const TesterTask = () => {
 
   const [issues, setIssues] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState(null);
 
   const getData = async () => {
     try {
@@ -22,13 +23,13 @@ export const TesterTask = () => {
 
   const updateStatus = async (issueId, newStatus) => {
     try {
-      setLoading(true);
+      setActionLoading(`${issueId}-${newStatus}`);
       await axios.put(`/issue/update/${issueId}`, { status: newStatus });
       getData();
     } catch (err) {
       console.log(err);
     } finally {
-      setLoading(false);
+      setActionLoading(null);
     }
   };
 
@@ -183,12 +184,13 @@ export const TesterTask = () => {
                                 background: 'linear-gradient(135deg, #047857, #10b981)',
                                 color: '#fff', border: '1px solid rgba(16, 185, 129, 0.3)',
                                 boxShadow: '0 4px 16px rgba(16, 185, 129, 0.25)',
-                                opacity: loading ? 0.5 : 1,
+                                opacity: actionLoading === `${issue._id}-Resolved` ? 0.6 : 1,
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px',
                               }}
                               onClick={() => updateStatus(issue._id, "Resolved")}
-                              disabled={loading}
+                              disabled={!!actionLoading}
                             >
-                              Resolve
+                              {actionLoading === `${issue._id}-Resolved` ? (<><div style={{width:'12px',height:'12px',border:'2px solid rgba(255,255,255,0.3)',borderTop:'2px solid #fff',borderRadius:'50%',animation:'spin 1s linear infinite'}} />...</>) : 'Resolve'}
                             </button>
                             <button
                               style={{
@@ -196,12 +198,13 @@ export const TesterTask = () => {
                                 background: 'linear-gradient(135deg, #be123c, #ef4444)',
                                 color: '#fff', border: '1px solid rgba(239, 68, 68, 0.3)',
                                 boxShadow: '0 4px 16px rgba(239, 68, 68, 0.25)',
-                                opacity: loading ? 0.5 : 1,
+                                opacity: actionLoading === `${issue._id}-Closed` ? 0.6 : 1,
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px',
                               }}
                               onClick={() => updateStatus(issue._id, "Closed")}
-                              disabled={loading}
+                              disabled={!!actionLoading}
                             >
-                              Close
+                              {actionLoading === `${issue._id}-Closed` ? (<><div style={{width:'12px',height:'12px',border:'2px solid rgba(255,255,255,0.3)',borderTop:'2px solid #fff',borderRadius:'50%',animation:'spin 1s linear infinite'}} />...</>) : 'Close'}
                             </button>
                           </div>
                           <button
@@ -225,12 +228,13 @@ export const TesterTask = () => {
                             background: 'linear-gradient(135deg, #4338ca, #7c3aed)',
                             color: '#fff', border: '1px solid rgba(124, 58, 237, 0.3)',
                             boxShadow: '0 4px 16px rgba(124, 58, 237, 0.25)',
-                            opacity: loading ? 0.5 : 1,
+                            opacity: actionLoading === `${issue._id}-Re-Open` ? 0.6 : 1,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px',
                           }}
                           onClick={() => updateStatus(issue._id, "Re-Open")}
-                          disabled={loading}
+                          disabled={!!actionLoading}
                         >
-                          🔄 Re-Open
+                          {actionLoading === `${issue._id}-Re-Open` ? (<><div style={{width:'12px',height:'12px',border:'2px solid rgba(255,255,255,0.3)',borderTop:'2px solid #fff',borderRadius:'50%',animation:'spin 1s linear infinite'}} />Processing...</>) : '🔄 Re-Open'}
                         </button>
                       )}
 

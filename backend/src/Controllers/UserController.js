@@ -104,7 +104,7 @@ const loginUser = async (req, resp) => {
 
         // 🔐 Secure JWT
         const token = jwt.sign(
-            { id: foundUserFromEmail._id, role: foundUserFromEmail.role },
+            { id: foundUserFromEmail._id, role: foundUserFromEmail.role, name: foundUserFromEmail.name },
             secret,
             { expiresIn: "1d" }
         )

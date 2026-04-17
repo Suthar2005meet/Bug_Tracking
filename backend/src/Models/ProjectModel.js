@@ -42,13 +42,6 @@
             require : true
         },
 
-        members : [
-            {
-                type : mongoose.Schema.Types.ObjectId,
-                ref : "users"
-            }
-        ],
-
         inTesting : {
             type : Boolean,
             default : false

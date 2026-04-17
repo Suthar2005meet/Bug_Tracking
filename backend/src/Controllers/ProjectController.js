@@ -52,7 +52,7 @@ const sendNotification = async ({
 const getAllProject = async (req, resp) => {
   try {
     const allProject = await ProjectSchema.find()
-      .populate("createdBy members")
+      .populate("createdBy")
       .sort({ createdAt: -1 });
 
     resp.json({
@@ -200,7 +200,7 @@ const getProjectsByUser = async (req, res) => {
 
     const projects = await ProjectSchema.find({
       createdBy: id,
-    }).populate("members");
+    })
 
     res.status(200).json({
       success: true,

@@ -30,7 +30,7 @@ const getDevTesterUsers = async (req, res) => {
   try {
     const users = await User.find({
       role: { $in: ["Developer", "Tester"] }
-    }).select("name email role");
+    }).select("name email role image");
 
     res.status(200).json({
       success: true,
@@ -165,10 +165,12 @@ const addOrUpdateTeam = async (req, res) => {
         users
       });
     } else {
-      // Update team
       team.users = users;
       await team.save();
     }
+
+    // Populate the newly added/updated team members
+    await team.populate("users", "name email role image");
 
     res.status(200).json({
       success: true,

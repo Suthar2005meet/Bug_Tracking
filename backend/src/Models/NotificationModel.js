@@ -51,7 +51,7 @@
 
         task: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "issues",
+        ref: "issue",
         },
 
         sprint: {
