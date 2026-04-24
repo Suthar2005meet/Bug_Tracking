@@ -333,12 +333,14 @@ export const Bug = () => {
 
                       {/* Comment + History */}
                       <div style={{ display: 'flex', gap: '8px' }}>
-                        <Link
-                          to={`addcomment/${bug._id}`}
-                          style={{ ...btnSprintStyle, ...btnBaseStyle, display: 'block', fontSize: '10px' }}
-                        >
-                          + Comment
-                        </Link>
+                        {!( (isDeveloper || isTester) && bug.status === "Closed") && (
+                          <Link
+                            to={`addcomment/${bug._id}`}
+                            style={{ ...btnSprintStyle, ...btnBaseStyle, display: 'block', fontSize: '10px' }}
+                          >
+                            + Comment
+                          </Link>
+                        )}
                         <Link
                           to={`allcomment/${bug._id}`}
                           style={{

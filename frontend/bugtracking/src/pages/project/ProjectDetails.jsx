@@ -176,14 +176,14 @@ export const ProjectDetails = () => {
           transition={{ delay: 0.4 }}
           className="glass p-8 h-fit lg:sticky lg:top-24"
         >
-          <div className="flex items-center justify-between mb-8">
+          {/* <div className="flex items-center justify-between mb-8">
             <h3 className="flex items-center gap-2 text-[11px] font-black text-white/40 uppercase tracking-[0.2em]">
               <FiUsers className="text-violet-400" /> Crew List
             </h3>
             <span className="bg-violet-500/10 text-violet-400 text-[10px] font-black px-2 py-0.5 rounded-md">
               {project.members?.length || 0} Total
             </span>
-          </div>
+          </div> */}
 
           {/* <div className="space-y-4">
             {project.members && project.members.length > 0 ? (

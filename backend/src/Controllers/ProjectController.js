@@ -118,8 +118,7 @@ const createProject = async (req, resp) => {
 const getProjectById = async (req, resp) => {
   try {
     const res = await ProjectSchema.findById(req.params.id).populate([
-      { path: "createdBy" },
-      { path: "members" },
+      { path: "createdBy" }
     ]);
 
     resp.json({

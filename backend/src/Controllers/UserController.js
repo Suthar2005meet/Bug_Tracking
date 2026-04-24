@@ -271,14 +271,32 @@ const forgotPassword = async (req, resp) => {
     const token = jwt.sign(
         { id: foundUserFromEmail._id },
         secret,
-        { expiresIn: "10m" }
+        { expiresIn: "15m" }
     )
 
     await mailSend(foundUserFromEmail.email, "Reset Password Link", "forgetPassword.html", token)
 
-    resp.status(200).json({
+    resp.status(201).json({
         message: "Mail sent successfully"
     })
+}
+
+// ======================== VERIFY RESET TOKEN ========================
+const verifyResetToken = async (req, resp) => {
+    const { token } = req.params
+
+    try {
+        jwt.verify(token, secret)
+        resp.status(200).json({
+            success: true,
+            message: "Token is valid"
+        })
+    } catch (err) {
+        resp.status(401).json({
+            success: false,
+            message: "Invalid or expired token"
+        })
+    }
 }
 
 
@@ -361,6 +379,7 @@ module.exports = {
     getUserById,
     updateUser,
     forgotPassword,
+    verifyResetToken,
     resetPassword,
     getUserByRole
 }
